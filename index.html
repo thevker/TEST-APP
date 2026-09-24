@@ -24,12 +24,12 @@
 
   /* ===== 計算機頁面 ===== */
   #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-  .container { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-  h2 { text-align: center; margin-bottom: 5px; color: #1a1a1a; font-size: 20px; }
-  .subtitle { text-align: center; font-size: 13px; color: #888; margin: 3px 0; }
-
-  /* ===== 歷史數據面板 ===== */
-  .stats-panel { width: 100%; max-width: 400px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+  
+  /* 深色卡片通用樣式 */
+  .dark-card { width: 100%; max-width: 400px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+  
+  /* 歷史數據面板 */
+  .stats-panel { margin-bottom: 20px; }
   .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: #a0c4ff; letter-spacing: 1px; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .stat-item { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center; }
@@ -39,22 +39,28 @@
   .stat-item .value.negative { color: #f87171; }
   .stat-item .value.neutral { color: #fbbf24; }
   .stats-note { text-align: center; font-size: 11px; color: #6b7f9e; margin-top: 12px; }
+  .stats-note.date-note { margin-top: 5px; color: #a0c4ff; }
   .stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
   .stats-link:hover { color: #93c5fd; text-decoration: underline; }
 
-  /* ===== 輸入框 ===== */
+  /* 輸入框（深色版） */
+  .container h2 { text-align: center; margin-bottom: 5px; color: #fff; font-size: 20px; }
+  .container .subtitle { text-align: center; font-size: 13px; color: #8db4e2; margin: 3px 0; }
   .input-group { margin-bottom: 15px; }
-  label { display: block; font-size: 14px; margin-bottom: 5px; color: #555; }
-  input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.3s; }
-  input:focus { border-color: #007aff; }
-  #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+  .container label { display: block; font-size: 14px; margin-bottom: 5px; color: #a0c4ff; }
+  .container input { width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none; transition: border 0.3s; }
+  .container input::placeholder { color: rgba(255,255,255,0.4); }
+  .container input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
+  #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
   #calcBtn:hover { background: #0062cc; }
+
+  /* 結果框（深色版） */
   .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
-  .result-H { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-  .result-A { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-  .result-D { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
-  .result-skip { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
-  .result-error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+  .result-H { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+  .result-A { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.4); }
+  .result-D { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
+  .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
+  .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
 </style>
 </head>
 <body>
@@ -126,28 +132,33 @@
 <div id="calcPage">
 
   <!-- 歷史數據面板 -->
-  <div class="stats-panel">
+  <div class="dark-card stats-panel">
     <h3>📊 歷史數據統計</h3>
     <div class="stats-grid">
+      <!-- 第一行：左（總盈虧）、右（命中數） -->
       <div class="stat-item">
         <div class="label">總盈虧</div>
         <div class="value neutral" id="stat-pnl">—</div>
       </div>
       <div class="stat-item">
+        <div class="label">命中數</div>
+        <div class="value" id="stat-wins">—</div>
+      </div>
+      
+      <!-- 第二行：左（總成本）、右（出手數） -->
+      <div class="stat-item">
         <div class="label">總成本</div>
         <div class="value" id="stat-cost">—</div>
-      </div>
-      <div class="stat-item">
-        <div class="label">盈虧率 (ROI)</div>
-        <div class="value" id="stat-roi">—</div>
       </div>
       <div class="stat-item">
         <div class="label">出手數</div>
         <div class="value" id="stat-bets">—</div>
       </div>
+      
+      <!-- 第三行：左（盈虧率）、右（命中率） -->
       <div class="stat-item">
-        <div class="label">命中數</div>
-        <div class="value" id="stat-wins">—</div>
+        <div class="label">盈虧率 (ROI)</div>
+        <div class="value" id="stat-roi">—</div>
       </div>
       <div class="stat-item">
         <div class="label">命中率</div>
@@ -155,11 +166,12 @@
       </div>
     </div>
     <div class="stats-note">※ 每注固定 $100，所有數據實時同步</div>
+    <div class="stats-note date-note">📅 資料庫更新日期：<span id="stat-update-date">—</span></div>
     <a class="stats-link" href="https://docs.google.com/spreadsheets/d/1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM/edit?usp=drivesdk" target="_blank">📋 查看詳細賽果 →</a>
   </div>
 
   <!-- 計算機 -->
-  <div class="container">
+  <div class="dark-card container">
     <h2>⚽ 智能量化預測系統</h2>
     <p class="subtitle">勝率數據建議使用 FootballForecastAI 勝率</p>
     <p class="subtitle">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
@@ -226,21 +238,46 @@ function fetchCell(range) {
     .then(text => {
       const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
       const cell = json.table.rows[0]?.c[0];
-      return cell ? cell.v : null;
+      // 優先使用格式化後的字串 (f)，沒有才用原始值 (v)
+      return cell ? (cell.f !== undefined ? cell.f : cell.v) : null;
     });
+}
+
+// 通用百分比格式化函數
+function formatPercent(value, needPlusSign) {
+    if (value === null || value === undefined || value === '') return '—';
+    let strVal = String(value).trim();
+    let numVal;
+    
+    if (strVal.includes('%')) {
+        // 例如 "29.98%" -> 29.98
+        numVal = parseFloat(strVal.replace('%', ''));
+    } else {
+        // 如果沒有 %，可能是 0.2998 或 29.98
+        numVal = parseFloat(strVal);
+        // 如果是小數（絕對值 <= 1 且不等於 0），乘以 100 轉為百分比
+        if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) {
+            numVal = numVal * 100;
+        }
+    }
+    
+    if (isNaN(numVal)) return '—';
+    
+    let sign = (numVal > 0 && needPlusSign) ? '+' : '';
+    return sign + numVal.toFixed(2) + '%';
 }
 
 function loadStats() {
   // L7 = 總盈虧
   fetchCell('L7').then(v => {
     if (v === null || v === undefined) { document.getElementById('stat-pnl').textContent = '—'; return; }
-    const num = Number(v);
+    const num = Number(String(v).replace(/,/g, '')); // 去掉千分位逗號
     const el = document.getElementById('stat-pnl');
     if (num > 0) {
-      el.textContent = '+' + num;
+      el.textContent = '+' + v;
       el.className = 'value positive';
     } else if (num < 0) {
-      el.textContent = num;
+      el.textContent = v;
       el.className = 'value negative';
     } else {
       el.textContent = '0';
@@ -255,12 +292,7 @@ function loadStats() {
 
   // L9 = 盈虧率
   fetchCell('L9').then(v => {
-    if (v === null || v === undefined) { document.getElementById('stat-roi').textContent = '—'; return; }
-    const el = document.getElementById('stat-roi');
-    const num = Number(v);
-    if (num > 0) { el.textContent = '+' + (num * 100).toFixed(2) + '%'; el.className = 'value positive'; }
-    else if (num < 0) { el.textContent = (num * 100).toFixed(2) + '%'; el.className = 'value negative'; }
-    else { el.textContent = '0%'; el.className = 'value neutral'; }
+    document.getElementById('stat-roi').textContent = formatPercent(v, true);
   }).catch(() => document.getElementById('stat-roi').textContent = '—');
 
   // L10 = 出手數
@@ -275,10 +307,13 @@ function loadStats() {
 
   // L12 = 命中率
   fetchCell('L12').then(v => {
-    if (v === null || v === undefined) { document.getElementById('stat-hitrate').textContent = '—'; return; }
-    const num = Number(v);
-    document.getElementById('stat-hitrate').textContent = num <= 1 ? (num * 100).toFixed(1) + '%' : num + '%';
+    document.getElementById('stat-hitrate').textContent = formatPercent(v, false);
   }).catch(() => document.getElementById('stat-hitrate').textContent = '—');
+
+  // M2 = 資料庫更新日期
+  fetchCell('M2').then(v => {
+    document.getElementById('stat-update-date').textContent = v !== null ? v : '—';
+  }).catch(() => document.getElementById('stat-update-date').textContent = '—');
 }
 
 // 每 15 秒自動更新一次
@@ -314,10 +349,6 @@ function calculate() {
       showResult("⚠️ 命中率大於100%", "result-error");
       return;
   }
-
-  let ho_f = ho / 100;
-  let do_f = doo / 100;
-  let ao_f = ao / 100;
 
   let bet = "skip";
 
