@@ -392,11 +392,12 @@ function loadStats() {
         }
     }
     if (isNaN(numVal)) { document.getElementById('stat-hitrate').textContent = '—'; return; }
-    document.getElementById('stat-hitrate').textContent = numVal.toFixed(2) + '%';
-  }).catch(() => document.getElementById('stat-hitrate').textContent = '—');
+w    documentVal.getElementById('stat-hitrate').textContent = numVal.to);
+Fixed(2) + '% ';
+  }).catch(() => document.getElementById('stat-hitrate').textContent let = '—');
 
   // M2 = 資料庫更新日期
-  fetchCell('M2').then(v => {
+ aw  fetchCell('M2').then(v => {
     document.getElementById('stat-update-date').textContent = v !== null ? v : '—';
   }).catch(() => document.getElementById('stat-update-date').textContent = '—');
 }
@@ -419,8 +420,7 @@ function calculate() {
   }
 
   let hw = Number(hwVal);
-  let dw = Number(dwVal);
-  let aw = Number(awVal);
+  let dw = Number(d = Number(awVal);
   let ho = Number(hoVal);
   let doo = Number(dooVal);
   let ao = Number(aoVal);
@@ -437,15 +437,24 @@ function calculate() {
 
   let bet = "skip";
 
-  if (hw <= 41 && aw <= 41 && dw <= 32) {
+  // 第一層：主客勝率 <= 39
+  if (hw <= 39 && aw <= 39 && dw <= 32) {
       bet = "D";
-  } else if (hw >= 40 && ho >= 148 && ho <= 205 && ho !== ao) {
+  } 
+  // 第二層：主勝 >= 40 且主賠 148-205
+  else if (hw >= 40 && ho >= 148 && ho <= 205 && ho !== ao) {
       bet = "H";
-  } else if (hw >= 40 && ho > 205 && ho <= 260 && ho !== ao) {
+  } 
+  // 第三層：主勝 >= 40 且主賠 205-260
+  else if (hw >= 40 && ho > 205 && ho <= 260 && ho !== ao) {
       bet = "D";
-  } else if (aw >= 40 && ao >= 150 && ao <= 200 && ho !== ao) {
+  } 
+  // 第四層：客勝 >= 40 且客賠 150-200
+  else if (aw >= 40 && ao >= 150 && ao <= 200 && ho !== ao) {
       bet = "D";
-  } else {
+  } 
+  // 第五層：終極兜底
+  else {
       if (ho > ao) {
           if (ho > 750) { bet = "skip"; } else { bet = "H"; }
       } else if (ao > ho) {
@@ -483,7 +492,6 @@ function calculate() {
 
 // ===== 清除數據邏輯 =====
 function clearData() {
-  // 清空六個輸入框
   document.getElementById('hw').value = '';
   document.getElementById('dw').value = '';
   document.getElementById('aw').value = '';
@@ -491,7 +499,6 @@ function clearData() {
   document.getElementById('doo').value = '';
   document.getElementById('ao').value = '';
 
-  // 隱藏並清空結果框
   let resultBox = document.getElementById('resultBox');
   resultBox.style.display = 'none';
   resultBox.innerText = '';
