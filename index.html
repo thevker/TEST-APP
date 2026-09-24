@@ -94,8 +94,14 @@
   .container input { width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none; transition: border 0.3s; }
   .container input::placeholder { color: rgba(255,255,255,0.4); }
   .container input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
+  
+  /* 計算結果按鈕 */
   #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
   #calcBtn:hover { background: #0062cc; }
+
+  /* 清除數據按鈕（紅色） */
+  #clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
+  #clearBtn:hover { background: #dc2626; }
 
   /* 結果框（深色版） */
   .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
@@ -250,6 +256,7 @@
     </div>
 
     <button id="calcBtn" onclick="calculate()">計算結果</button>
+    <button id="clearBtn" onclick="clearData()">清除數據</button>
 
     <div id="resultBox" class="result-box"></div>
   </div>
@@ -292,7 +299,6 @@ function fetchCell(range) {
     .then(text => {
       const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
       const cell = json.table.rows[0]?.c[0];
-      // 優先使用格式化後的字串 (f)，沒有才用原始值 (v)
       return cell ? (cell.f !== undefined ? cell.f : cell.v) : null;
     });
 }
@@ -320,7 +326,7 @@ function loadStats() {
     document.getElementById('stat-cost').textContent = v !== null ? v : '—';
   }).catch(() => document.getElementById('stat-cost').textContent = '—');
 
-  // L9 = 盈虧率（修改此處以套用顏色）
+  // L9 = 盈虧率
   fetchCell('L9').then(v => {
     const el = document.getElementById('stat-roi');
     if (v === null || v === undefined || v === '') {
@@ -349,7 +355,6 @@ function loadStats() {
     let sign = (numVal > 0) ? '+' : '';
     el.textContent = sign + numVal.toFixed(2) + '%';
 
-    // 根據正負套用顏色
     if (numVal > 0) {
       el.className = 'value positive';
     } else if (numVal < 0) {
@@ -474,6 +479,23 @@ function calculate() {
   }
 
   showResult(text, className);
+}
+
+// ===== 清除數據邏輯 =====
+function clearData() {
+  // 清空六個輸入框
+  document.getElementById('hw').value = '';
+  document.getElementById('dw').value = '';
+  document.getElementById('aw').value = '';
+  document.getElementById('ho').value = '';
+  document.getElementById('doo').value = '';
+  document.getElementById('ao').value = '';
+
+  // 隱藏並清空結果框
+  let resultBox = document.getElementById('resultBox');
+  resultBox.style.display = 'none';
+  resultBox.innerText = '';
+  resultBox.className = 'result-box';
 }
 
 function showResult(text, className) {
