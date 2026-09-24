@@ -104,6 +104,11 @@
   .result-D { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
   .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
   .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+
+  /* WhatsApp 底部連結 */
+  .whatsapp-footer { text-align: center; margin-top: 25px; padding-bottom: 20px; }
+  .whatsapp-footer a { color: #25D366; font-size: 16px; font-weight: bold; text-decoration: none; transition: color 0.3s; }
+  .whatsapp-footer a:hover { color: #128C7E; text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -248,6 +253,12 @@
 
     <div id="resultBox" class="result-box"></div>
   </div>
+
+  <!-- 底部 WhatsApp 群組連結 -->
+  <div class="whatsapp-footer">
+    <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank">📱 加入WhatsApp群組</a>
+  </div>
+
 </div>
 
 <script>
@@ -286,35 +297,11 @@ function fetchCell(range) {
     });
 }
 
-// 通用百分比格式化函數
-function formatPercent(value, needPlusSign) {
-    if (value === null || value === undefined || value === '') return '—';
-    let strVal = String(value).trim();
-    let numVal;
-    
-    if (strVal.includes('%')) {
-        // 例如 "29.98%" -> 29.98
-        numVal = parseFloat(strVal.replace('%', ''));
-    } else {
-        // 如果沒有 %，可能是 0.2998 或 29.98
-        numVal = parseFloat(strVal);
-        // 如果是小數（絕對值 <= 1 且不等於 0），乘以 100 轉為百分比
-        if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) {
-            numVal = numVal * 100;
-        }
-    }
-    
-    if (isNaN(numVal)) return '—';
-    
-    let sign = (numVal > 0 && needPlusSign) ? '+' : '';
-    return sign + numVal.toFixed(2) + '%';
-}
-
 function loadStats() {
   // L7 = 總盈虧
   fetchCell('L7').then(v => {
     if (v === null || v === undefined) { document.getElementById('stat-pnl').textContent = '—'; return; }
-    const num = Number(String(v).replace(/,/g, '')); // 去掉千分位逗號
+    const num = Number(String(v).replace(/,/g, '')); 
     const el = document.getElementById('stat-pnl');
     if (num > 0) {
       el.textContent = '+' + v;
@@ -333,10 +320,48 @@ function loadStats() {
     document.getElementById('stat-cost').textContent = v !== null ? v : '—';
   }).catch(() => document.getElementById('stat-cost').textContent = '—');
 
-  // L9 = 盈虧率
+  // L9 = 盈虧率（修改此處以套用顏色）
   fetchCell('L9').then(v => {
-    document.getElementById('stat-roi').textContent = formatPercent(v, true);
-  }).catch(() => document.getElementById('stat-roi').textContent = '—');
+    const el = document.getElementById('stat-roi');
+    if (v === null || v === undefined || v === '') {
+        el.textContent = '—';
+        el.className = 'value';
+        return;
+    }
+    let strVal = String(v).trim();
+    let numVal;
+    
+    if (strVal.includes('%')) {
+        numVal = parseFloat(strVal.replace('%', ''));
+    } else {
+        numVal = parseFloat(strVal);
+        if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) {
+            numVal = numVal * 100;
+        }
+    }
+    
+    if (isNaN(numVal)) {
+        el.textContent = '—';
+        el.className = 'value';
+        return;
+    }
+
+    let sign = (numVal > 0) ? '+' : '';
+    el.textContent = sign + numVal.toFixed(2) + '%';
+
+    // 根據正負套用顏色
+    if (numVal > 0) {
+      el.className = 'value positive';
+    } else if (numVal < 0) {
+      el.className = 'value negative';
+    } else {
+      el.className = 'value neutral';
+    }
+  }).catch(() => {
+    const el = document.getElementById('stat-roi');
+    el.textContent = '—';
+    el.className = 'value';
+  });
 
   // L10 = 出手數
   fetchCell('L10').then(v => {
@@ -350,7 +375,19 @@ function loadStats() {
 
   // L12 = 命中率
   fetchCell('L12').then(v => {
-    document.getElementById('stat-hitrate').textContent = formatPercent(v, false);
+    if (v === null || v === undefined || v === '') { document.getElementById('stat-hitrate').textContent = '—'; return; }
+    let strVal = String(v).trim();
+    let numVal;
+    if (strVal.includes('%')) {
+        numVal = parseFloat(strVal.replace('%', ''));
+    } else {
+        numVal = parseFloat(strVal);
+        if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) {
+            numVal = numVal * 100;
+        }
+    }
+    if (isNaN(numVal)) { document.getElementById('stat-hitrate').textContent = '—'; return; }
+    document.getElementById('stat-hitrate').textContent = numVal.toFixed(2) + '%';
   }).catch(() => document.getElementById('stat-hitrate').textContent = '—');
 
   // M2 = 資料庫更新日期
