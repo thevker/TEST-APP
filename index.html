@@ -6,10 +6,9 @@
 <title>智能量化足球預測系統 ver 1.0</title>
 <style>
   * { box-sizing: border-box; }
-  /* 網頁底部改為深灰色 */
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #333; margin: 0; padding: 0; min-height: 100vh; }
 
-  /* ===== 守則頁面（深色卡片風格） ===== */
+  /* ===== 守則頁面 ===== */
   #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
   .terms-container { 
     background: linear-gradient(135deg, #1a1a2e, #16213e); 
@@ -41,7 +40,6 @@
   .terms-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
   .terms-scroll::-webkit-scrollbar-thumb:hover { background: #777; }
   
-  /* 同意按鈕（深色版） */
   #agreeBtn { 
     width: 100%; 
     padding: 15px; 
@@ -59,8 +57,6 @@
 
   /* ===== 計算機頁面 ===== */
   #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-  
-  /* 深色卡片通用樣式 */
   .dark-card { 
     width: 100%; 
     max-width: 400px; 
@@ -70,8 +66,6 @@
     padding: 25px; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
   }
-  
-  /* 歷史數據面板 */
   .stats-panel { margin-bottom: 20px; }
   .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: #a0c4ff; letter-spacing: 1px; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -86,7 +80,6 @@
   .stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
   .stats-link:hover { color: #93c5fd; text-decoration: underline; }
 
-  /* 輸入框（深色版） */
   .container h2 { text-align: center; margin-bottom: 5px; color: #fff; font-size: 20px; }
   .container .subtitle { text-align: center; font-size: 13px; color: #8db4e2; margin: 3px 0; }
   .input-group { margin-bottom: 15px; }
@@ -94,16 +87,11 @@
   .container input { width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none; transition: border 0.3s; }
   .container input::placeholder { color: rgba(255,255,255,0.4); }
   .container input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
-  
-  /* 計算結果按鈕 */
   #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
   #calcBtn:hover { background: #0062cc; }
-
-  /* 清除數據按鈕（紅色） */
   #clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
   #clearBtn:hover { background: #dc2626; }
 
-  /* 結果框（深色版） */
   .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
   .result-H { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
   .result-A { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.4); }
@@ -111,7 +99,6 @@
   .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
   .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
 
-  /* WhatsApp 底部連結 */
   .whatsapp-footer { text-align: center; margin-top: 25px; padding-bottom: 20px; }
   .whatsapp-footer a { color: #25D366; font-size: 16px; font-weight: bold; text-decoration: none; transition: color 0.3s; }
   .whatsapp-footer a:hover { color: #128C7E; text-decoration: underline; }
@@ -189,7 +176,6 @@
   <div class="dark-card stats-panel">
     <h3>📊 歷史數據統計</h3>
     <div class="stats-grid">
-      <!-- 第一行：左（總盈虧）、右（命中數） -->
       <div class="stat-item">
         <div class="label">總盈虧</div>
         <div class="value neutral" id="stat-pnl">—</div>
@@ -198,8 +184,6 @@
         <div class="label">命中數</div>
         <div class="value" id="stat-wins">—</div>
       </div>
-      
-      <!-- 第二行：左（總成本）、右（出手數） -->
       <div class="stat-item">
         <div class="label">總成本</div>
         <div class="value" id="stat-cost">—</div>
@@ -208,8 +192,6 @@
         <div class="label">出手數</div>
         <div class="value" id="stat-bets">—</div>
       </div>
-      
-      <!-- 第三行：左（盈虧率）、右（命中率） -->
       <div class="stat-item">
         <div class="label">盈虧率 (ROI)</div>
         <div class="value" id="stat-roi">—</div>
@@ -269,28 +251,34 @@
 </div>
 
 <script>
-// ===== 守則滾動邏輯 =====
+// ===== 守則滾動邏輯（已修復）=====
 const termsScroll = document.getElementById('termsScroll');
 const agreeBtn = document.getElementById('agreeBtn');
 
-termsScroll.addEventListener('scroll', function() {
-  const reachedBottom = termsScroll.scrollTop + termsScroll.clientHeight >= termsScroll.scrollHeight - 5;
+function checkScroll() {
+  // 增大容差至 20px，避免因取整誤差無法觸發
+  const reachedBottom = termsScroll.scrollTop + termsScroll.clientHeight >= termsScroll.scrollHeight - 20;
   if (reachedBottom) {
     agreeBtn.disabled = false;
     agreeBtn.classList.add('active');
     agreeBtn.textContent = '✅ 我已閱讀並同意，進入系統';
   }
-});
+}
+
+termsScroll.addEventListener('scroll', checkScroll);
+window.addEventListener('resize', checkScroll);
+// 頁面載入後延遲檢查一次，若內容不足則直接啟用
+setTimeout(checkScroll, 200);
 
 agreeBtn.addEventListener('click', function() {
   document.getElementById('termsPage').style.display = 'none';
   document.getElementById('calcPage').style.display = 'flex';
-  loadStats(); // 進入後才載入數據
+  loadStats();
 });
 
 // ===== 讀取 Google Sheets 統計數據 =====
 const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
-const SHEET_NAME = '工作表1'; // ← 如果你的工作表名稱不同，請在這裡修改
+const SHEET_NAME = '工作表1'; // 若你的工作表名稱不同，請修改此處
 
 function fetchCell(range) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}&range=${range}&t=${Date.now()}`;
@@ -392,12 +380,11 @@ function loadStats() {
         }
     }
     if (isNaN(numVal)) { document.getElementById('stat-hitrate').textContent = '—'; return; }
-w    documentVal.getElementById('stat-hitrate').textContent = numVal.to);
-Fixed(2) + '% ';
-  }).catch(() => document.getElementById('stat-hitrate').textContent let = '—');
+    document.getElementById('stat-hitrate').textContent = numVal.toFixed(2) + '%';
+  }).catch(() => document.getElementById('stat-hitrate').textContent = '—');
 
   // M2 = 資料庫更新日期
- aw  fetchCell('M2').then(v => {
+  fetchCell('M2').then(v => {
     document.getElementById('stat-update-date').textContent = v !== null ? v : '—';
   }).catch(() => document.getElementById('stat-update-date').textContent = '—');
 }
@@ -420,7 +407,8 @@ function calculate() {
   }
 
   let hw = Number(hwVal);
-  let dw = Number(d = Number(awVal);
+  let dw = Number(dwVal);
+  let aw = Number(awVal);
   let ho = Number(hoVal);
   let doo = Number(dooVal);
   let ao = Number(aoVal);
