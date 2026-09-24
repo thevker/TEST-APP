@@ -1,147 +1,150 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>智能量化足球預測系統 ver 1.0</title>
-<style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-  .container { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-  h2 { text-align: center; margin-bottom: 5px; color: #1a1a1a; font-size: 20px; }
-  .subtitle { text-align: center; font-size: 13px; color: #888; margin: 3px 0; }
-  .input-group { margin-bottom: 15px; }
-  label { display: block; font-size: 14px; margin-bottom: 5px; color: #555; }
-  input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.3s; }
-  input:focus { border-color: #007aff; }
-  button { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-  button:hover { background: #0062cc; }
-  .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
-  .result-H { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-  .result-A { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-  .result-D { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
-  .result-skip { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
-  .result-error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
-</style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>智能量化足球預測系統 ver 1.0</title>
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+		.container { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+		h2 { text-align: center; margin-bottom: 5px; color: #1a1a1a; font-size: 20px; }
+		.subtitle { text-align: center; font-size: 13px; color: #888; margin: 3px 0; }
+		.input-group { margin-bottom: 15px; }
+		label { display: block; font-size: 14px; margin-bottom: 5px; color: #555; }
+		input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.3s; }
+		input:focus { border-color: #007aff; }
+		button { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+		button:hover { background: #0062cc; }
+		.result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
+		.result-H { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+		.result-A { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+		.result-D { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+		.result-skip { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
+		.result-error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+	</style>
 </head>
 <body>
-
-<div class="container">
-  <h2>⚽ 智能量化預測系統</h2>
-  <p class="subtitle">勝率數據建議使用 FootballForecastAI 勝率</p>
-  <p class="subtitle">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
-  
-  <div class="input-group">
-    <label>主勝率 (%)</label>
-    <input type="number" id="hw" placeholder="例如：40">
-  </div>
-  <div class="input-group">
-    <label>和勝率 (%)</label>
-    <input type="number" id="dw" placeholder="例如：30">
-  </div>
-  <div class="input-group">
-    <label>客勝率 (%)</label>
-    <input type="number" id="aw" placeholder="例如：30">
-  </div>
-  <div class="input-group">
-    <label>主賠 (如 158)</label>
-    <input type="number" id="ho" placeholder="例如：158">
-  </div>
-  <div class="input-group">
-    <label>和賠 (如 395)</label>
-    <input type="number" id="doo" placeholder="例如：395">
-  </div>
-  <div class="input-group">
-    <label>客賠 (如 405)</label>
-    <input type="number" id="ao" placeholder="例如：405">
-  </div>
-
-  <button onclick="calculate()">計算結果</button>
-
-  <div id="resultBox" class="result-box"></div>
-</div>
-
-<script>
-function calculate() {
-  let hwVal = document.getElementById('hw').value.trim();
-  let dwVal = document.getElementById('dw').value.trim();
-  let awVal = document.getElementById('aw').value.trim();
-  let hoVal = document.getElementById('ho').value.trim();
-  let dooVal = document.getElementById('doo').value.trim();
-  let aoVal = document.getElementById('ao').value.trim();
-
-  if (hwVal === '' || dwVal === '' || awVal === '' || hoVal === '' || dooVal === '' || aoVal === '') {
-      showResult("⚠️ 數據不完整", "result-error");
-      return;
-  }
-
-  let hw = Number(hwVal);
-  let dw = Number(dwVal);
-  let aw = Number(awVal);
-  let ho = Number(hoVal);
-  let doo = Number(dooVal);
-  let ao = Number(aoVal);
-
-  if (isNaN(hw) || isNaN(dw) || isNaN(aw) || isNaN(ho) || isNaN(doo) || isNaN(ao)) {
-      showResult("⚠️ 數據不完整", "result-error");
-      return;
-  }
-
-  let ho_f = ho / 100;
-  let do_f = doo / 100;
-  let ao_f = ao / 100;
-
-  let bet = "skip";
-
-  if (hw <= 41 && aw <= 41 && dw <= 32) {
-      bet = "D";
-  } else if (hw >= 40 && ho >= 148 && ho <= 205 && ho !== ao) {
-      bet = "H";
-  } else if (hw >= 40 && ho > 205 && ho <= 260 && ho !== ao) {
-      bet = "D";
-  } else if (aw >= 40 && ao >= 150 && ao <= 200 && ho !== ao) {
-      bet = "D";
-  } else {
-      if (ho > ao) {
-          if (ho > 750) { bet = "skip"; } else { bet = "H"; }
-      } else if (ao > ho) {
-          if (ao > 750) { bet = "skip"; } else { bet = "A"; }
-      } else {
-          if (hw > aw) {
-              if (ho > 750) { bet = "skip"; } else { bet = "H"; }
-          } else if (aw > hw) {
-              if (ao > 750) { bet = "skip"; } else { bet = "A"; }
-          } else {
-              bet = "skip";
-          }
-      }
-  }
-
-  let text = "";
-  let className = "";
-
-  if (bet === "H") {
-      text = "✅ 建議出手：買主勝";
-      className = "result-H";
-  } else if (bet === "A") {
-      text = "✅ 建議出手：買客勝";
-      className = "result-A";
-  } else if (bet === "D") {
-      text = "✅ 建議出手：買和局";
-      className = "result-D";
-  } else {
-      text = "⛔ 建議不出手";
-      className = "result-skip";
-  }
-
-  showResult(text, className);
-}
-
-function showResult(text, className) {
-  let resultBox = document.getElementById('resultBox');
-  resultBox.style.display = 'block';
-  resultBox.className = "result-box " + className;
-  resultBox.innerText = text;
-}
-</script>
+	<div class="container">
+		<h2>⚽ 智能量化預測系統</h2>
+		<p class="subtitle">勝率數據建議使用 FootballForecastAI 勝率</p>
+		<p class="subtitle">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
+		<div class="input-group">
+			<label>主勝率 (%)</label>
+			<input type="number" id="hw" placeholder="例如：40">
+		</div>
+		<div class="input-group">
+			<label>和勝率 (%)</label>
+			<input type="number" id="dw" placeholder="例如：30">
+		</div>
+		<div class="input-group">
+			<label>客勝率 (%)</label>
+			<input type="number" id="aw" placeholder="例如：30">
+		</div>
+		<div class="input-group">
+			<label>主賠 (如 158)</label>
+			<input type="number" id="ho" placeholder="例如：158">
+		</div>
+		<div class="input-group">
+			<label>和賠 (如 395)</label>
+			<input type="number" id="doo" placeholder="例如：395">
+		</div>
+		<div class="input-group">
+			<label>客賠 (如 405)</label>
+			<input type="number" id="ao" placeholder="例如：405">
+		</div>
+		<button onclick="calculate()">計算結果</button>
+		<div id="resultBox" class="result-box"></div>
+	</div>
+	<script>
+		function calculate() {
+		  let hwVal = document.getElementById('hw').value.trim();
+		  let dwVal = document.getElementById('dw').value.trim();
+		  let awVal = document.getElementById('aw').value.trim();
+		  let hoVal = document.getElementById('ho').value.trim();
+		  let dooVal = document.getElementById('doo').value.trim();
+		  let aoVal = document.getElementById('ao').value.trim();
+		
+		  // 檢查空值
+		  if (hwVal === '' || dwVal === '' || awVal === '' || hoVal === '' || dooVal === '' || aoVal === '') {
+		      showResult("⚠️ 數據不完整", "result-error");
+		      return;
+		  }
+		
+		  let hw = Number(hwVal);
+		  let dw = Number(dwVal);
+		  let aw = Number(awVal);
+		  let ho = Number(hoVal);
+		  let doo = Number(dooVal);
+		  let ao = Number(aoVal);
+		
+		  // 檢查非數字
+		  if (isNaN(hw) || isNaN(dw) || isNaN(aw) || isNaN(ho) || isNaN(doo) || isNaN(ao)) {
+		      showResult("⚠️ 數據不完整", "result-error");
+		      return;
+		  }
+		
+		  // 檢查三個勝率總和是否大於 100
+		  if (hw + dw + aw > 100) {
+		      showResult("⚠️ 命中率大於100%", "result-error");
+		      return;
+		  }
+		
+		  let ho_f = ho / 100;
+		  let do_f = doo / 100;
+		  let ao_f = ao / 100;
+		
+		  let bet = "skip";
+		
+		  if (hw <= 41 && aw <= 41 && dw <= 32) {
+		      bet = "D";
+		  } else if (hw >= 40 && ho >= 148 && ho <= 205 && ho !== ao) {
+		      bet = "H";
+		  } else if (hw >= 40 && ho > 205 && ho <= 260 && ho !== ao) {
+		      bet = "D";
+		  } else if (aw >= 40 && ao >= 150 && ao <= 200 && ho !== ao) {
+		      bet = "D";
+		  } else {
+		      if (ho > ao) {
+		          if (ho > 750) { bet = "skip"; } else { bet = "H"; }
+		      } else if (ao > ho) {
+		          if (ao > 750) { bet = "skip"; } else { bet = "A"; }
+		      } else {
+		          if (hw > aw) {
+		              if (ho > 750) { bet = "skip"; } else { bet = "H"; }
+		          } else if (aw > hw) {
+		              if (ao > 750) { bet = "skip"; } else { bet = "A"; }
+		          } else {
+		              bet = "skip";
+		          }
+		      }
+		  }
+		
+		  let text = "";
+		  let className = "";
+		
+		  if (bet === "H") {
+		      text = "✅ 建議出手：買主勝";
+		      className = "result-H";
+		  } else if (bet === "A") {
+		      text = "✅ 建議出手：買客勝";
+		      className = "result-A";
+		  } else if (bet === "D") {
+		      text = "✅ 建議出手：買和局";
+		      className = "result-D";
+		  } else {
+		      text = "⛔ 建議不出手";
+		      className = "result-skip";
+		  }
+		
+		  showResult(text, className);
+		}
+		
+		function showResult(text, className) {
+		  let resultBox = document.getElementById('resultBox');
+		  resultBox.style.display = 'block';
+		  resultBox.className = "result-box " + className;
+		  resultBox.innerText = text;
+		}
+	</script>
 </body>
 </html>
