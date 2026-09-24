@@ -6,27 +6,70 @@
 <title>智能量化足球預測系統 ver 1.0</title>
 <style>
   * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 0; min-height: 100vh; }
+  /* 網頁底部改為深灰色 */
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #333; margin: 0; padding: 0; min-height: 100vh; }
 
-  /* ===== 守則頁面 ===== */
+  /* ===== 守則頁面（深色卡片風格） ===== */
   #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-  .terms-container { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; }
-  .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: #1a1a1a; font-size: 20px; }
-  .terms-scroll { overflow-y: auto; flex: 1; padding-right: 10px; margin-bottom: 15px; border: 1px solid #eee; border-radius: 8px; padding: 15px; background: #fafafa; }
-  .terms-scroll h3 { color: #007aff; font-size: 15px; margin: 15px 0 8px 0; }
-  .terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: #444; margin: 5px 0; }
+  .terms-container { 
+    background: linear-gradient(135deg, #1a1a2e, #16213e); 
+    color: #fff; 
+    border-radius: 16px; 
+    padding: 25px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+    width: 100%; 
+    max-width: 500px; 
+    display: flex; 
+    flex-direction: column; 
+    max-height: 90vh; 
+  }
+  .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: #fff; font-size: 20px; }
+  .terms-scroll { 
+    overflow-y: auto; 
+    flex: 1; 
+    padding: 15px; 
+    margin-bottom: 15px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 8px; 
+    background: rgba(255,255,255,0.05); 
+  }
+  .terms-scroll h3 { color: #a0c4ff; font-size: 15px; margin: 15px 0 8px 0; }
+  .terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: #ccc; margin: 5px 0; }
   .terms-scroll ul { padding-left: 20px; margin: 5px 0; }
   .terms-scroll::-webkit-scrollbar { width: 6px; }
-  .terms-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-  #agreeBtn { width: 100%; padding: 15px; background: #ccc; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: not-allowed; transition: background 0.3s; }
-  #agreeBtn.active { background: #007aff; cursor: pointer; }
+  .terms-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+  .terms-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+  .terms-scroll::-webkit-scrollbar-thumb:hover { background: #777; }
+  
+  /* 同意按鈕（深色版） */
+  #agreeBtn { 
+    width: 100%; 
+    padding: 15px; 
+    background: #333; 
+    color: #888; 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 18px; 
+    font-weight: bold; 
+    cursor: not-allowed; 
+    transition: background 0.3s; 
+  }
+  #agreeBtn.active { background: #007aff; color: #fff; cursor: pointer; }
   #agreeBtn.active:hover { background: #0062cc; }
 
   /* ===== 計算機頁面 ===== */
   #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
   
   /* 深色卡片通用樣式 */
-  .dark-card { width: 100%; max-width: 400px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+  .dark-card { 
+    width: 100%; 
+    max-width: 400px; 
+    background: linear-gradient(135deg, #1a1a2e, #16213e); 
+    color: #fff; 
+    border-radius: 16px; 
+    padding: 25px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+  }
   
   /* 歷史數據面板 */
   .stats-panel { margin-bottom: 20px; }
@@ -121,8 +164,8 @@
         <li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
       </ul>
 
-      <p style="text-align:center; margin-top:20px; font-weight:bold; color:#007aff;">理性參與，享受數據分析的樂趣。</p>
-      <p style="text-align:center; font-size:12px; color:#999;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
+      <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據分析的樂趣。</p>
+      <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
     </div>
     <button id="agreeBtn" disabled>請滾動閱讀至最底部</button>
   </div>
