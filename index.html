@@ -99,6 +99,20 @@
   .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
   .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
 
+  /* 建議說明提示行 */
+  .hint-box { 
+    margin-top: 10px; 
+    padding: 12px; 
+    border-radius: 8px; 
+    background: rgba(255,255,255,0.05); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    font-size: 13px; 
+    line-height: 1.6; 
+    color: #a0c4ff; 
+    text-align: left; 
+    display: none;
+  }
+
   .whatsapp-footer { text-align: center; margin-top: 25px; padding-bottom: 20px; }
   .whatsapp-footer a { color: #25D366; font-size: 16px; font-weight: bold; text-decoration: none; transition: color 0.3s; }
   .whatsapp-footer a:hover { color: #128C7E; text-decoration: underline; }
@@ -241,6 +255,7 @@
     <button id="clearBtn" onclick="clearData()">清除數據</button>
 
     <div id="resultBox" class="result-box"></div>
+    <div id="hintBox" class="hint-box"></div>
   </div>
 
   <!-- 底部 WhatsApp 群組連結 -->
@@ -251,12 +266,11 @@
 </div>
 
 <script>
-// ===== 守則滾動邏輯（已修復）=====
+// ===== 守則滾動邏輯 =====
 const termsScroll = document.getElementById('termsScroll');
 const agreeBtn = document.getElementById('agreeBtn');
 
 function checkScroll() {
-  // 增大容差至 20px，避免因取整誤差無法觸發
   const reachedBottom = termsScroll.scrollTop + termsScroll.clientHeight >= termsScroll.scrollHeight - 20;
   if (reachedBottom) {
     agreeBtn.disabled = false;
@@ -267,7 +281,6 @@ function checkScroll() {
 
 termsScroll.addEventListener('scroll', checkScroll);
 window.addEventListener('resize', checkScroll);
-// 頁面載入後延遲檢查一次，若內容不足則直接啟用
 setTimeout(checkScroll, 200);
 
 agreeBtn.addEventListener('click', function() {
@@ -278,7 +291,7 @@ agreeBtn.addEventListener('click', function() {
 
 // ===== 讀取 Google Sheets 統計數據 =====
 const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
-const SHEET_NAME = '工作表1'; // 若你的工作表名稱不同，請修改此處
+const SHEET_NAME = '工作表1'; // 若你的工作表名稱不同，請修改
 
 function fetchCell(range) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}&range=${range}&t=${Date.now()}`;
@@ -424,25 +437,31 @@ function calculate() {
   }
 
   let bet = "skip";
+  let layer = 0;
 
   // 第一層：主客勝率 <= 39
   if (hw <= 39 && aw <= 39 && dw <= 32) {
       bet = "D";
+      layer = 1;
   } 
   // 第二層：主勝 >= 40 且主賠 148-205
   else if (hw >= 40 && ho >= 148 && ho <= 205 && ho !== ao) {
       bet = "H";
+      layer = 2;
   } 
   // 第三層：主勝 >= 40 且主賠 205-260
   else if (hw >= 40 && ho > 205 && ho <= 260 && ho !== ao) {
       bet = "D";
+      layer = 3;
   } 
   // 第四層：客勝 >= 40 且客賠 150-200
   else if (aw >= 40 && ao >= 150 && ao <= 200 && ho !== ao) {
       bet = "D";
+      layer = 4;
   } 
   // 第五層：終極兜底
   else {
+      layer = 5;
       if (ho > ao) {
           if (ho > 750) { bet = "skip"; } else { bet = "H"; }
       } else if (ao > ho) {
@@ -475,7 +494,53 @@ function calculate() {
       className = "result-skip";
   }
 
-  showResult(text, className);
+  showResult(text, className, layer, bet);
+}
+
+// ===== 顯示結果 + 建議說明 =====
+function showResult(text, className, layer, bet) {
+  let resultBox = document.getElementById('resultBox');
+  resultBox.style.display = 'block';
+  resultBox.className = "result-box " + className;
+  resultBox.innerText = text;
+
+  let hintBox = document.getElementById('hintBox');
+  
+  // 如果是錯誤訊息，隱藏提示
+  if (className === 'result-error') {
+      hintBox.style.display = 'none';
+      hintBox.innerText = '';
+      return;
+  }
+
+  let hintText = '';
+  
+  if (bet === "skip") {
+      hintText = '數據信號不明，系統選擇跳過本次投注，避免風險。';
+  } else {
+      switch(layer) {
+          case 1:
+              hintText = '兩隊勝率均偏低，和局概率被市場低估，系統捕捉冷門和局，建議買和局。';
+              break;
+          case 2:
+              hintText = '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。';
+              break;
+          case 3:
+              hintText = '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。';
+              break;
+          case 4:
+              hintText = '客隊勝率較高但客賠過低，存在大熱必死風險，系統利用和局抵禦客場不確定性，建議買和局。';
+              break;
+          case 5:
+              hintText = '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。';
+              break;
+          default:
+              hintText = '';
+      }
+  }
+  
+  hintBox.innerText = hintText;
+  hintBox.style.display = hintText ? 'block' : 'none';
 }
 
 // ===== 清除數據邏輯 =====
@@ -491,13 +556,10 @@ function clearData() {
   resultBox.style.display = 'none';
   resultBox.innerText = '';
   resultBox.className = 'result-box';
-}
 
-function showResult(text, className) {
-  let resultBox = document.getElementById('resultBox');
-  resultBox.style.display = 'block';
-  resultBox.className = "result-box " + className;
-  resultBox.innerText = text;
+  let hintBox = document.getElementById('hintBox');
+  hintBox.style.display = 'none';
+  hintBox.innerText = '';
 }
 </script>
 </body>
