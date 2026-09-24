@@ -5,7 +5,25 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>智能量化足球預測系統 ver 1.0</title>
 	<style>
-		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+		* { box-sizing: border-box; }
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 0; min-height: 100vh; }
+		
+		/* ===== 守則頁面 ===== */
+		#termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+		.terms-container { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; }
+		.terms-container h2 { text-align: center; margin: 0 0 15px 0; color: #1a1a1a; font-size: 20px; }
+		.terms-scroll { overflow-y: auto; flex: 1; padding-right: 10px; margin-bottom: 15px; border: 1px solid #eee; border-radius: 8px; padding: 15px; background: #fafafa; }
+		.terms-scroll h3 { color: #007aff; font-size: 15px; margin: 15px 0 8px 0; }
+		.terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: #444; margin: 5px 0; }
+		.terms-scroll ul { padding-left: 20px; margin: 5px 0; }
+		.terms-scroll::-webkit-scrollbar { width: 6px; }
+		.terms-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+		#agreeBtn { width: 100%; padding: 15px; background: #ccc; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: not-allowed; transition: background 0.3s; }
+		#agreeBtn.active { background: #007aff; cursor: pointer; }
+		#agreeBtn.active:hover { background: #0062cc; }
+		
+		/* ===== 計算機頁面 ===== */
+		#calcPage { display: none; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
 		.container { background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
 		h2 { text-align: center; margin-bottom: 5px; color: #1a1a1a; font-size: 20px; }
 		.subtitle { text-align: center; font-size: 13px; color: #888; margin: 3px 0; }
@@ -13,8 +31,8 @@
 		label { display: block; font-size: 14px; margin-bottom: 5px; color: #555; }
 		input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.3s; }
 		input:focus { border-color: #007aff; }
-		button { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-		button:hover { background: #0062cc; }
+		#calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+		#calcBtn:hover { background: #0062cc; }
 		.result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
 		.result-H { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
 		.result-A { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
@@ -24,38 +42,116 @@
 	</style>
 </head>
 <body>
-	<div class="container">
-		<h2>⚽ 智能量化預測系統</h2>
-		<p class="subtitle">勝率數據建議使用 FootballForecastAI 勝率</p>
-		<p class="subtitle">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
-		<div class="input-group">
-			<label>主勝率 (%)</label>
-			<input type="number" id="hw" placeholder="例如：40">
+	<!-- ===== 守則頁面 ===== -->
+	<div id="termsPage">
+		<div class="terms-container">
+			<h2>📋 使用守則與風險聲明</h2>
+			<div class="terms-scroll" id="termsScroll">
+				<h3>📊 智能量化足球預測系統 ver 1.0</h3>
+				<p>感謝您使用本系統。在使用前，請務必仔細閱讀以下所有條款。您必須滾動到最底部，才能點擊「同意」按鈕進入系統。</p>
+				<h3>🎯 系統核心定位</h3>
+				<p>本系統是一套結合機率模型、市場定價（賠率）與極致風控的自動化量化分析工具。系統嚴格執行數學邏輯，旨在杜絕人為情緒干擾，協助用戶進行數據分析。</p>
+				<h3>🛠️ 核心功能模組</h3>
+				<p><strong>1. 勝率與市場賠率的綜合過濾</strong></p>
+				<ul>
+					<li>核心勝率線：低於系統設定的勝率基準，除非有特殊賠率價值，否則系統一律放棄。</li>
+					<li>冷門捕捉機制：當雙方勝率陷入低迷且市場對和局缺乏防備時，系統會自動捕捉高價值的冷門和局。</li>
+				</ul>
+				<p><strong>2. 精細化賠率區間與防冷機制</strong></p>
+				<ul>
+					<li>主場價值投資：數據看好主隊且賠率處於合理回報區間時，直接進行價值投資。</li>
+					<li>主場防冷保險：數據看好主隊但賠率偏高時，自動切換為和局保護本金。</li>
+					<li>客場防冷保險：客隊被看好但賠率過低時，利用和局抵禦客場風險。</li>
+					<li>平賠陷阱規避：主客賠率完全相同時，系統自動跳過。</li>
+				</ul>
+				<p><strong>3. 終極賠率博弈與極端風險防雷</strong></p>
+				<ul>
+					<li>價值博弈：比較主客賠率，誰的賠率更具市場價值就買誰。</li>
+					<li>極端冷門防禦罩：當賠率高達系統設定的警戒線時，系統會強制跳過這些場次。</li>
+				</ul>
+				<p><strong>4. 動態 EV（期望值）與成本計算模組</strong></p> 系統 <p>系統內建期望值與成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
+				<p><strong>5. 全方位績效儀表板</strong></p>
+				<p>自動彙整獲利與虧損、顯示命中率、反映資金使用效率。</p>
+				<h3>📈 系統核心優勢</h3>
+				<ul>
+					<li>絕對紀律：所有公式均已設定好，觸發條件自動給出訊號。</li>
+					<li>攻守兼備：兼具捕捉冷門的進攻邏輯與極端賠率跳過的防守邏輯。</li>
+					<li>持續進化：ver 1.0 版本，持續追蹤表現並根據市場變化迭代。</li>
+				</ul>
+				<h3>⚠️ 給客人的誠信風險聲明</h3>
+				<ul>
+					<li>歷史不等於未來：本系統基於歷史數據回測與概率模型，歷史表現不代表未來必贏。</li>
+					<li>長期複利思維：足球比賽充滿不可抗力（紅牌、點球、烏龍等），單場比賽的盈虧隨機性極高。系統的優勢在於長期複利的穩定，而非一夜暴富。</li>
+					<li>嚴格注碼管理：強烈建議客戶採用固定比例注碼（例如總資金的 1%-2%）。切勿因為短期連續黑單而手動干預公式或盲目重注。</li>
+				</ul>
+				<h3>🛡️ 法律合規與負責任博彩聲明</h3>
+				<ul>
+					<li>只作研究用途：本系統及所有相關數據、圖表與分析結果，僅供學術研究、數據分析及個人興趣之用，不構成任何形式的投資建議或博彩邀約。</li>
+					<li>必須控制注碼：博彩涉及風險，用戶在參與任何相關活動時，必須嚴格控制注碼，量力而為，切勿將無法承受損失的資金投入其中。</li>
+					<li>切勿沉迷賭博：請保持理性，切勿沉迷賭博。若發現自己或身邊的人有賭博成癮的傾向，請立即尋求專業協助。</li>
+					<li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
+				</ul>
+				<p style="text-align:center; margin-top:20px; font-weight:bold; color:#007aff;">理性參與，享受數據分析的樂趣。</p>
+				<p style="text-align:center; font-size:12px; color:#999;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
+			</div>
+			<button id="agreeBtn" disabled>請滾動閱讀至最底部</button>
 		</div>
-		<div class="input-group">
-			<label>和勝率 (%)</label>
-			<input type="number" id="dw" placeholder="例如：30">
+	</div>
+	<!-- ===== 計算機頁面 ===== -->
+	<div id="calcPage">
+		<div class="container">
+			<h2>⚽ 智能量化預測</h2>
+			<p class="subtitle">勝率數據建議使用 FootballForecastAI 勝率</p>
+			<p class="subtitle">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
+			<div class="input-group">
+				<label>主勝率 (%)</label>
+				<input type="number" id="hw" placeholder="例如：40">
+			</div>
+			<div class="input-group">
+				<label>和勝率 (%)</label>
+				<input type="number" id="dw" placeholder="例如：30">
+			</div>
+			<div class="input-group">
+				<label>客勝率 (%)</label>
+				<input type="number" id="aw" placeholder="例如：30">
+			</div>
+			<div class="input-group">
+				<label>主賠 (如 158)</label>
+				<input type="number" id="ho" placeholder="例如：158">
+			</div>
+			<div class="input-group">
+				<label>和賠 (如 395)</label>
+				<input type="number" id="doo" placeholder="例如：395">
+			</div>
+			<div class="input-group">
+				<label>客賠 (如 405)</label>
+				<input type="number" id="ao" placeholder="例如：405">
+			</div>
+			<button id="calcBtn" onclick="calculate()">計算結果</button>
+			<div id="resultBox" class="result-box"></div>
 		</div>
-		<div class="input-group">
-			<label>客勝率 (%)</label>
-			<input type="number" id="aw" placeholder="例如：30">
-		</div>
-		<div class="input-group">
-			<label>主賠 (如 158)</label>
-			<input type="number" id="ho" placeholder="例如：158">
-		</div>
-		<div class="input-group">
-			<label>和賠 (如 395)</label>
-			<input type="number" id="doo" placeholder="例如：395">
-		</div>
-		<div class="input-group">
-			<label>客賠 (如 405)</label>
-			<input type="number" id="ao" placeholder="例如：405">
-		</div>
-		<button onclick="calculate()">計算結果</button>
-		<div id="resultBox" class="result-box"></div>
 	</div>
 	<script>
+		// ===== 守則滾動邏輯 =====
+		const termsScroll = document.getElementById('termsScroll');
+		const agreeBtn = document.getElementById('agreeBtn');
+		
+		termsScroll.addEventListener('scroll', function() {
+		  // 當滾動到最底部（容許 5px 誤差）
+		  const reachedBottom = termsScroll.scrollTop + termsScroll.clientHeight >= termsScroll.scrollHeight - 5;
+		  if (reachedBottom) {
+		    agreeBtn.disabled = false;
+		    agreeBtn.classList.add('active');
+		    agreeBtn.textContent = '✅ 我已閱讀並同意，進入系統';
+		  }
+		});
+		
+		agreeBtn.addEventListener('click', function() {
+		  document.getElementById('termsPage').style.display = 'none';
+		  document.getElementById('calcPage').style.display = 'flex';
+		});
+		
+		// ===== 計算機邏輯 =====
 		function calculate() {
 		  let hwVal = document.getElementById('hw').value.trim();
 		  let dwVal = document.getElementById('dw').value.trim();
@@ -64,7 +160,6 @@
 		  let dooVal = document.getElementById('doo').value.trim();
 		  let aoVal = document.getElementById('ao').value.trim();
 		
-		  // 檢查空值
 		  if (hwVal === '' || dwVal === '' || awVal === '' || hoVal === '' || dooVal === '' || aoVal === '') {
 		      showResult("⚠️ 數據不完整", "result-error");
 		      return;
@@ -77,13 +172,11 @@
 		  let doo = Number(dooVal);
 		  let ao = Number(aoVal);
 		
-		  // 檢查非數字
 		  if (isNaN(hw) || isNaN(dw) || isNaN(aw) || isNaN(ho) || isNaN(doo) || isNaN(ao)) {
 		      showResult("⚠️ 數據不完整", "result-error");
 		      return;
 		  }
 		
-		  // 檢查三個勝率總和是否大於 100
 		  if (hw + dw + aw > 100) {
 		      showResult("⚠️ 命中率大於100%", "result-error");
 		      return;
