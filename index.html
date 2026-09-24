@@ -69,7 +69,8 @@
 					<li>價值博弈：比較主客賠率，誰的賠率更具市場價值就買誰。</li>
 					<li>極端冷門防禦罩：當賠率高達系統設定的警戒線時，系統會強制跳過這些場次。</li>
 				</ul>
-				<p><strong>4. 動態 EV（期望值）與成本計算模組</strong></p> 系統 <p>系統內建期望值與成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
+				<p><strong>4. 動態 EV（期望值）與成本計算模組</strong></p>
+				<p>系統內建期望值與成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
 				<p><strong>5. 全方位績效儀表板</strong></p>
 				<p>自動彙整獲利與虧損、顯示命中率、反映資金使用效率。</p>
 				<h3>📈 系統核心優勢</h3>
@@ -100,32 +101,32 @@
 	<!-- ===== 計算機頁面 ===== -->
 	<div id="calcPage">
 		<div class="container">
-			<h2>⚽ 智能量化預測</h2>
+			<h2>⚽ 智能量化預測系統</h2>
 			<p class="subtitle">勝率數據建議使用 FootballForecastAI 勝率</p>
 			<p class="subtitle">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
 			<div class="input-group">
 				<label>主勝率 (%)</label>
-				<input type="number" id="hw" placeholder="例如：40">
+				<input type="text" id="hw" inputmode="numeric" pattern="[0-9]*" placeholder="例如：40" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 			</div>
 			<div class="input-group">
 				<label>和勝率 (%)</label>
-				<input type="number" id="dw" placeholder="例如：30">
+				<input type="text" id="dw" inputmode="numeric" pattern="[0-9]*" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 			</div>
 			<div class="input-group">
 				<label>客勝率 (%)</label>
-				<input type="number" id="aw" placeholder="例如：30">
+				<input type="text" id="aw" inputmode="numeric" pattern="[0-9]*" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 			</div>
 			<div class="input-group">
 				<label>主賠 (如 158)</label>
-				<input type="number" id="ho" placeholder="例如：158">
+				<input type="text" id="ho" inputmode="numeric" pattern="[0-9]*" placeholder="例如：158" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 			</div>
 			<div class="input-group">
 				<label>和賠 (如 395)</label>
-				<input type="number" id="doo" placeholder="例如：395">
+				<input type="text" id="doo" inputmode="numeric" pattern="[0-9]*" placeholder="例如：395" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 			</div>
 			<div class="input-group">
 				<label>客賠 (如 405)</label>
-				<input type="number" id="ao" placeholder="例如：405">
+				<input type="text" id="ao" inputmode="numeric" pattern="[0-9]*" placeholder="例如：405" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 			</div>
 			<button id="calcBtn" onclick="calculate()">計算結果</button>
 			<div id="resultBox" class="result-box"></div>
@@ -137,7 +138,6 @@
 		const agreeBtn = document.getElementById('agreeBtn');
 		
 		termsScroll.addEventListener('scroll', function() {
-		  // 當滾動到最底部（容許 5px 誤差）
 		  const reachedBottom = termsScroll.scrollTop + termsScroll.clientHeight >= termsScroll.scrollHeight - 5;
 		  if (reachedBottom) {
 		    agreeBtn.disabled = false;
