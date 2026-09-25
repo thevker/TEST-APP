@@ -50,23 +50,25 @@
 
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
 
+  /* ✅ 主題切換：左上角，往右一點 (left: 60px) */
   .theme-switcher {
-    position: fixed; top: 12px; left: 12px; z-index: 9999;
+    position: fixed; top: 12px; left: 60px; z-index: 9999;
     background: var(--bg-switcher); border: 1px solid var(--border-switcher);
     border-radius: 8px; padding: 6px 12px;
     color: var(--text-primary); font-size: 18px; line-height: 1;
     cursor: pointer; backdrop-filter: blur(10px);
     user-select: none; -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    transition: opacity 0.3s, background 0.3s;
   }
   .theme-switcher:active { opacity: 0.7; }
 
+  /* ✅ 語言切換：右上角 */
   .lang-switcher {
     position: fixed; top: 12px; right: 12px; z-index: 9999;
     background: var(--bg-switcher); border: 1px solid var(--border-switcher);
     border-radius: 8px; padding: 6px 10px; color: var(--text-primary); font-size: 13px;
     cursor: pointer; backdrop-filter: blur(10px);
-    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    transition: opacity 0.3s, background 0.3s;
   }
   .lang-switcher select {
     background: transparent; color: var(--text-secondary); border: none; outline: none;
@@ -74,13 +76,14 @@
   }
   .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
 
+  /* ✅ 滾動時隱藏頂部按鈕（純淡出，無位移，避免抖動） */
   .theme-switcher.hidden,
   .lang-switcher.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-20px);
   }
 
+  /* ✅ WhatsApp：底部正中央 */
   .whatsapp-bottom {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     z-index: 9998;
@@ -371,18 +374,18 @@
       <div class="stat-item"><div class="label" data-i18n="winsCount">命中數</div><div class="value" id="stat-wins">—</div></div>
       <div class="stat-item"><div class="label" data-i18n="totalCost">總成本</div><div class="value" id="stat-cost">—</div></div>
       <div class="stat-item"><div class="label" data-i18n="betsCount">出手數</div><div class="value" id="stat-bets">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="roi">盈虧率 (ROI)</div><div class="value" id="stat-roi">—</>
-div></div>
-      <div class="stat-item   "><div class="label" data-i18n="hitRate"> <命中率</div><div classp="value" id="stat-hitrate class">—="</div></div>
+      <div class="stat-item"><div class="label" data-i18n="roi">盈虧率 (ROI)</div><div class="value" id="stat-roi">—</div></div>
+      <div class="stat-item"><div class="label" data-i18n="hitRate">命中率</div><div class="value" id="stat-hitrate">—</div></div>
     </div>
-   sub <div class="stats-note" data-i18ntitle="statsNote">"※ 每注固定 data $100，所有數據實時同步</div>
-   -i <div class="stats-note date-note"><span data-i18n="dbUpdate">📅 資料庫更新日期：</span><span id="stat-update-date">—</span></div>
+    <div class="stats-note" data-i18n="statsNote">※ 每注固定 $100，所有數據實時同步</div>
+    <div class="stats-note date-note"><span data-i18n="dbUpdate">📅 資料庫更新日期：</span><span id="stat-update-date">—</span></div>
     <a class="stats-link" href="https://docs.google.com/spreadsheets/d/1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM/edit?usp=drivesdk" target="_blank" data-i18n="viewDetails">📋 查看詳細賽果 →</a>
   </div>
 
   <div class="dark-card container">
     <h2 data-i18n="mainTitle">⚽ 智能量化預測系統</h2>
-    <p class="subtitle" data-i18n="sub1">勝率數據建議使用 FootballForecastAI 勝率</p18n="sub2">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
+    <p class="subtitle" data-i18n="sub1">勝率數據建議使用 FootballForecastAI 勝率</p>
+    <p class="subtitle" data-i18n="sub2">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
 
     <div class="input-group">
       <label data-i18n="labelHW">主勝率</label>
