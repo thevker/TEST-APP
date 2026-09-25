@@ -1,53 +1,108 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-HK" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>智能量化足球預測系統 ver 1.0</title>
 <style>
   * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #333; margin: 0; padding: 0; min-height: 100vh; }
+
+  /* ===== 主題變數 ===== */
+  :root[data-theme="dark"] {
+    --bg-body: #121212;
+    --bg-card: linear-gradient(135deg, #1a1a2e, #16213e);
+    --bg-switcher: rgba(26, 26, 46, 0.9);
+    --bg-panel: rgba(255,255,255,0.05);
+    --bg-stat: rgba(255,255,255,0.08);
+    --bg-input: rgba(255,255,255,0.08);
+    --bg-input-focus: rgba(255,255,255,0.12);
+    --text-primary: #fff;
+    --text-secondary: #a0c4ff;
+    --text-tertiary: #8db4e2;
+    --text-muted: #6b7f9e;
+    --text-content: #ccc;
+    --text-btn-disabled: #888;
+    --border-color: rgba(255,255,255,0.1);
+    --border-input: rgba(255,255,255,0.2);
+    --border-switcher: rgba(255,255,255,0.2);
+    --placeholder: rgba(255,255,255,0.4);
+    --scroll-thumb: #555;
+    --icon-theme: '🌙';
+  }
+  :root[data-theme="light"] {
+    --bg-body: #eef1f6;
+    --bg-card: linear-gradient(135deg, #ffffff, #eef3ff);
+    --bg-switcher: rgba(255, 255, 255, 0.95);
+    --bg-panel: rgba(0,0,0,0.03);
+    --bg-stat: rgba(0,0,0,0.05);
+    --bg-input: rgba(0,0,0,0.04);
+    --bg-input-focus: rgba(0,0,0,0.07);
+    --text-primary: #1a1a2e;
+    --text-secondary: #3b5aa0;
+    --text-tertiary: #5a7bc0;
+    --text-muted: #8a9ab0;
+    --text-content: #444;
+    --text-btn-disabled: #aaa;
+    --border-color: rgba(0,0,0,0.1);
+    --border-input: rgba(0,0,0,0.15);
+    --border-switcher: rgba(0,0,0,0.15);
+    --placeholder: rgba(0,0,0,0.35);
+    --scroll-thumb: #c0c0c0;
+    --icon-theme: '☀️';
+  }
+
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
+
+  .theme-switcher {
+    position: fixed; top: 12px; right: 150px; z-index: 9999;
+    background: var(--bg-switcher); border: 1px solid var(--border-switcher);
+    border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-size: 16px;
+    cursor: pointer; backdrop-filter: blur(10px);
+    user-select: none; -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s;
+  }
+  .theme-switcher:active { opacity: 0.7; }
 
   .lang-switcher {
     position: fixed; top: 12px; right: 12px; z-index: 9999;
-    background: rgba(26, 26, 46, 0.9); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 13px;
+    background: var(--bg-switcher); border: 1px solid var(--border-switcher);
+    border-radius: 8px; padding: 6px 10px; color: var(--text-primary); font-size: 13px;
     cursor: pointer; backdrop-filter: blur(10px);
   }
   .lang-switcher select {
-    background: transparent; color: #a0c4ff; border: none; outline: none;
+    background: transparent; color: var(--text-secondary); border: none; outline: none;
     font-size: 13px; cursor: pointer; font-weight: bold;
   }
-  .lang-switcher select option { background: #1a1a2e; color: #fff; }
+  .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
 
   .whatsapp-top {
     position: fixed; top: 12px; left: 12px; z-index: 9999;
-    background: rgba(26, 26, 46, 0.9); border: 1px solid rgba(37, 211, 102, 0.4);
+    background: var(--bg-switcher); border: 1px solid rgba(37, 211, 102, 0.4);
     border-radius: 8px; padding: 6px 10px; backdrop-filter: blur(10px);
   }
   .whatsapp-top a { color: #25D366; font-size: 13px; font-weight: bold; text-decoration: none; }
 
   #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
   .terms-container { 
-    background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; 
+    background: var(--bg-card); color: var(--text-primary); 
     border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
     width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; 
   }
-  .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: #fff; font-size: 20px; }
+  .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: var(--text-primary); font-size: 20px; }
   .terms-scroll { 
     overflow-y: auto; flex: 1; padding: 15px; margin-bottom: 15px;
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; 
-    background: rgba(255,255,255,0.05); 
+    border: 1px solid var(--border-color); border-radius: 8px; 
+    background: var(--bg-panel); 
   }
-  .terms-scroll h3 { color: #a0c4ff; font-size: 15px; margin: 15px 0 8px 0; }
-  .terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: #ccc; margin: 5px 0; }
+  .terms-scroll h3 { color: var(--text-secondary); font-size: 15px; margin: 15px 0 8px 0; }
+  .terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: var(--text-content); margin: 5px 0; }
   .terms-scroll ul { padding-left: 20px; margin: 5px 0; }
   .terms-scroll::-webkit-scrollbar { width: 6px; }
-  .terms-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-  .terms-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+  .terms-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+  .terms-scroll::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
   
   #agreeBtn { 
-    width: 100%; padding: 15px; background: #333; color: #888; border: none; 
+    width: 100%; padding: 15px; background: #333; color: var(--text-btn-disabled); border: none; 
     border-radius: 8px; font-size: 18px; font-weight: bold;
     cursor: pointer;
     transition: background 0.3s;
@@ -59,62 +114,77 @@
   #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; }
   .dark-card { 
     width: 100%; max-width: 400px; 
-    background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; 
+    background: var(--bg-card); color: var(--text-primary); 
     border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
   }
   .stats-panel { margin-bottom: 20px; }
-  .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: #a0c4ff; letter-spacing: 1px; }
+  .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: var(--text-secondary); letter-spacing: 1px; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .stat-item { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center; }
-  .stat-item .label { font-size: 11px; color: #8db4e2; margin-bottom: 4px; }
+  .stat-item { background: var(--bg-stat); border-radius: 10px; padding: 12px; text-align: center; }
+  .stat-item .label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
   .stat-item .value { font-size: 20px; font-weight: bold; }
-  .stat-item .value.positive { color: #4ade80; }
-  .stat-item .value.negative { color: #f87171; }
-  .stat-item .value.neutral { color: #fbbf24; }
-  .stats-note { text-align: center; font-size: 11px; color: #6b7f9e; margin-top: 12px; }
-  .stats-note.date-note { margin-top: 5px; color: #a0c4ff; }
-  .stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+  .stat-item .value.positive { color: #16a34a; }
+  .stat-item .value.negative { color: #dc2626; }
+  .stat-item .value.neutral { color: #d97706; }
+  :root[data-theme="dark"] .stat-item .value.positive { color: #4ade80; }
+  :root[data-theme="dark"] .stat-item .value.negative { color: #f87171; }
+  :root[data-theme="dark"] .stat-item .value.neutral { color: #fbbf24; }
+  .stats-note { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 12px; }
+  .stats-note.date-note { margin-top: 5px; color: var(--text-secondary); }
+  .stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid var(--border-color); padding-top: 10px; }
 
-  .container h2 { text-align: center; margin-bottom: 5px; color: #fff; font-size: 20px; }
-  .container .subtitle { text-align: center; font-size: 13px; color: #8db4e2; margin: 3px 0; }
+  .container h2 { text-align: center; margin-bottom: 5px; color: var(--text-primary); font-size: 20px; }
+  .container .subtitle { text-align: center; font-size: 13px; color: var(--text-tertiary); margin: 3px 0; }
   .input-group { margin-bottom: 15px; }
-  .container label { display: block; font-size: 14px; margin-bottom: 5px; color: #a0c4ff; }
+  .container label { display: block; font-size: 14px; margin-bottom: 5px; color: var(--text-secondary); }
   
   .input-wrapper { position: relative; }
   .input-wrapper input { 
     width: 100%; padding: 12px; padding-right: 32px;
-    background: rgba(255,255,255,0.08); 
-    border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; 
-    box-sizing: border-box; font-size: 16px; color: #fff; outline: none;
+    background: var(--bg-input); 
+    border: 1px solid var(--border-input); border-radius: 8px; 
+    box-sizing: border-box; font-size: 16px; color: var(--text-primary); outline: none;
   }
-  .input-wrapper input::placeholder { color: rgba(255,255,255,0.4); }
-  .input-wrapper input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
+  .input-wrapper input::placeholder { color: var(--placeholder); }
+  .input-wrapper input:focus { border-color: #60a5fa; background: var(--bg-input-focus); }
   .input-wrapper .suffix {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    color: #a0c4ff; font-size: 15px; font-weight: bold; pointer-events: none;
+    color: var(--text-secondary); font-size: 15px; font-weight: bold; pointer-events: none;
   }
   
   #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
   #clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
 
   .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
-  .result-H { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
-  .result-A { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.4); }
-  .result-D { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
-  .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
-  .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+  .result-H { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.4); }
+  .result-A { background: rgba(96, 165, 250, 0.15); color: #2563eb; border: 1px solid rgba(96, 165, 250, 0.4); }
+  .result-D { background: rgba(251, 191, 36, 0.15); color: #d97706; border: 1px solid rgba(251, 191, 36, 0.4); }
+  .result-skip { background: rgba(156, 163, 175, 0.15); color: #6b7280; border: 1px solid rgba(156, 163, 175, 0.4); }
+  .result-error { background: rgba(248, 113, 113, 0.15); color: #dc2626; border: 1px solid rgba(248, 113, 113, 0.4); }
+  :root[data-theme="dark"] .result-H { color: #4ade80; }
+  :root[data-theme="dark"] .result-A { color: #60a5fa; }
+  :root[data-theme="dark"] .result-D { color: #fbbf24; }
+  :root[data-theme="dark"] .result-skip { color: #9ca3af; }
+  :root[data-theme="dark"] .result-error { color: #f87171; }
 
-  .ev-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); font-size: 15px; text-align: center; color: #60a5fa; font-weight: bold; display: none; }
-  .ev-box .ev-positive { color: #4ade80; }
-  .ev-box .ev-negative { color: #f87171; }
+  .ev-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); font-size: 15px; text-align: center; color: #2563eb; font-weight: bold; display: none; }
+  .ev-box .ev-positive { color: #16a34a; }
+  .ev-box .ev-negative { color: #dc2626; }
+  :root[data-theme="dark"] .ev-box { color: #60a5fa; }
+  :root[data-theme="dark"] .ev-box .ev-positive { color: #4ade80; }
+  :root[data-theme="dark"] .ev-box .ev-negative { color: #f87171; }
 
-  .hint-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6; color: #a0c4ff; text-align: left; display: none; }
+  .hint-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: var(--bg-panel); border: 1px solid var(--border-color); font-size: 13px; line-height: 1.6; color: var(--text-secondary); text-align: left; display: none; }
 </style>
 </head>
 <body>
 
 <div class="whatsapp-top">
   <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
+</div>
+
+<div class="theme-switcher" onclick="toggleTheme()" title="切換主題">
+  <span id="themeIcon">🌙</span>
 </div>
 
 <div class="lang-switcher">
@@ -178,7 +248,7 @@
           <li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
         </ul>
         <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據分析的樂趣。</p>
-        <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
+        <p style="text-align:center; font-size:12px; color:var(--text-muted);">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
       </div>
 
       <div id="terms-zh-CN" style="display:none;">
@@ -228,7 +298,7 @@
           <li>只供娱乐：请将本系统视为纯粹的娱乐工具，享受数据分析与策略验证的乐趣，而非视为赚钱的捷径。</li>
         </ul>
         <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性参与，享受数据分析的乐趣。</p>
-        <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上为完整条款，滚动到最底部即可点击同意 ——</p>
+        <p style="text-align:center; font-size:12px; color:var(--text-muted);">—— 以上为完整条款，滚动到最底部即可点击同意 ——</p>
       </div>
 
       <div id="terms-en-US" style="display:none;">
@@ -278,7 +348,7 @@
           <li>Entertainment only: Treat this system as a pure entertainment tool. Enjoy data analysis and strategy validation — not as a shortcut to wealth.</li>
         </ul>
         <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">Play rationally, enjoy data analysis.</p>
-        <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— Full terms above. Scroll to bottom to click Agree ——</p>
+        <p style="text-align:center; font-size:12px; color:var(--text-muted);">—— Full terms above. Scroll to bottom to click Agree ——</p>
       </div>
 
     </div>
@@ -358,11 +428,24 @@
 </div>
 
 <script>
+// ==================== 主題切換 ====================
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  var icon = document.getElementById('themeIcon');
+  if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+  try { localStorage.setItem('qfp_theme', theme); } catch(e) {}
+}
+
+function toggleTheme() {
+  var current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
 // ==================== 同意按鈕文字字典 ====================
 var agreeTexts = {
-  'zh-HK': { scroll: '請滾動閱讀至最底部', agree: '✅ 我已閱讀並同意，進入系統' },
-  'zh-CN': { scroll: '请滚动阅读至最底部', agree: '✅ 我已阅读并同意，进入系统' },
-  'en-US': { scroll: 'Please scroll to the bottom', agree: '✅ I have read and agree, enter system' }
+  'zh-HK': { scroll: '請滾動閱讀至最底部', agree: '✅ 我已閱讀並同意，進入系統', alert: '請滾動閱讀至最底部，才能按同意。' },
+  'zh-CN': { scroll: '请滚动阅读至最底部', agree: '✅ 我已阅读并同意，进入系统', alert: '请滚动阅读至最底部，才能按同意。' },
+  'en-US': { scroll: 'Please scroll to the bottom', agree: '✅ I have read and agree, enter system', alert: 'Please scroll to the bottom before clicking Agree.' }
 };
 
 function updateAgreeBtnText() {
@@ -374,14 +457,11 @@ function updateAgreeBtnText() {
 
 // ==================== 處理同意按鈕 ====================
 function handleAgree() {
-  var s = document.getElementById('termsScroll');
-  var reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 30;
+  var btn = document.getElementById('agreeBtn');
+  var lang = agreeTexts[currentLang] || agreeTexts['zh-HK'];
   
-  if (!reachedBottom) {
-    var hintText = (currentLang === 'zh-HK') ? '請滾動閱讀至最底部，才能按同意。' 
-                 : (currentLang === 'zh-CN') ? '请滚动阅读至最底部，才能按同意。' 
-                 : 'Please scroll to the bottom before clicking Agree.';
-    alert(hintText);
+  if (!btn.classList.contains('active')) {
+    alert(lang.alert);
     return;
   }
   
@@ -490,17 +570,22 @@ function updateAgreeBtnVisual() {
   var btn = document.getElementById('agreeBtn');
   if (!s || !btn) return;
   
+  if (btn.classList.contains('active')) return;
+  
   var reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 30;
   
   if (reachedBottom) {
     btn.classList.add('active');
-  } else {
-    btn.classList.remove('active');
+    updateAgreeBtnText();
   }
-  updateAgreeBtnText();
 }
 
 window.addEventListener('load', function() {
+  // 載入主題
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
+  applyTheme(savedTheme);
+  
   var s = document.getElementById('termsScroll');
   if (s) {
     s.addEventListener('scroll', updateAgreeBtnVisual);
@@ -558,13 +643,18 @@ function applyLanguage(lang) {
   
   document.getElementById('langSelect').value = lang;
   
-  // ✅ 更新同意按鈕文字（無論 active 與否）
   updateAgreeBtnText();
   
-  // ✅ 用新語言重新渲染上一次的計算結果
   if (window._lastResult) {
     const r = window._lastResult;
     let text = "";
+    if (r.className === 'result-error') {
+      if (r.errKey === 'incomplete') text = t.errIncomplete;
+      else if (r.errKey === 'over100') text = t.errOver100;
+      else text = t.errIncomplete;
+      showResult(text, r.className, r.layer, r.bet, r.ev, r.isReverse, r.errKey);
+      return;
+    }
     if (r.bet === "H") text = t.resultH;
     else if (r.bet === "A") text = t.resultA;
     else if (r.bet === "D") text = t.resultD;
@@ -708,18 +798,18 @@ function calculate() {
   let aoVal = document.getElementById('ao').value.trim();
 
   if (hwVal === '' || dwVal === '' || awVal === '' || hoVal === '' || dooVal === '' || aoVal === '') {
-    showResult(t.errIncomplete, "result-error"); return;
+    showResult(t.errIncomplete, "result-error", 0, "skip", null, false, 'incomplete'); return;
   }
 
   let hw = Number(hwVal), dw = Number(dwVal), aw = Number(awVal);
   let ho = Number(hoVal), doo = Number(dooVal), ao = Number(aoVal);
 
   if (isNaN(hw) || isNaN(dw) || isNaN(aw) || isNaN(ho) || isNaN(doo) || isNaN(ao)) {
-    showResult(t.errIncomplete, "result-error"); return;
+    showResult(t.errIncomplete, "result-error", 0, "skip", null, false, 'incomplete'); return;
   }
 
   if (hw + dw + aw > 100) {
-    showResult(t.errOver100, "result-error"); return;
+    showResult(t.errOver100, "result-error", 0, "skip", null, false, 'over100'); return;
   }
 
   let bet = "skip", layer = 0, isReverse = false;
@@ -753,7 +843,7 @@ function calculate() {
   showResult(text, className, layer, bet, ev, isReverse);
 }
 
-function showResult(text, className, layer, bet, ev, isReverse) {
+function showResult(text, className, layer, bet, ev, isReverse, errKey) {
   let resultBox = document.getElementById('resultBox');
   resultBox.style.display = 'block';
   resultBox.className = "result-box " + className;
@@ -766,7 +856,7 @@ function showResult(text, className, layer, bet, ev, isReverse) {
     evBox.style.display = 'none';
     hintBox.style.display = 'none';
     hintBox.innerText = '';
-    window._lastResult = null;
+    window._lastResult = { text, className, layer, bet, ev, isReverse, errKey };
     return;
   }
 
