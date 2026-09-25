@@ -50,7 +50,6 @@
 
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
 
-  /* 主題切換：與語言按鈕同高 */
   .theme-switcher {
     position: fixed; top: 12px; left: max(20px, calc(50% - 200px)); z-index: 9999;
     background: var(--bg-switcher); border: 1px solid var(--border-switcher);
@@ -65,7 +64,6 @@
   }
   .theme-switcher:active { opacity: 0.7; }
 
-  /* 語言切換：與主題按鈕同高 */
   .lang-switcher {
     position: fixed; top: 12px; right: max(20px, calc(50% - 200px)); z-index: 9999;
     background: var(--bg-switcher); border: 1px solid var(--border-switcher);
@@ -533,8 +531,8 @@ const translations = {
     hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
     hint4: '客勝率高於主勝率，且客賠處於 1.90～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
-    hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
-    hintReverse: '偵測到一方賠率高達 15.00 以上，屬於極端冷門。系統改為買和局，搏爆冷和局高賠回報。'
+    hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
+    hintReverse: '偵測到主隊賠率高達 10.00 以上（極端冷門），足球低比分特性令和局率被市場低估，系統改為買和局搏高賠回報。'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明',
@@ -561,8 +559,8 @@ const translations = {
     hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
     hint4: '客胜率高于主胜率，且客赔处于 1.90～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
-    hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
-    hintReverse: '侦测到一方赔率高达 15.00 以上，属于极端冷门。系统改为买和局，搏爆冷和局高赔回报。'
+    hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
+    hintReverse: '侦测到主队赔率高达 10.00 以上（极端冷门），足球低比分特性令和局率被市场低估，系统改为买和局搏高赔回报。'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement',
@@ -589,8 +587,8 @@ const translations = {
     hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
     hint4: 'Away win rate exceeds home, and away odds fall in the 1.90–2.15 high-value zone. Bet Away Win.',
-    hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play — underdog bet.',
-    hintReverse: 'Detected extreme underdog odds (15.00+). System switches to Draw bet for high-payout upset potential.'
+    hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
+    hintReverse: 'Detected extreme underdog odds (10.00+ on home). Football low-scoring nature makes draw undervalued. System switches to Draw bet.'
   }
 };
 
@@ -815,7 +813,7 @@ document.addEventListener('visibilitychange', function() {
   if (!document.hidden) loadStatsWithRetry();
 });
 
-// ==================== 核心計算（已對應最新公式，極端門檻 15.00）====================
+// ==================== 核心計算（已對應最新公式）====================
 function calculate() {
   const t = translations[currentLang];
   let hwVal = document.getElementById('hw').value.trim();
@@ -850,18 +848,21 @@ function calculate() {
   else if (hw >= 40 && ho > 2.05 && ho <= 2.55 && ho !== ao) { bet = "D"; layer = 3; }
   // 第 4 層：C>A 且 1.90≤F≤2.15 → A
   else if (aw > hw && ao >= 1.90 && ao <= 2.15) { bet = "A"; layer = 4; }
-  // 第 5 層：兜底（賠率博弈，極端門檻 15.00 → 買和）
+  // 第 5 層：兜底（賠率博弈）
   else {
     layer = 5;
     if (ho > ao) {
-      if (ho >= 15.00) { bet = "D"; isReverse = true; }
+      // D > F：主賠高（主隊冷門）
+      if (ho >= 10.00) { bet = "D"; isReverse = true; }
       else { bet = "H"; }
     } else if (ao > ho) {
+      // F > D：客賠高（客隊冷門）
       if (ao >= 15.00) { bet = "D"; isReverse = true; }
       else { bet = "A"; }
     } else {
-      if (hw > aw) { bet = ho > 15.00 ? "skip" : "H"; }
-      else if (aw > hw) { bet = ao > 15.00 ? "skip" : "A"; }
+      // D = F：按勝率
+      if (hw > aw) { bet = "H"; }
+      else if (aw > hw) { bet = "A"; }
       else { bet = "skip"; }
     }
   }
