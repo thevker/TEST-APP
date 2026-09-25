@@ -1,746 +1,752 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>智能量化足球預測系統 ver 1.0</title>
-<style>
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #333; margin: 0; padding: 0; min-height: 100vh; }
-
-  .lang-switcher {
-    position: fixed; top: 12px; right: 12px; z-index: 9999;
-    background: rgba(26, 26, 46, 0.9); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 13px;
-    cursor: pointer; backdrop-filter: blur(10px); transition: background 0.3s;
-  }
-  .lang-switcher:hover { background: rgba(26, 26, 46, 1); }
-  .lang-switcher select {
-    background: transparent; color: #a0c4ff; border: none; outline: none;
-    font-size: 13px; cursor: pointer; font-weight: bold;
-  }
-  .lang-switcher select option { background: #1a1a2e; color: #fff; }
-
-  .whatsapp-top {
-    position: fixed; top: 12px; left: 12px; z-index: 9999;
-    background: rgba(26, 26, 46, 0.9); border: 1px solid rgba(37, 211, 102, 0.4);
-    border-radius: 8px; padding: 6px 10px; backdrop-filter: blur(10px);
-    transition: background 0.3s;
-  }
-  .whatsapp-top:hover { background: rgba(26, 26, 46, 1); }
-  .whatsapp-top a { color: #25D366; font-size: 13px; font-weight: bold; text-decoration: none; }
-
-  #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-  .terms-container { 
-    background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; 
-    border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-    width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; 
-  }
-  .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: #fff; font-size: 20px; }
-  .terms-scroll { 
-    overflow-y: auto; flex: 1; padding: 15px; margin-bottom: 15px; 
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; 
-    background: rgba(255,255,255,0.05); 
-  }
-  .terms-scroll h3 { color: #a0c4ff; font-size: 15px; margin: 15px 0 8px 0; }
-  .terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: #ccc; margin: 5px 0; }
-  .terms-scroll ul { padding-left: 20px; margin: 5px 0; }
-  .terms-scroll::-webkit-scrollbar { width: 6px; }
-  .terms-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-  .terms-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
-  .terms-scroll::-webkit-scrollbar-thumb:hover { background: #777; }
-  
-  #agreeBtn { 
-    width: 100%; padding: 15px; background: #333; color: #888; border: none; 
-    border-radius: 8px; font-size: 18px; font-weight: bold; cursor: not-allowed; 
-    transition: background 0.3s; 
-  }
-  #agreeBtn.active { background: #007aff; color: #fff; cursor: pointer; }
-  #agreeBtn.active:hover { background: #0062cc; }
-
-  #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; }
-  .dark-card { 
-    width: 100%; max-width: 400px; 
-    background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; 
-    border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-  }
-  .stats-panel { margin-bottom: 20px; }
-  .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: #a0c4ff; letter-spacing: 1px; }
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .stat-item { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center; }
-  .stat-item .label { font-size: 11px; color: #8db4e2; margin-bottom: 4px; }
-  .stat-item .value { font-size: 20px; font-weight: bold; }
-  .stat-item .value.positive { color: #4ade80; }
-  .stat-item .value.negative { color: #f87171; }
-  .stat-item .value.neutral { color: #fbbf24; }
-  .stats-note { text-align: center; font-size: 11px; color: #6b7f9e; margin-top: 12px; }
-  .stats-note.date-note { margin-top: 5px; color: #a0c4ff; }
-  .stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
-  .stats-link:hover { color: #93c5fd; text-decoration: underline; }
-
-  .container h2 { text-align: center; margin-bottom: 5px; color: #fff; font-size: 20px; }
-  .container .subtitle { text-align: center; font-size: 13px; color: #8db4e2; margin: 3px 0; }
-  .input-group { margin-bottom: 15px; }
-  .container label { display: block; font-size: 14px; margin-bottom: 5px; color: #a0c4ff; }
-  .container input { 
-    width: 100%; padding: 12px; background: rgba(255,255,255,0.08); 
-    border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; 
-    box-sizing: border-box; font-size: 16px; color: #fff; outline: none; transition: border 0.3s; 
-  }
-  .container input::placeholder { color: rgba(255,255,255,0.4); }
-  .container input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
-  #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
-  #calcBtn:hover { background: #0062cc; }
-  #clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
-
-  .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
-  .result-H { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
-  .result-A { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.4); }
-  .result-D { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
-  .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
-  .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
-
-  .ev-box {
-    margin-top: 10px; padding: 12px; border-radius: 8px;
-    background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3);
-    font-size: 15px; text-align: center; color: #60a5fa; font-weight: bold; display: none;
-  }
-  .ev-box .ev-positive { color: #4ade80; }
-  .ev-box .ev-negative { color: #f87171; }
-
-  .hint-box { 
-    margin-top: 10px; padding: 12px; border-radius: 8px; 
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-    font-size: 13px; line-height: 1.6; color: #a0c4ff; text-align: left; display: none; 
-  }
-</style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>智能量化足球預測系統 ver 1.0</title>
+	<style>
+		* { box-sizing: border-box; }
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #333; margin: 0; padding: 0; min-height: 100vh; }
+		
+		.lang-switcher {
+		  position: fixed; top: 12px; right: 12px; z-index: 9999;
+		  background: rgba(26, 26, 46, 0.9); border: 1px solid rgba(255,255,255,0.2);
+		  border-radius: 8px; padding: 6px 10px; color: #fff; font-size: 13px;
+		  cursor: pointer; backdrop-filter: blur(10px);
+		}
+		.lang-switcher select {
+		  background: transparent; color: #a0c4ff; border: none; outline: none;
+		  font-size: 13px; cursor: pointer; font-weight: bold;
+		}
+		.lang-switcher select option { background: #1a1a2e; color: #fff; }
+		
+		.whatsapp-top {
+		  position: fixed; top: 12px; left: 12px; z-index: 9999;
+		  background: rgba(26, 26, 46, 0.9); border: 1px solid rgba(37, 211, 102, 0.4);
+		  border-radius: 8px; padding: 6px 10px; backdrop-filter: blur(10px);
+		}
+		.whatsapp-top a { color: #25D366; font-size: 13px; font-weight: bold; text-decoration: none; }
+		
+		#termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+		.terms-container { 
+		  background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; 
+		  border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+		  width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; 
+		}
+		.terms-container h2 { text-align: center; margin: 0 0 15px 0; color: #fff; font-size: 20px; }
+		.terms-scroll { 
+		  overflow-y: auto; flex: 1; padding: 15px; margin-bottom: 15px;
+		  border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; 
+		  background: rgba(255,255,255,0.05); 
+		}
+		.terms-scroll h3 { color: #a0c4ff; font-size: 15px; margin: 15px 0 8px 0; }
+		.terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: #ccc; margin: 5px 0; }
+		.terms-scroll ul { padding-left: 20px; margin: 5px 0; }
+		.terms-scroll::-webkit-scrollbar { width: 6px; }
+		.terms-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+		.terms-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+		
+		#agreeBtn { 
+		  width: 100%; padding: 15px; background: #333; color: #888; border: none; 
+		  border-radius: 8px; font-size: 18px; font-weight: bold;
+		  pointer-events: none;
+		  transition: background 0.3s;
+		  -webkit-tap-highlight-color: transparent;
+		}
+		#agreeBtn.active { 
+		  background: #007aff; color: #fff; 
+		  pointer-events: auto;
+		  cursor: pointer;
+		}
+		
+		#calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; }
+		.dark-card { 
+		  width: 100%; max-width: 400px; 
+		  background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; 
+		  border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+		}
+		.stats-panel { margin-bottom: 20px; }
+		.stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: #a0c4ff; letter-spacing: 1px; }
+		.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+		.stat-item { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; text-align: center; }
+		.stat-item .label { font-size: 11px; color: #8db4e2; margin-bottom: 4px; }
+		.stat-item .value { font-size: 20px; font-weight: bold; }
+		.stat-item .value.positive { color: #4ade80; }
+		.stat-item .value.negative { color: #f87171; }
+		.stat-item .value.neutral { color: #fbbf24; }
+		.stats-note { text-align: center; font-size: 11px; color: #6b7f9e; margin-top: 12px; }
+		.stats-note.date-note { margin-top: 5px; color: #a0c4ff; }
+		.stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+		
+		.container h2 { text-align: center; margin-bottom: 5px; color: #fff; font-size: 20px; }
+		.container .subtitle { text-align: center; font-size: 13px; color: #8db4e2; margin: 3px 0; }
+		.input-group { margin-bottom: 15px; }
+		.container label { display: block; font-size: 14px; margin-bottom: 5px; color: #a0c4ff; }
+		
+		.input-wrapper { position: relative; }
+		.input-wrapper input { 
+		  width: 100%; padding: 12px; padding-right: 32px;
+		  background: rgba(255,255,255,0.08); 
+		  border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; 
+		  box-sizing: border-box; font-size: 16px; color: #fff; outline: none;
+		}
+		.input-wrapper input::placeholder { color: rgba(255,255,255,0.4); }
+		.input-wrapper input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
+		.input-wrapper .suffix {
+		  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+		  color: #a0c4ff; font-size: 15px; font-weight: bold; pointer-events: none;
+		}
+		
+		#calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+		#clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
+		
+		.result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
+		.result-H { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+		.result-A { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.4); }
+		.result-D { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
+		.result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
+		.result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
+		
+		.ev-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); font-size: 15px; text-align: center; color: #60a5fa; font-weight: bold; display: none; }
+		.ev-box .ev-positive { color: #4ade80; }
+		.ev-box .ev-negative { color: #f87171; }
+		
+		.hint-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); font-size: 13px; line-height: 1.6; color: #a0c4ff; text-align: left; display: none; }
+	</style>
 </head>
 <body>
-
-<div class="whatsapp-top">
-  <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
-</div>
-
-<div class="lang-switcher">
-  🌐 <select id="langSelect" onchange="changeLang(this.value)">
-    <option value="zh-HK">繁體中文 (HK/TW)</option>
-    <option value="zh-CN">简体中文 (CN)</option>
-    <option value="en-US">English (US)</option>
-  </select>
-</div>
-
-<!-- ===== 守則頁面 ===== -->
-<div id="termsPage">
-  <div class="terms-container">
-    <h2 id="termsTitleText">📋 使用守則與風險聲明</h2>
-    <div class="terms-scroll" id="termsScroll">
-      <h3>📊 智能量化足球預測系統 ver 1.0</h3>
-      <p>感謝您使用本系統。在使用前，請務必仔細閱讀以下所有條款。您必須滾動到最底部，才能點擊「同意」按鈕進入系統。</p>
-      <h3>🎯 系統核心定位</h3>
-      <p>本系統是一套結合機率模型、市場定價（賠率）與極致風控的自動化量化分析工具。系統嚴格執行數學邏輯，旨在杜絕人為情緒干擾，協助用戶進行數據分析。</p>
-      <h3>🛠️ 核心功能模組</h3>
-      <p><strong>1. 勝率與市場賠率的綜合過濾</strong></p>
-      <ul>
-        <li>核心勝率線：低於系統設定的勝率基準，除非有特殊賠率價值，否則系統一律放棄。</li>
-        <li>冷門捕捉機制：當雙方勝率陷入低迷且市場對和局缺乏防備時，系統會自動捕捉高價值的冷門和局。</li>
-      </ul>
-      <p><strong>2. 精細化賠率區間與防冷機制</strong></p>
-      <ul>
-        <li>主場價值投資：數據看好主隊且賠率處於合理回報區間時，直接進行價值投資。</li>
-        <li>主場防冷保險：數據看好主隊但賠率偏高時，自動切換為和局保護本金。</li>
-        <li>客場防冷保險：客隊被看好但賠率過低時，利用和局抵禦客場風險。</li>
-        <li>平賠陷阱規避：主客賠率完全相同時，系統自動跳過。</li>
-      </ul>
-      <p><strong>3. 終極賠率博弈與極端風險防雷</strong></p>
-      <ul>
-        <li>價值博弈：比較主客賠率，誰的賠率更具市場價值就買誰。</li>
-        <li>極端冷門防禦罩：當賠率高達系統設定的警戒線時，系統會強制跳過這些場次。</li>
-      </ul>
-      <p><strong>4. 動態 EV（期望值）與成本計算模組</strong></p>
-      <p>系統內建期望值與成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
-      <p><strong>5. 全方位績效儀表板</strong></p>
-      <p>自動彙整獲利與虧損、顯示命中率、反映資金使用效率。</p>
-      <h3>📈 系統核心優勢</h3>
-      <ul>
-        <li>絕對紀律：所有公式均已設定好，觸發條件自動給出訊號。</li>
-        <li>攻守兼備：兼具捕捉冷門的進攻邏輯與極端賠率跳過的防守邏輯。</li>
-        <li>持續進化：ver 1.0 版本，持續追蹤表現並根據市場變化迭代。</li>
-      </ul>
-      <h3>⚠️ 給客人的誠信風險聲明</h3>
-      <ul>
-        <li>歷史不等於未來：本系統基於歷史數據回測與概率模型，歷史表現不代表未來必贏。</li>
-        <li>長期複利思維：足球比賽充滿不可抗力（紅牌、點球、烏龍等），單場比賽的盈虧隨機性極高。系統的優勢在於長期複利的穩定，而非一夜暴富。</li>
-        <li>嚴格注碼管理：強烈建議客戶採用固定比例注碼（例如總資金的 1%-2%）。切勿因為短期連續黑單而手動干預公式或盲目重注。</li>
-      </ul>
-      <h3>🛡️ 法律合規與負責任博彩聲明</h3>
-      <ul>
-        <li>只作研究用途：本系統及所有相關數據、圖表與分析結果，僅供學術研究、數據分析及個人興趣之用，不構成任何形式的投資建議或博彩邀約。</li>
-        <li>必須控制注碼：博彩涉及風險，用戶在參與任何相關活動時，必須嚴格控制注碼，量力而為，切勿將無法承受損失的資金投入其中。</li>
-        <li>切勿沉迷賭博：請保持理性，切勿沉迷賭博。若發現自己或身邊的人有賭博成癮的傾向，請立即尋求專業協助。</li>
-        <li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
-      </ul>
-      <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據分析的樂趣。</p>
-      <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
-      <div id="termsEndMarker" style="height:1px;"></div>
-    </div>
-    <button id="agreeBtn" disabled>請滾動閱讀至最底部</button>
-  </div>
-</div>
-
-<div id="calcPage">
-  <div class="dark-card stats-panel">
-    <h3 data-i18n="statsTitle">📊 歷史數據統計</h3>
-    <div class="stats-grid">
-      <div class="stat-item"><div class="label" data-i18n="totalPnl">總盈虧</div><div class="value neutral" id="stat-pnl">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="winsCount">命中數</div><div class="value" id="stat-wins">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="totalCost">總成本</div><div class="value" id="stat-cost">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="betsCount">出手數</div><div class="value" id="stat-bets">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="roi">盈虧率 (ROI)</div><div class="value" id="stat-roi">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="hitRate">命中率</div><div class="value" id="stat-hitrate">—</div></div>
-    </div>
-    <div class="stats-note" data-i18n="statsNote">※ 每注固定 $100，所有數據實時同步</div>
-    <div class="stats-note date-note"><span data-i18n="dbUpdate">📅 資料庫更新日期：</span><span id="stat-update-date">—</span></div>
-    <a class="stats-link" href="https://docs.google.com/spreadsheets/d/1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM/edit?usp=drivesdk" target="_blank" data-i18n="viewDetails">📋 查看詳細賽果 →</a>
-  </div>
-
-  <div class="dark-card container">
-    <h2 data-i18n="mainTitle">⚽ 智能量化預測系統</h2>
-    <p class="subtitle" data-i18n="sub1">勝率數據建議使用 FootballForecastAI 勝率</p>
-    <p class="subtitle" data-i18n="sub2">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
-
-    <div class="input-group"><label data-i18n="labelHW">主勝率 (%)</label><input type="text" id="hw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phHW" placeholder="例如：40" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();"></div>
-    <div class="input-group"><label data-i18n="labelDW">和勝率 (%)</label><input type="text" id="dw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phDW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();"></div>
-    <div class="input-group"><label data-i18n="labelAW">客勝率 (%)</label><input type="text" id="aw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phAW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();"></div>
-    <div class="input-group"><label data-i18n="labelHO">主賠 (如 158)</label><input type="text" id="ho" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phHO" placeholder="例如：158" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();"></div>
-    <div class="input-group"><label data-i18n="labelDO">和賠 (如 395)</label><input type="text" id="doo" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phDO" placeholder="例如：395" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();"></div>
-    <div class="input-group"><label data-i18n="labelAO">客賠 (如 405)</label><input type="text" id="ao" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phAO" placeholder="例如：405" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();"></div>
-
-    <button id="calcBtn" onclick="calculate()" data-i18n="calcBtn">計算結果</button>
-    <button id="clearBtn" onclick="clearData()" data-i18n="clearBtn">清除數據</button>
-
-    <div id="resultBox" class="result-box"></div>
-    <div id="evBox" class="ev-box"></div>
-    <div id="hintBox" class="hint-box"></div>
-  </div>
-</div>
-
-<script>
-// ==================== 翻譯字典 ====================
-const translations = {
-  'zh-HK': {
-    termsTitle: '📋 使用守則與風險聲明',
-    scrollHint: '請滾動閱讀至最底部',
-    agreeBtnActive: '✅ 我已閱讀並同意，進入系統',
-    statsTitle: '📊 歷史數據統計',
-    totalPnl: '總盈虧', winsCount: '命中數', totalCost: '總成本', betsCount: '出手數',
-    roi: '盈虧率 (ROI)', hitRate: '命中率',
-    statsNote: '※ 每注固定 $100，所有數據實時同步',
-    dbUpdate: '📅 資料庫更新日期：',
-    viewDetails: '📋 查看詳細賽果 →',
-    mainTitle: '⚽ 智能量化預測系統',
-    sub1: '勝率數據建議使用 FootballForecastAI 勝率',
-    sub2: '賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率',
-    labelHW: '主勝率 (%)', labelDW: '和勝率 (%)', labelAW: '客勝率 (%)',
-    labelHO: '主賠 (如 158)', labelDO: '和賠 (如 395)', labelAO: '客賠 (如 405)',
-    phHW: '例如：40', phDW: '例如：30', phAW: '例如：30',
-    phHO: '例如：158', phDO: '例如：395', phAO: '例如：405',
-    calcBtn: '計算結果', clearBtn: '清除數據', whatsapp: '📱 加入WhatsApp群組',
-    resultH: '✅ 建議出手：買主勝', resultA: '✅ 建議出手：買客勝',
-    resultD: '✅ 建議出手：買和局', resultSkip: '⛔ 建議不出手',
-    errIncomplete: '⚠️ 數據不完整', errOver100: '⚠️ 命中率大於100%',
-    evLabel: '期望值 EV-1：',
-    hintSkip: '數據信號不明，系統選擇跳過本次投注，避免風險。',
-    hint1: '兩隊勝率均偏低，和局概率被市場低估，系統捕捉冷門和局，建議買和局。',
-    hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
-    hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
-    hint4: '客隊勝率較高但客賠過低，存在大熱必死風險，系統利用和局抵禦客場不確定性，建議買和局。',
-    hint5: '市場賠率與勝率模型出現分歧或熱門賠率極低，盈利上完全不值得投資，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。'
-  },
-  'zh-CN': {
-    termsTitle: '📋 使用守则与风险声明',
-    scrollHint: '请滚动阅读至最底部',
-    agreeBtnActive: '✅ 我已阅读并同意，进入系统',
-    statsTitle: '📊 历史数据统计',
-    totalPnl: '总盈亏', winsCount: '命中数', totalCost: '总成本', betsCount: '出手数',
-    roi: '盈亏率 (ROI)', hitRate: '命中率',
-    statsNote: '※ 每注固定 $100，所有数据实时同步',
-    dbUpdate: '📅 数据库更新日期：',
-    viewDetails: '📋 查看详细赛果 →',
-    mainTitle: '⚽ 智能量化预测系统',
-    sub1: '胜率数据建议使用 FootballForecastAI 胜率',
-    sub2: '赔率数据建议使用 Tipsme 内的马会(HKJC) 赔率',
-    labelHW: '主胜率 (%)', labelDW: '和胜率 (%)', labelAW: '客胜率 (%)',
-    labelHO: '主赔 (如 158)', labelDO: '和赔 (如 395)', labelAO: '客赔 (如 405)',
-    phHW: '例如：40', phDW: '例如：30', phAW: '例如：30',
-    phHO: '例如：158', phDO: '例如：395', phAO: '例如：405',
-    calcBtn: '计算结果', clearBtn: '清除数据', whatsapp: '📱 加入WhatsApp群组',
-    resultH: '✅ 建议出手：买主胜', resultA: '✅ 建议出手：买客胜',
-    resultD: '✅ 建议出手：买和局', resultSkip: '⛔ 建议不出手',
-    errIncomplete: '⚠️ 数据不完整', errOver100: '⚠️ 命中率大于100%',
-    evLabel: '期望值 EV-1：',
-    hintSkip: '数据信号不明，系统选择跳过本次投注，避免风险。',
-    hint1: '两队胜率均偏低，和局概率被市场低估，系统捕捉冷门和局，建议买和局。',
-    hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
-    hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
-    hint4: '客队胜率较高但客赔过低，存在大热必死风险，系统利用和局抵御客场不确定性，建议买和局。',
-    hint5: '市场赔率与胜率模型出现分歧或热门赔率极低，盈利上完全不值得投资，系统选择赔率更高的一方进行反向博弈，建议冷门出手。'
-  },
-  'en-US': {
-    termsTitle: '📋 Terms of Use & Risk Statement',
-    scrollHint: 'Please scroll to the bottom to continue',
-    agreeBtnActive: '✅ I have read and agree, enter system',
-    statsTitle: '📊 Historical Statistics',
-    totalPnl: 'Total P/L', winsCount: 'Wins', totalCost: 'Total Cost', betsCount: 'Bets',
-    roi: 'ROI', hitRate: 'Hit Rate',
-    statsNote: '※ Fixed $100 per bet, all data synced in real-time',
-    dbUpdate: '📅 Database updated: ',
-    viewDetails: '📋 View detailed results →',
-    mainTitle: '⚽ Quant Football Prediction System',
-    sub1: 'Win rate data: FootballForecastAI recommended',
-    sub2: 'Odds data: Tipsme (HKJC) recommended',
-    labelHW: 'Home Win Rate (%)', labelDW: 'Draw Rate (%)', labelAW: 'Away Win Rate (%)',
-    labelHO: 'Home Odds (e.g. 158)', labelDO: 'Draw Odds (e.g. 395)', labelAO: 'Away Odds (e.g. 405)',
-    phHW: 'e.g. 40', phDW: 'e.g. 30', phAW: 'e.g. 30',
-    phHO: 'e.g. 158', phDO: 'e.g. 395', phAO: 'e.g. 405',
-    calcBtn: 'Calculate', clearBtn: 'Clear Data', whatsapp: '📱 Join WhatsApp Group',
-    resultH: '✅ Recommendation: Bet Home Win', resultA: '✅ Recommendation: Bet Away Win',
-    resultD: '✅ Recommendation: Bet Draw', resultSkip: '⛔ Recommendation: No Bet',
-    errIncomplete: '⚠️ Incomplete Data', errOver100: '⚠️ Probability exceeds 100%',
-    evLabel: 'Expected Value EV-1: ',
-    hintSkip: 'Signal unclear. System skips this bet to avoid risk.',
-    hint1: 'Both teams have low win rates. Draw is undervalued by the market. Bet Draw.',
-    hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
-    hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
-    hint4: 'Away team is favored but odds are too low. Risk of upset. Bet Draw.',
-    hint5: 'Market odds diverge from win rate model or the hot favorite odds are extremely low, which is not worth investing at all in terms of profit. The system selects the side with higher odds for contrarian play, recommending an underdog bet.'
-  }
-};
-
-// 守則內容（切換語言時更新）
-const termsContents = {
-  'zh-HK': null, // HTML 中已預置
-  'zh-CN': `
-    <h3>📊 智能量化足球预测系统 ver 1.0</h3>
-    <p>感谢您使用本系统。在使用前，请务必仔细阅读以下所有条款。您必须滚动到最底部，才能点击“同意”按钮进入系统。</p>
-    <h3>🎯 系统核心定位</h3>
-    <p>本系统是一套结合概率模型、市场定价（赔率）与极致风控的自动化量化分析工具。系统严格执行数学逻辑，旨在杜绝人为情绪干扰，协助用户进行数据分析。</p>
-    <h3>🛠️ 核心功能模组</h3>
-    <p><strong>1. 胜率与市场赔率的综合过滤</strong></p>
-    <ul>
-      <li>核心胜率线：低于系统设定的胜率基准，除非有特殊赔率价值，否则系统一律放弃。</li>
-      <li>冷门捕捉机制：当双方胜率陷入低迷且市场对和局缺乏防备时，系统会自动捕捉高价值的冷门和局。</li>
-    </ul>
-    <p><strong>2. 精细化赔率区间与防冷机制</strong></p>
-    <ul>
-      <li>主场价值投资：数据看好主队且赔率处于合理回报区间时，直接进行价值投资。</li>
-      <li>主场防冷保险：数据看好主队但赔率偏高时，自动切换为和局保护本金。</li>
-      <li>客场防冷保险：客队被看好但赔率过低时，利用和局抵御客场风险。</li>
-      <li>平赔陷阱规避：主客赔率完全相同时，系统自动跳过。</li>
-    </ul>
-    <p><strong>3. 终极赔率博弈与极端风险防雷</strong></p>
-    <ul>
-      <li>价值博弈：比较主客赔率，谁的赔率更具市场价值就买谁。</li>
-      <li>极端冷门防御罩：当赔率高达系统设定的警戒线时，系统会强制跳过这些场次。</li>
-    </ul>
-    <p><strong>4. 动态 EV（期望值）与成本计算模组</strong></p>
-    <p>系统内建期望值与成本的自动计算功能，确保每一注都是在数学上占优的价值投注。</p>
-    <p><strong>5. 全方位绩效仪表板</strong></p>
-    <p>自动汇总获利与亏损、显示命中率、反映资金使用效率。</p>
-    <h3>📈 系统核心优势</h3>
-    <ul>
-      <li>绝对纪律：所有公式均已设定好，触发条件自动给出信号。</li>
-      <li>攻守兼备：兼具捕捉冷门的进攻逻辑与极端赔率跳过的防守逻辑。</li>
-      <li>持续进化：ver 1.0 版本，持续追踪表现并根据市场变化迭代。</li>
-    </ul>
-    <h3>⚠️ 给客人的诚信风险声明</h3>
-    <ul>
-      <li>历史不等于未来：本系统基于历史数据回测与概率模型，历史表现不代表未来必赢。</li>
-      <li>长期复利思维：足球比赛充满不可抗力（红牌、点球、乌龙等），单场比赛的盈亏随机性极高。系统的优势在于长期复利的稳定，而非一夜暴富。</li>
-      <li>严格注码管理：强烈建议客户采用固定比例注码（例如总资金的 1%-2%）。切勿因为短期连续黑单而手动干预公式或盲目重注。</li>
-    </ul>
-    <h3>🛡️ 法律合规与负责任博彩声明</h3>
-    <ul>
-      <li>只作研究用途：本系统及所有相关数据、图表与分析结果，仅供学术研究、数据分析及个人兴趣之用，不构成任何形式的投资建议或博彩邀约。</li>
-      <li>必须控制注码：博彩涉及风险，用户在参与任何相关活动时，必须严格控制注码，量力而为，切勿将无法承受损失的资金投入其中。</li>
-      <li>切勿沉迷赌博：请保持理性，切勿沉迷赌博。若发现自己或身边的人有赌博成瘾的倾向，请立即寻求专业协助。</li>
-      <li>只供娱乐：请将本系统视为纯粹的娱乐工具，享受数据分析与策略验证的乐趣，而非视为赚钱的捷径。</li>
-    </ul>
-    <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性参与，享受数据分析的乐趣。</p>
-    <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上为完整条款，滚动到最底部即可点击同意 ——</p>
-    <div id="termsEndMarker" style="height:1px;"></div>
-  `,
-  'en-US': `
-    <h3>📊 Quant Football Prediction System ver 1.0</h3>
-    <p>Thank you for using this system. Before use, please read all terms below carefully. You must scroll to the bottom before clicking "Agree" to enter.</p>
-    <h3>🎯 System Positioning</h3>
-    <p>This system is an automated quantitative analysis tool combining probability models, market pricing (odds), and strict risk control. It executes mathematical logic strictly to eliminate emotional interference.</p>
-    <h3>🛠️ Core Function Modules</h3>
-    <p><strong>1. Win Rate & Market Odds Combined Filter</strong></p>
-    <ul>
-      <li>Core win rate line: Below system threshold, unless special odds value exists, the system skips.</li>
-      <li>Underdog capture: When both teams have low win rates and the market underprepares for draws, the system captures high-value draw opportunities.</li>
-    </ul>
-    <p><strong>2. Refined Odds Ranges & Anti-Upset Mechanism</strong></p>
-    <ul>
-      <li>Home value investment: When data favors home team with reasonable odds, invest directly.</li>
-      <li>Home anti-upset insurance: When data favors home team but odds are elevated, switch to Draw to protect capital.</li>
-      <li>Away anti-upset insurance: Away matches are always difficult. When away team is favored but odds are too low, use Draw to hedge against uncertainty.</li>
-      <li>Equal-odds trap avoidance: When home and away odds are identical, the system skips automatically.</li>
-    </ul>
-    <p><strong>3. Ultimate Odds Game & Extreme Risk Shield</strong></p>
-    <ul>
-      <li>Value game: Compare home/away odds, bet on the one with higher market value.</li>
-      <li>Extreme underdog shield: When odds exceed the system's alert line, the system forcibly skips these matches.</li>
-    </ul>
-    <p><strong>4. Dynamic EV (Expected Value) & Cost Calculation Module</strong></p>
-    <p>The system automatically calculates expected value and cost, ensuring every bet has mathematical advantage.</p>
-    <p><strong>5. Full Performance Dashboard</strong></p>
-    <p>Automatically aggregates profits/losses, displays hit rate, and reflects capital efficiency.</p>
-    <h3>📈 Core System Advantages</h3>
-    <ul>
-      <li>Absolute discipline: All formulas pre-set, automatic signals upon trigger.</li>
-      <li>Offense & defense: Combines underdog capture logic with extreme odds skip defense.</li>
-      <li>Continuous evolution: ver 1.0, continuous tracking and market-adaptive iteration.</li>
-    </ul>
-    <h3>⚠️ Integrity Risk Statement for Users</h3>
-    <ul>
-      <li>History ≠ Future: This system is based on historical backtesting and probability models. Past performance does not guarantee future wins.</li>
-      <li>Long-term compound mindset: Football matches contain uncontrollable factors (red cards, penalties, own goals). Single-match variance is extremely high. The advantage lies in long-term compound stability, not overnight riches.</li>
-      <li>Strict stake management: Fixed proportional stakes strongly recommended (e.g. 1%-2% of total capital). Do not manually intervene or over-bet during short-term losing streaks.</li>
-    </ul>
-    <h3>🛡️ Legal Compliance & Responsible Gaming Statement</h3>
-    <ul>
-      <li>Research purpose only: All data, charts, and analysis results are for academic research, data analysis, and personal interest only. They do not constitute investment advice or betting solicitation.</li>
-      <li>Must control stakes: Betting involves risk. Users must strictly control stakes when participating, never invest funds they cannot afford to lose.</li>
-      <li>Do not become addicted: Stay rational. Do not become addicted to gambling. If you or someone you know shows signs of gambling addiction, seek professional help immediately.</li>
-      <li>Entertainment only: Treat this system as a pure entertainment tool. Enjoy data analysis and strategy validation — not as a shortcut to wealth.</li>
-    </ul>
-    <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">Play rationally, enjoy data analysis.</p>
-    <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— Full terms above. Scroll to bottom to click Agree ——</p>
-    <div id="termsEndMarker" style="height:1px;"></div>
-  `
-};
-
-let currentLang = 'zh-HK';
-
-function enableAgreeBtn() {
-  const btn = document.getElementById('agreeBtn');
-  if (btn && btn.disabled) {
-    btn.disabled = false;
-    btn.classList.add('active');
-    btn.textContent = translations[currentLang].agreeBtnActive;
-  }
-}
-
-function setupTermsObserver() {
-  const marker = document.getElementById('termsEndMarker');
-  const scrollEl = document.getElementById('termsScroll');
-  
-  if (!marker || !scrollEl) return;
-  
-  if (scrollEl.scrollHeight <= scrollEl.clientHeight + 5) {
-    enableAgreeBtn();
-    return;
-  }
-  
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(function(entries) {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          enableAgreeBtn();
-          observer.disconnect();
-        }
-      });
-    }, {
-      root: scrollEl,
-      threshold: 0,
-      rootMargin: '0px 0px -10px 0px'
-    });
-    observer.observe(marker);
-  } else {
-    scrollEl.addEventListener('scroll', function() {
-      if (scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 30) {
-        enableAgreeBtn();
-      }
-    });
-  }
-}
-
-function applyLanguage(lang) {
-  currentLang = lang;
-  const t = translations[lang];
-  if (!t) return;
-  
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key]) el.textContent = t[key];
-  });
-  
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-    const key = el.getAttribute('data-i18n-ph');
-    if (t[key]) el.placeholder = t[key];
-  });
-  
-  const titleEl = document.getElementById('termsTitleText');
-  if (titleEl && t.termsTitle) titleEl.textContent = t.termsTitle;
-  
-  const termsScrollEl = document.getElementById('termsScroll');
-  const content = termsContents[lang];
-  if (termsScrollEl && content) {
-    termsScrollEl.innerHTML = content;
-    setTimeout(setupTermsObserver, 50);
-  }
-  
-  document.getElementById('langSelect').value = lang;
-  
-  const agreeBtnEl = document.getElementById('agreeBtn');
-  if (agreeBtnEl && !agreeBtnEl.disabled) {
-    agreeBtnEl.textContent = t.agreeBtnActive;
-  }
-  
-  if (window._lastResult) {
-    showResult(window._lastResult.text, window._lastResult.className, window._lastResult.layer, window._lastResult.bet, window._lastResult.ev);
-  }
-}
-
-function changeLang(lang) { applyLanguage(lang); }
-
-function checkClearBtn() {
-  const hw = document.getElementById('hw').value.trim();
-  const dw = document.getElementById('dw').value.trim();
-  const aw = document.getElementById('aw').value.trim();
-  const ho = document.getElementById('ho').value.trim();
-  const doo = document.getElementById('doo').value.trim();
-  const ao = document.getElementById('ao').value.trim();
-  const clearBtn = document.getElementById('clearBtn');
-  if (hw === '' && dw === '' && aw === '' && ho === '' && doo === '' && ao === '') {
-    clearBtn.style.display = 'none';
-  } else {
-    clearBtn.style.display = 'block';
-  }
-}
-
-// ===== 讀取 Google Sheets =====
-const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
-const SHEET_NAME = '工作表1';
-
-function fetchCell(range) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}&range=${range}&t=${Date.now()}`;
-  return fetch(url)
-    .then(res => res.text())
-    .then(text => {
-      const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
-      const cell = json.table.rows[0]?.c[0];
-      return cell ? (cell.f !== undefined ? cell.f : cell.v) : null;
-    });
-}
-
-function loadStats() {
-  fetchCell('L7').then(v => {
-    if (v === null || v === undefined) { document.getElementById('stat-pnl').textContent = '—'; return; }
-    const num = Number(String(v).replace(/,/g, '')); 
-    const el = document.getElementById('stat-pnl');
-    if (num > 0) { el.textContent = '+' + v; el.className = 'value positive'; }
-    else if (num < 0) { el.textContent = v; el.className = 'value negative'; }
-    else { el.textContent = '0'; el.className = 'value neutral'; }
-  }).catch(() => document.getElementById('stat-pnl').textContent = '—');
-
-  fetchCell('L8').then(v => { document.getElementById('stat-cost').textContent = v !== null ? v : '—'; }).catch(() => document.getElementById('stat-cost').textContent = '—');
-
-  fetchCell('L9').then(v => {
-    const el = document.getElementById('stat-roi');
-    if (v === null || v === undefined || v === '') { el.textContent = '—'; el.className = 'value'; return; }
-    let strVal = String(v).trim();
-    let numVal;
-    if (strVal.includes('%')) { numVal = parseFloat(strVal.replace('%', '')); }
-    else {
-        numVal = parseFloat(strVal);
-        if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) numVal = numVal * 100;
-    }
-    if (isNaN(numVal)) { el.textContent = '—'; el.className = 'value'; return; }
-    let sign = (numVal > 0) ? '+' : '';
-    el.textContent = sign + numVal.toFixed(2) + '%';
-    if (numVal > 0) el.className = 'value positive';
-    else if (numVal < 0) el.className = 'value negative';
-    else el.className = 'value neutral';
-  }).catch(() => {
-    const el = document.getElementById('stat-roi');
-    el.textContent = '—'; el.className = 'value';
-  });
-
-  fetchCell('L10').then(v => { document.getElementById('stat-bets').textContent = v !== null ? v : '—'; }).catch(() => document.getElementById('stat-bets').textContent = '—');
-  fetchCell('L11').then(v => { document.getElementById('stat-wins').textContent = v !== null ? v : '—'; }).catch(() => document.getElementById('stat-wins').textContent = '—');
-
-  fetchCell('L12').then(v => {
-    if (v === null || v === undefined || v === '') { document.getElementById('stat-hitrate').textContent = '—'; return; }
-    let strVal = String(v).trim();
-    let numVal;
-    if (strVal.includes('%')) { numVal = parseFloat(strVal.replace('%', '')); }
-    else {
-        numVal = parseFloat(strVal);
-        if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) numVal = numVal * 100;
-    }
-    if (isNaN(numVal)) { document.getElementById('stat-hitrate').textContent = '—'; return; }
-    document.getElementById('stat-hitrate').textContent = numVal.toFixed(2) + '%';
-  }).catch(() => document.getElementById('stat-hitrate').textContent = '—');
-
-  fetchCell('M2').then(v => { document.getElementById('stat-update-date').textContent = v !== null ? v : '—'; }).catch(() => document.getElementById('stat-update-date').textContent = '—');
-}
-
-setInterval(loadStats, 15000);
-
-// ===== 計算機邏輯 =====
-function calculate() {
-  const t = translations[currentLang];
-  let hwVal = document.getElementById('hw').value.trim();
-  let dwVal = document.getElementById('dw').value.trim();
-  let awVal = document.getElementById('aw').value.trim();
-  let hoVal = document.getElementById('ho').value.trim();
-  let dooVal = document.getElementById('doo').value.trim();
-  let aoVal = document.getElementById('ao').value.trim();
-
-  if (hwVal === '' || dwVal === '' || awVal === '' || hoVal === '' || dooVal === '' || aoVal === '') {
-      showResult(t.errIncomplete, "result-error");
-      return;
-  }
-
-  let hw = Number(hwVal), dw = Number(dwVal), aw = Number(awVal);
-  let ho = Number(hoVal), doo = Number(dooVal), ao = Number(aoVal);
-
-  if (isNaN(hw) || isNaN(dw) || isNaN(aw) || isNaN(ho) || isNaN(doo) || isNaN(ao)) {
-      showResult(t.errIncomplete, "result-error");
-      return;
-  }
-
-  if (hw + dw + aw > 100) {
-      showResult(t.errOver100, "result-error");
-      return;
-  }
-
-  let bet = "skip";
-  let layer = 0;
-
-  if (hw <= 39 && aw <= 39 && dw <= 32) { bet = "D"; layer = 1; }
-  else if (hw >= 40 && ho >= 148 && ho <= 205 && ho !== ao) { bet = "H"; layer = 2; }
-  else if (hw >= 40 && ho > 205 && ho <= 260 && ho !== ao) { bet = "D"; layer = 3; }
-  else if (aw >= 40 && ao >= 150 && ao <= 200 && ho !== ao) { bet = "D"; layer = 4; }
-  else {
-      layer = 5;
-      // 最新兜底邏輯：若賠率 >= 1000，直接買熱門隊（賠率較低的那一方）
-      if (ho > ao) {
-          // 主賠較高，客隊是熱門
-          if (ho >= 1000) { bet = "A"; }        // 極端冷門，反向買熱門客勝
-          else if (ho > 750) { bet = "skip"; }  // 高賠但未達極端，跳過
-          else { bet = "H"; }                    // 正常買主勝
-      } else if (ao > ho) {
-          // 客賠較高，主隊是熱門
-          if (ao >= 1000) { bet = "H"; }        // 極端冷門，反向買熱門主勝
-          else if (ao > 750) { bet = "skip"; }  // 高賠但未達極端，跳過
-          else { bet = "A"; }                    // 正常買客勝
-      } else {
-          // 主客賠率相同，比較勝率
-          if (hw > aw) {
-              if (ho > 750) { bet = "skip"; } else { bet = "H"; }
-          } else if (aw > hw) {
-              if (ao > 750) { bet = "skip"; } else { bet = "A"; }
-          } else {
-              bet = "skip";
-          }
-      }
-  }
-
-  let text = "", className = "", ev = null;
-
-  if (bet === "H") { text = t.resultH; className = "result-H"; ev = (hw / 100) * (ho / 100) - 1; }
-  else if (bet === "A") { text = t.resultA; className = "result-A"; ev = (aw / 100) * (ao / 100) - 1; }
-  else if (bet === "D") { text = t.resultD; className = "result-D"; ev = (dw / 100) * (doo / 100) - 1; }
-  else { text = t.resultSkip; className = "result-skip"; }
-
-  showResult(text, className, layer, bet, ev);
-}
-
-function showResult(text, className, layer, bet, ev) {
-  let resultBox = document.getElementById('resultBox');
-  resultBox.style.display = 'block';
-  resultBox.className = "result-box " + className;
-  resultBox.innerText = text;
-
-  let evBox = document.getElementById('evBox');
-  let hintBox = document.getElementById('hintBox');
-  
-  if (className === 'result-error') {
-      evBox.style.display = 'none';
-      hintBox.style.display = 'none';
-      hintBox.innerText = '';
-      window._lastResult = null;
-      return;
-  }
-
-  const t = translations[currentLang];
-
-  if (ev !== null && ev !== undefined && !isNaN(ev)) {
-      const evPercent = (ev * 100).toFixed(2);
-      const sign = ev >= 0 ? '+' : '';
-      const colorClass = ev >= 0 ? 'ev-positive' : 'ev-negative';
-      evBox.innerHTML = t.evLabel + '<span class="' + colorClass + '">' + sign + evPercent + '%</span>';
-      evBox.style.display = 'block';
-  } else {
-      evBox.style.display = 'none';
-  }
-
-  let hintText = '';
-  if (bet === "skip") { hintText = t.hintSkip; }
-  else {
-      switch(layer) {
-          case 1: hintText = t.hint1; break;
-          case 2: hintText = t.hint2; break;
-          case 3: hintText = t.hint3; break;
-          case 4: hintText = t.hint4; break;
-          case 5: hintText = t.hint5; break;
-      }
-  }
-  
-  hintBox.innerText = hintText;
-  hintBox.style.display = hintText ? 'block' : 'none';
-  
-  window._lastResult = { text, className, layer, bet, ev };
-}
-
-function clearData() {
-  ['hw','dw','aw','ho','doo','ao'].forEach(id => document.getElementById(id).value = '');
-
-  let resultBox = document.getElementById('resultBox');
-  resultBox.style.display = 'none';
-  resultBox.innerText = '';
-  resultBox.className = 'result-box';
-
-  let evBox = document.getElementById('evBox');
-  evBox.style.display = 'none';
-  evBox.innerText = '';
-
-  let hintBox = document.getElementById('hintBox');
-  hintBox.style.display = 'none';
-  hintBox.innerText = '';
-  
-  window._lastResult = null;
-  checkClearBtn();
-}
-
-window.addEventListener('load', function() {
-  const agreeBtnEl = document.getElementById('agreeBtn');
-  if (agreeBtnEl) {
-    agreeBtnEl.addEventListener('click', function() {
-      if (this.disabled) return;
-      document.getElementById('termsPage').style.display = 'none';
-      document.getElementById('calcPage').style.display = 'flex';
-      loadStats();
-    });
-  }
-  setTimeout(setupTermsObserver, 200);
-});
-
-applyLanguage('zh-HK');
-checkClearBtn();
-</script>
+	<div class="whatsapp-top">
+		<a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
+	</div>
+	<div class="lang-switcher"> 🌐 <select id="langSelect" onchange="changeLang(this.value)">
+			<option value="zh-HK">繁體中文 (HK/TW)</option>
+			<option value="zh-CN">简体中文 (CN)</option>
+			<option value="en-US">English (US)</option>
+		</select>
+	</div>
+	<!-- ===== 守則頁面 ===== -->
+	<div id="termsPage">
+		<div class="terms-container">
+			<h2 id="termsTitleText">📋 使用守則與風險聲明</h2>
+			<div class="terms-scroll" id="termsScroll">
+				<div id="terms-zh-HK">
+					<h3>📊 智能量化足球預測系統 ver 1.0</h3>
+					<p>感謝您使用本系統。在使用前，請務必仔細閱讀以下所有條款。您必須滾動到最底部，才能點擊「同意」按鈕進入系統。</p>
+					<h3>🎯 系統核心定位</h3>
+					<p>本系統是一套結合機率模型、市場定價（賠率）與極致風控的自動化量化分析工具。系統嚴格執行數學邏輯，旨在杜絕人為情緒干擾，協助用戶進行數據分析。</p>
+					<h3>🛠️ 核心功能模組</h3>
+					<p><strong>1. 勝率與市場賠率的綜合過濾</strong></p>
+					<ul>
+						<li>核心勝率線：低於系統設定的勝率基準，除非有特殊賠率價值，否則系統一律放棄。</li>
+						<li>冷門捕捉機制：當雙方勝率陷入低迷且市場對和局缺乏防備時，系統會自動捕捉高價值的冷門和局。</li>
+					</ul>
+					<p><strong>2. 精細化賠率區間與防冷機制</strong></p>
+					<ul>
+						<li>主場價值投資：數據看好主隊且賠率處於合理回報區間時，直接進行價值投資。</li>
+						<li>主場防冷保險：數據看好主隊但賠率偏高時，自動切換為和局保護本金。</li>
+						<li>客場防冷保險：客隊被看好但賠率過低時，利用和局抵禦客場風險。</li>
+						<li>平賠陷阱規避：主客賠率完全相同時，系統自動跳過。</li>
+					</ul>
+					<p><strong>3. 終極賠率博弈與極端風險防雷</strong></p>
+					<ul>
+						<li>價值博弈：比較主客賠率，誰的賠率更具市場價值就買誰。</li>
+						<li>極端冷門防禦罩：當賠率高達系統設定的警戒線時，系統會強制跳過這些場次。</li>
+					</ul>
+					<p><strong>4. 動態 EV（期望值）與成本計算模組</strong></p>
+					<p>系統內建期望值與成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
+					<p><strong>5. 全方位績效儀表板</strong></p>
+					<p>自動彙整獲利與虧損、顯示命中率、反映資金使用效率。</p>
+					<h3>📈 系統核心優勢</h3>
+					<ul>
+						<li>絕對紀律：所有公式均已設定好，觸發條件自動給出訊號。</li>
+						<li>攻守兼備：兼具捕捉冷門的進攻邏輯與極端賠率跳過的防守邏輯。</li>
+						<li>持續進化：ver 1.0 版本，持續追蹤表現並根據市場變化迭代。</li>
+					</ul>
+					<h3>⚠️ 給客人的誠信風險聲明</h3>
+					<ul>
+						<li>歷史不等於未來：本系統基於歷史數據回測與概率模型，歷史表現不代表未來必贏。</li>
+						<li>長期複利思維：足球比賽充滿不可抗力（紅牌、點球、烏龍等），單場比賽的盈虧隨機性極高。系統的優勢在於長期複利的穩定，而非一夜暴富。</li>
+						<li>嚴格注碼管理：強烈建議客戶採用固定比例注碼（例如總資金的 1%-2%）。切勿因為短期連續黑單而手動干預公式或盲目重注。</li>
+					</ul>
+					<h3>🛡️ 法律合規與負責任博彩聲明</h3>
+					<ul>
+						<li>只作研究用途：本系統及所有相關數據、圖表與分析結果，僅供學術研究、數據分析及個人興趣之用，不構成任何形式的投資建議或博彩邀約。</li>
+						<li>必須控制注碼：博彩涉及風險，用戶在參與任何相關活動時，必須嚴格控制注碼，量力而為，切勿將無法承受損失的資金投入其中。</li>
+						<li>切勿沉迷賭博：請保持理性，切勿沉迷賭博。若發現自己或身邊的人有賭博成癮的傾向，請立即尋求專業協助。</li>
+						<li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
+					</ul>
+					<p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據分析的樂趣。</p>
+					<p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
+				</div>
+				<div id="terms-zh-CN" style="display:none;">
+					<h3>📊 智能量化足球预测系统 ver 1.0</h3>
+					<p>感谢您使用本系统。在使用前，请务必仔细阅读以下所有条款。您必须滚动到最底部，才能点击“同意”按钮进入系统。</p>
+					<h3>🎯 系统核心定位</h3>
+					<p>本系统是一套结合概率模型、市场定价（赔率）与极致风控的自动化量化分析工具。系统严格执行数学逻辑，旨在杜绝人为情绪干扰，协助用户进行数据分析。</p>
+					<h3>🛠️ 核心功能模组</h3>
+					<p><strong>1. 胜率与市场赔率的综合过滤</strong></p>
+					<ul>
+						<li>核心胜率线：低于系统设定的胜率基准，除非有特殊赔率价值，否则系统一律放弃。</li>
+						<li>冷门捕捉机制：当双方胜率陷入低迷且市场对和局缺乏防备时，系统会自动捕捉高价值的冷门和局。</li>
+					</ul>
+					<p><strong>2. 精细化赔率区间与防冷机制</strong></p>
+					<ul>
+						<li>主场价值投资：数据看好主队且赔率处于合理回报区间时，直接进行价值投资。</li>
+						<li>主场防冷保险：数据看好主队但赔率偏高时，自动切换为和局保护本金。</li>
+						<li>客场防冷保险：客队被看好但赔率过低时，利用和局抵御客场风险。</li>
+						<li>平赔陷阱规避：主客赔率完全相同时，系统自动跳过。</li>
+					</ul>
+					<p><strong>3. 终极赔率博弈与极端风险防雷</strong></p>
+					<ul>
+						<li>价值博弈：比较主客赔率，谁的赔率更具市场价值就买谁。</li>
+						<li>极端冷门防御罩：当赔率高达系统设定的警戒线时，系统会强制跳过这些场次。</li>
+					</ul>
+					<p><strong>4. 动态 EV（期望值）与成本计算模组</strong></p>
+					<p>系统内建期望值与成本的自动计算功能，确保每一注都是在数学上占优的价值投注。</p>
+					<p><strong>5. 全方位绩效仪表板</strong></p>
+					<p>自动汇总获利与亏损、显示命中率、反映资金使用效率。</p>
+					<h3>📈 系统核心优势</h3>
+					<ul>
+						<li>绝对纪律：所有公式均已设定好，触发条件自动给出信号。</li>
+						<li>攻守兼备：兼具捕捉冷门的进攻逻辑与极端赔率跳过的防守逻辑。</li>
+						<li>持续进化：ver 1.0 版本，持续追踪表现并根据市场变化迭代。</li>
+					</ul>
+					<h3>⚠️ 给客人的诚信风险声明</h3>
+					<ul>
+						<li>历史不等于未来：本系统基于历史数据回测与概率模型，历史表现不代表未来必赢。</li>
+						<li>长期复利思维：足球比赛充满不可抗力（红牌、点球、乌龙等），单场比赛的盈亏随机性极高。系统的优势在于长期复利的稳定，而非一夜暴富。</li>
+						<li>严格注码管理：强烈建议客户采用固定比例注码（例如总资金的 1%-2%）。切勿因为短期连续黑单而手动干预公式或盲目重注。</li>
+					</ul>
+					<h3>🛡️ 法律合规与负责任博彩声明</h3>
+					<ul>
+						<li>只作研究用途：本系统及所有相关数据、图表与分析结果，仅供学术研究、数据分析及个人兴趣之用，不构成任何形式的投资建议或博彩邀约。</li>
+						<li>必须控制注码：博彩涉及风险，用户在参与任何相关活动时，必须严格控制注码，量力而为，切勿将无法承受损失的资金投入其中。</li>
+						<li>切勿沉迷赌博：请保持理性，切勿沉迷赌博。若发现自己或身边的人有赌博成瘾的倾向，请立即寻求专业协助。</li>
+						<li>只供娱乐：请将本系统视为纯粹的娱乐工具，享受数据分析与策略验证的乐趣，而非视为赚钱的捷径。</li>
+					</ul>
+					<p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性参与，享受数据分析的乐趣。</p>
+					<p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上为完整条款，滚动到最底部即可点击同意 ——</p>
+				</div>
+				<div id="terms-en-US" style="display:none;">
+					<h3>📊 Quant Football Prediction System ver 1.0</h3>
+					<p>Thank you for using this system. Before use, please read all terms below carefully. You must scroll to the bottom before clicking "Agree" to enter.</p>
+					<h3>🎯 System Positioning</h3>
+					<p>This system is an automated quantitative analysis tool combining probability models, market pricing (odds), and strict risk control. It executes mathematical logic strictly to eliminate emotional interference.</p>
+					<h3>🛠️ Core Function Modules</h3>
+					<p><strong>1. Win Rate & Market Odds Combined Filter</strong></p>
+					<ul>
+						<li>Core win rate line: Below system threshold, unless special odds value exists, the system skips.</li>
+						<li>Underdog capture: When both teams have low win rates and the market underprepares for draws, the system captures high-value draw opportunities.</li>
+					</ul>
+					<p><strong>2. Refined Odds Ranges & Anti-Upset Mechanism</strong></p>
+					<ul>
+						<li>Home value investment: When data favors home team with reasonable odds, invest directly.</li>
+						<li>Home anti-upset insurance: When data favors home team but odds are elevated, switch to Draw to protect capital.</li>
+						<li>Away anti-upset insurance: Away matches are always difficult. When away team is favored but odds are too low, use Draw to hedge against uncertainty.</li>
+						<li>Equal-odds trap avoidance: When home and away odds are identical, the system skips automatically.</li>
+					</ul>
+					<p><strong>3. Ultimate Odds Game & Extreme Risk Shield</strong></p>
+					<ul>
+						<li>Value game: Compare home/away odds, bet on the one with higher market value.</li>
+						<li>Extreme underdog shield: When odds exceed the system's alert line, the system forcibly skips these matches.</li>
+					</ul>
+					<p><strong>4. Dynamic EV (Expected Value) & Cost Calculation Module</strong></p>
+					<p>The system automatically calculates expected value and cost, ensuring every bet has mathematical advantage.</p>
+					<p><strong>5. Full Performance Dashboard</strong></p>
+					<p>Automatically aggregates profits/losses, displays hit rate, and reflects capital efficiency.</p>
+					<h3>📈 Core System Advantages</h3>
+					<ul>
+						<li>Absolute discipline: All formulas pre-set, automatic signals upon trigger.</li>
+						<li>Offense & defense: Combines underdog capture logic with extreme odds skip defense.</li>
+						<li>Continuous evolution: ver 1.0, continuous tracking and market-adaptive iteration.</li>
+					</ul>
+					<h3>⚠️ Integrity Risk Statement for Users</h3>
+					<ul>
+						<li>History ≠ Future: This system is based on historical backtesting and probability models. Past performance does not guarantee future wins.</li>
+						<li>Long-term compound mindset: Football matches contain uncontrollable factors (red cards, penalties, own goals). Single-match variance is extremely high. The advantage lies in long-term compound stability, not overnight riches.</li>
+						<li>Strict stake management: Fixed proportional stakes strongly recommended (e.g. 1%-2% of total capital). Do not manually intervene or over-bet during short-term losing streaks.</li>
+					</ul>
+					<h3>🛡️ Legal Compliance & Responsible Gaming Statement</h3>
+					<ul>
+						<li>Research purpose only: All data, charts, and analysis results are for academic research, data analysis, and personal interest only. They do not constitute investment advice or betting solicitation.</li>
+						<li>Must control stakes: Betting involves risk. Users must strictly control stakes when participating, never invest funds they cannot afford to lose.</li>
+						<li>Do not become addicted: Stay rational. Do not become addicted to gambling. If you or someone you know shows signs of gambling addiction, seek professional help immediately.</li>
+						<li>Entertainment only: Treat this system as a pure entertainment tool. Enjoy data analysis and strategy validation — not as a shortcut to wealth.</li>
+					</ul>
+					<p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">Play rationally, enjoy data analysis.</p>
+					<p style="text-align:center; font-size:12px; color:#6b7f9e;">—— Full terms above. Scroll to bottom to click Agree ——</p>
+				</div>
+				<div id="termsEndMarker" style="height:1px;"></div>
+			</div>
+			<!-- 按鈕在滾動區域外，onclick 直接寫切換代碼 -->
+			<button id="agreeBtn" type="button" onclick="
+      document.getElementById('termsPage').style.display='none';
+      document.getElementById('calcPage').style.display='flex';
+      window.scrollTo(0,0);
+      try { if(typeof loadStats === 'function') loadStats(); } catch(e) {}
+    ">請滾動閱讀至最底部</button>
+		</div>
+	</div>
+	<div id="calcPage">
+		<div class="dark-card stats-panel">
+			<h3 data-i18n="statsTitle">📊 歷史數據統計</h3>
+			<div class="stats-grid">
+				<div class="stat-item">
+					<div class="label" data-i18n="totalPnl">總盈虧</div>
+					<div class="value neutral" id="stat-pnl">—</div>
+				</div>
+				<div class="stat-item">
+					<div class="label" data-i18n="winsCount">命中數</div>
+					<div class="value" id="stat-wins">—</div>
+				</div>
+				<div class="stat-item">
+					<div class="label" data-i18n="totalCost">總成本</div>
+					<div class="value" id="stat-cost">—</div>
+				</div>
+				<div class="stat-item">
+					<div class="label" data-i18n="betsCount">出手數</div>
+					<div class="value" id="stat-bets">—</div>
+				</div>
+				<div class="stat-item">
+					<div class="label" data-i18n="roi">盈虧率 (ROI)</div>
+					<div class="value" id="stat-roi">—</div>
+				</div>
+				<div class="stat-item">
+					<div class="label" data-i18n="hitRate">命中率</div>
+					<div class="value" id="stat-hitrate">—</div>
+				</div>
+			</div>
+			<div class="stats-note" data-i18n="statsNote">※ 每注固定 $100，所有數據實時同步</div>
+			<div class="stats-note date-note"><span data-i18n="dbUpdate">📅 資料庫更新日期：</span><span id="stat-update-date">—</span></div>
+			<a class="stats-link" href="https://docs.google.com/spreadsheets/d/1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM/edit?usp=drivesdk" target="_blank" data-i18n="viewDetails">📋 查看詳細賽果 →</a>
+		</div>
+		<div class="dark-card container">
+			<h2 data-i18n="mainTitle">⚽ 智能量化預測系統</h2>
+			<p class="subtitle" data-i18n="sub1">勝率數據建議使用 FootballForecastAI 勝率</p>
+			<p class="subtitle" data-i18n="sub2">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
+			<div class="input-group">
+				<label data-i18n="labelHW">主勝率</label>
+				<div class="input-wrapper">
+					<input type="text" id="hw" inputmode="numeric" data-i18n-ph="phHW" placeholder="例如：40" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
+					<span class="suffix">%</span>
+				</div>
+			</div>
+			<div class="input-group">
+				<label data-i18n="labelDW">和勝率</label>
+				<div class="input-wrapper">
+					<input type="text" id="dw" inputmode="numeric" data-i18n-ph="phDW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
+					<span class="suffix">%</span>
+				</div>
+			</div>
+			<div class="input-group">
+				<label data-i18n="labelAW">客勝率</label>
+				<div class="input-wrapper">
+					<input type="text" id="aw" inputmode="numeric" data-i18n-ph="phAW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
+					<span class="suffix">%</span>
+				</div>
+			</div>
+			<div class="input-group">
+				<label data-i18n="labelHO">主賠</label>
+				<div class="input-wrapper">
+					<input type="text" id="ho" inputmode="decimal" data-i18n-ph="phHO" placeholder="例如：1.58" oninput="formatOddsInput(this); checkClearBtn();" onblur="formatOddsOnBlur(this);">
+				</div>
+			</div>
+			<div class="input-group">
+				<label data-i18n="labelDO">和賠</label>
+				<div class="input-wrapper">
+					<input type="text" id="doo" inputmode="decimal" data-i18n-ph="phDO" placeholder="例如：3.95" oninput="formatOddsInput(this); checkClearBtn();" onblur="formatOddsOnBlur(this);">
+				</div>
+			</div>
+			<div class="input-group">
+				<label data-i18n="labelAO">客賠</label>
+				<div class="input-wrapper">
+					<input type="text" id="ao" inputmode="decimal" data-i18n-ph="phAO" placeholder="例如：4.05" oninput="formatOddsInput(this); checkClearBtn();" onblur="formatOddsOnBlur(this);">
+				</div>
+			</div>
+			<button id="calcBtn" onclick="calculate()" data-i18n="calcBtn">計算結果</button>
+			<button id="clearBtn" onclick="clearData()" data-i18n="clearBtn">清除數據</button>
+			<div id="resultBox" class="result-box"></div>
+			<div id="evBox" class="ev-box"></div>
+			<div id="hintBox" class="hint-box"></div>
+		</div>
+	</div>
+	<script>
+		// ==================== 滾動偵測啟用按鈕 ====================
+		(function() {
+		  function checkScroll() {
+		    var btn = document.getElementById('agreeBtn');
+		    var scrollEl = document.getElementById('termsScroll');
+		    if (!btn || !scrollEl) return;
+		    if (btn.classList.contains('active')) return;
+		    
+		    // 內容若不足，直接啟用
+		    if (scrollEl.scrollHeight <= scrollEl.clientHeight + 5) {
+		      btn.classList.add('active');
+		      btn.textContent = '✅ 我已閱讀並同意，進入系統';
+		      return;
+		    }
+		    
+		    // 判斷是否滾到底
+		    var reachedBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 30;
+		    if (reachedBottom) {
+		      btn.classList.add('active');
+		      btn.textContent = '✅ 我已閱讀並同意，進入系統';
+		    }
+		  }
+		  
+		  window.addEventListener('load', function() {
+		    var scrollEl = document.getElementById('termsScroll');
+		    if (scrollEl) {
+		      scrollEl.addEventListener('scroll', checkScroll);
+		      scrollEl.addEventListener('touchmove', checkScroll);
+		      scrollEl.addEventListener('touchend', checkScroll);
+		    }
+		    setTimeout(checkScroll, 500);
+		    window.addEventListener('resize', checkScroll);
+		  });
+		})();
+		
+		// ==================== 翻譯字典 ====================
+		const translations = {
+		  'zh-HK': {
+		    termsTitle: '📋 使用守則與風險聲明',
+		    agreeBtnActive: '✅ 我已閱讀並同意，進入系統',
+		    statsTitle: '📊 歷史數據統計',
+		    totalPnl: '總盈虧', winsCount: '命中數', totalCost: '總成本', betsCount: '出手數',
+		    roi: '盈虧率 (ROI)', hitRate: '命中率',
+		    statsNote: '※ 每注固定 $100，所有數據實時同步',
+		    dbUpdate: '📅 資料庫更新日期：',
+		    viewDetails: '📋 查看詳細賽果 →',
+		    mainTitle: '⚽ 智能量化預測系統',
+		    sub1: '勝率數據建議使用 FootballForecastAI 勝率',
+		    sub2: '賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率',
+		    labelHW: '主勝率', labelDW: '和勝率', labelAW: '客勝率',
+		    labelHO: '主賠', labelDO: '和賠', labelAO: '客賠',
+		    phHW: '例如：40', phDW: '例如：30', phAW: '例如：30',
+		    phHO: '例如：1.58', phDO: '例如：3.95', phAO: '例如：4.05',
+		    calcBtn: '計算結果', clearBtn: '清除數據', whatsapp: '📱 加入WhatsApp群組',
+		    resultH: '✅ 建議出手：買主勝', resultA: '✅ 建議出手：買客勝',
+		    resultD: '✅ 建議出手：買和局', resultSkip: '⛔ 建議不出手',
+		    errIncomplete: '⚠️ 數據不完整', errOver100: '⚠️ 命中率大於100%',
+		    evLabel: '期望值 EV-1：',
+		    hintSkip: '數據信號不明，系統選擇跳過本次投注，避免風險。',
+		    hint1: '兩隊勝率均偏低，和局概率被市場低估，系統捕捉冷門和局，建議買和局。',
+		    hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
+		    hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
+		    hint4: '客隊勝率較高但客賠過低，存在大熱必死風險，系統利用和局抵禦客場不確定性，建議買和局。',
+		    hint5: '市場賠率與勝率模型出現分歧或熱門賠率極低，盈利上完全不值得投資，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
+		    hintReverse: '偵測到一方賠率高達 10.00 以上，屬於極端冷門。熱門隊勝率極大，幾乎必勝，系統反向買入熱門隊，以穩定概率獲利。'
+		  },
+		  'zh-CN': {
+		    termsTitle: '📋 使用守则与风险声明',
+		    agreeBtnActive: '✅ 我已阅读并同意，进入系统',
+		    statsTitle: '📊 历史数据统计',
+		    totalPnl: '总盈亏', winsCount: '命中数', totalCost: '总成本', betsCount: '出手数',
+		    roi: '盈亏率 (ROI)', hitRate: '命中率',
+		    statsNote: '※ 每注固定 $100，所有数据实时同步',
+		    dbUpdate: '📅 数据库更新日期：',
+		    viewDetails: '📋 查看详细赛果 →',
+		    mainTitle: '⚽ 智能量化预测系统',
+		    sub1: '胜率数据建议使用 FootballForecastAI 胜率',
+		    sub2: '赔率数据建议使用 Tipsme 内的马会(HKJC) 赔率',
+		    labelHW: '主胜率', labelDW: '和胜率', labelAW: '客胜率',
+		    labelHO: '主赔', labelDO: '和赔', labelAO: '客赔',
+		    phHW: '例如：40', phDW: '例如：30', phAW: '例如：30',
+		    phHO: '例如：1.58', phDO: '例如：3.95', phAO: '例如：4.05',
+		    calcBtn: '计算结果', clearBtn: '清除数据', whatsapp: '📱 加入WhatsApp群组',
+		    resultH: '✅ 建议出手：买主胜', resultA: '✅ 建议出手：买客胜',
+		    resultD: '✅ 建议出手：买和局', resultSkip: '⛔ 建议不出手',
+		    errIncomplete: '⚠️ 数据不完整', errOver100: '⚠️ 命中率大于100%',
+		    evLabel: '期望值 EV-1：',
+		    hintSkip: '数据信号不明，系统选择跳过本次投注，避免风险。',
+		    hint1: '两队胜率均偏低，和局概率被市场低估，系统捕捉冷门和局，建议买和局。',
+		    hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
+		    hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
+		    hint4: '客队胜率较高但客赔过低，存在大热必死风险，系统利用和局抵御客场不确定性，建议买和局。',
+		    hint5: '市场赔率与胜率模型出现分歧或热门赔率极低，盈利上完全不值得投资，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
+		    hintReverse: '侦测到一方赔率高达 10.00 以上，属于极端冷门。热门队胜率极大，几乎必胜，系统反向买入热门队，以稳定概率获利。'
+		  },
+		  'en-US': {
+		    termsTitle: '📋 Terms of Use & Risk Statement',
+		    agreeBtnActive: '✅ I have read and agree, enter system',
+		    statsTitle: '📊 Historical Statistics',
+		    totalPnl: 'Total P/L', winsCount: 'Wins', totalCost: 'Total Cost', betsCount: 'Bets',
+		    roi: 'ROI', hitRate: 'Hit Rate',
+		    statsNote: '※ Fixed $100 per bet, all data synced in real-time',
+		    dbUpdate: '📅 Database updated: ',
+		    viewDetails: '📋 View detailed results →',
+		    mainTitle: '⚽ Quant Football Prediction System',
+		    sub1: 'Win rate data: FootballForecastAI recommended',
+		    sub2: 'Odds data: Tipsme (HKJC) recommended',
+		    labelHW: 'Home Win Rate', labelDW: 'Draw Rate', labelAW: 'Away Win Rate',
+		    labelHO: 'Home Odds', labelDO: 'Draw Odds', labelAO: 'Away Odds',
+		    phHW: 'e.g. 40', phDW: 'e.g. 30', phAW: 'e.g. 30',
+		    phHO: 'e.g. 1.58', phDO: 'e.g. 3.95', phAO: 'e.g. 4.05',
+		    calcBtn: 'Calculate', clearBtn: 'Clear Data', whatsapp: '📱 Join WhatsApp Group',
+		    resultH: '✅ Recommendation: Bet Home Win', resultA: '✅ Recommendation: Bet Away Win',
+		    resultD: '✅ Recommendation: Bet Draw', resultSkip: '⛔ Recommendation: No Bet',
+		    errIncomplete: '⚠️ Incomplete Data', errOver100: '⚠️ Probability exceeds 100%',
+		    evLabel: 'Expected Value EV-1: ',
+		    hintSkip: 'Signal unclear. System skips this bet to avoid risk.',
+		    hint1: 'Both teams have low win rates. Draw is undervalued by the market. Bet Draw.',
+		    hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
+		    hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
+		    hint4: 'Away team is favored but odds are too low. Risk of upset. Bet Draw.',
+		    hint5: 'Market odds diverge from win rate model or the hot favorite odds are extremely low, which is not worth investing at all in terms of profit. The system selects the side with higher odds for contrarian play, recommending an underdog bet.',
+		    hintReverse: 'Detected extreme underdog odds (10.00+). The favorite has an extremely high win probability, almost certain. System bets on the favorite for stable returns.'
+		  }
+		};
+		
+		let currentLang = 'zh-HK';
+		
+		function formatOddsInput(input) {
+		  let val = input.value.replace(/[^0-9.]/g, '');
+		  const parts = val.split('.');
+		  if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+		  input.value = val;
+		}
+		
+		function formatOddsOnBlur(input) {
+		  let val = input.value.trim();
+		  if (val === '' || val === '.') return;
+		  let num = parseFloat(val);
+		  if (isNaN(num)) return;
+		  input.value = num.toFixed(2);
+		}
+		
+		function applyLanguage(lang) {
+		  currentLang = lang;
+		  const t = translations[lang];
+		  if (!t) return;
+		  
+		  document.querySelectorAll('[data-i18n]').forEach(el => {
+		    const key = el.getAttribute('data-i18n');
+		    if (t[key]) el.textContent = t[key];
+		  });
+		  
+		  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+		    const key = el.getAttribute('data-i18n-ph');
+		    if (t[key]) el.placeholder = t[key];
+		  });
+		  
+		  const titleEl = document.getElementById('termsTitleText');
+		  if (titleEl && t.termsTitle) titleEl.textContent = t.termsTitle;
+		  
+		  ['zh-HK', 'zh-CN', 'en-US'].forEach(l => {
+		    const el = document.getElementById('terms-' + l);
+		    if (el) el.style.display = (l === lang) ? 'block' : 'none';
+		  });
+		  
+		  document.getElementById('langSelect').value = lang;
+		  
+		  const agreeBtnEl = document.getElementById('agreeBtn');
+		  if (agreeBtnEl && agreeBtnEl.classList.contains('active')) {
+		    agreeBtnEl.textContent = t.agreeBtnActive;
+		  }
+		  
+		  if (window._lastResult) {
+		    showResult(window._lastResult.text, window._lastResult.className, window._lastResult.layer, window._lastResult.bet, window._lastResult.ev, window._lastResult.isReverse);
+		  }
+		}
+		
+		function changeLang(lang) { applyLanguage(lang); }
+		
+		function checkClearBtn() {
+		  const hw = document.getElementById('hw').value.trim();
+		  const dw = document.getElementById('dw').value.trim();
+		  const aw = document.getElementById('aw').value.trim();
+		  const ho = document.getElementById('ho').value.trim();
+		  const doo = document.getElementById('doo').value.trim();
+		  const ao = document.getElementById('ao').value.trim();
+		  const clearBtn = document.getElementById('clearBtn');
+		  if (hw === '' && dw === '' && aw === '' && ho === '' && doo === '' && ao === '') {
+		    clearBtn.style.display = 'none';
+		  } else {
+		    clearBtn.style.display = 'block';
+		  }
+		}
+		
+		const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
+		const SHEET_NAME = '工作表1';
+		
+		function fetchCell(range) {
+		  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}&range=${range}&t=${Date.now()}`;
+		  return fetch(url)
+		    .then(res => res.text())
+		    .then(text => {
+		      const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+		      const cell = json.table.rows[0]?.c[0];
+		      return cell ? (cell.f !== undefined ? cell.f : cell.v) : null;
+		    });
+		}
+		
+		function loadStats() {
+		  fetchCell('L7').then(v => {
+		    if (v === null || v === undefined) { document.getElementById('stat-pnl').textContent = '—'; return; }
+		    const num = Number(String(v).replace(/,/g, '')); 
+		    const el = document.getElementById('stat-pnl');
+		    if (num > 0) { el.textContent = '+' + v; el.className = 'value positive'; }
+		    else if (num < 0) { el.textContent = v; el.className = 'value negative'; }
+		    else { el.textContent = '0'; el.className = 'value neutral'; }
+		  }).catch(() => {});
+		
+		  fetchCell('L8').then(v => { document.getElementById('stat-cost').textContent = v !== null ? v : '—'; }).catch(() => {});
+		  fetchCell('L10').then(v => { document.getElementById('stat-bets').textContent = v !== null ? v : '—'; }).catch(() => {});
+		  fetchCell('L11').then(v => { document.getElementById('stat-wins').textContent = v !== null ? v : '—'; }).catch(() => {});
+		  fetchCell('M2').then(v => { document.getElementById('stat-update-date').textContent = v !== null ? v : '—'; }).catch(() => {});
+		
+		  fetchCell('L9').then(v => {
+		    const el = document.getElementById('stat-roi');
+		    if (v === null || v === undefined || v === '') { el.textContent = '—'; el.className = 'value'; return; }
+		    let numVal;
+		    let strVal = String(v).trim();
+		    if (strVal.includes('%')) { numVal = parseFloat(strVal.replace('%', '')); }
+		    else {
+		      numVal = parseFloat(strVal);
+		      if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) numVal = numVal * 100;
+		    }
+		    if (isNaN(numVal)) { el.textContent = '—'; el.className = 'value'; return; }
+		    el.textContent = (numVal > 0 ? '+' : '') + numVal.toFixed(2) + '%';
+		    el.className = 'value ' + (numVal > 0 ? 'positive' : numVal < 0 ? 'negative' : 'neutral');
+		  }).catch(() => {});
+		
+		  fetchCell('L12').then(v => {
+		    if (v === null || v === undefined || v === '') { document.getElementById('stat-hitrate').textContent = '—'; return; }
+		    let numVal;
+		    let strVal = String(v).trim();
+		    if (strVal.includes('%')) { numVal = parseFloat(strVal.replace('%', '')); }
+		    else {
+		      numVal = parseFloat(strVal);
+		      if (!isNaN(numVal) && Math.abs(numVal) <= 1 && numVal !== 0) numVal = numVal * 100;
+		    }
+		    if (isNaN(numVal)) { document.getElementById('stat-hitrate').textContent = '—'; return; }
+		    document.getElementById('stat-hitrate').textContent = numVal.toFixed(2) + '%';
+		  }).catch(() => {});
+		}
+		
+		setInterval(loadStats, 15000);
+		
+		function calculate() {
+		  const t = translations[currentLang];
+		  let hwVal = document.getElementById('hw').value.trim();
+		  let dwVal = document.getElementById('dw').value.trim();
+		  let awVal = document.getElementById('aw').value.trim();
+		  let hoVal = document.getElementById('ho').value.trim();
+		  let dooVal = document.getElementById('doo').value.trim();
+		  let aoVal = document.getElementById('ao').value.trim();
+		
+		  if (hwVal === '' || dwVal === '' || awVal === '' || hoVal === '' || dooVal === '' || aoVal === '') {
+		    showResult(t.errIncomplete, "result-error"); return;
+		  }
+		
+		  let hw = Number(hwVal), dw = Number(dwVal), aw = Number(awVal);
+		  let ho = Number(hoVal), doo = Number(dooVal), ao = Number(aoVal);
+		
+		  if (isNaN(hw) || isNaN(dw) || isNaN(aw) || isNaN(ho) || isNaN(doo) || isNaN(ao)) {
+		    showResult(t.errIncomplete, "result-error"); return;
+		  }
+		
+		  if (hw + dw + aw > 100) {
+		    showResult(t.errOver100, "result-error"); return;
+		  }
+		
+		  let bet = "skip", layer = 0, isReverse = false;
+		
+		  if (hw <= 39 && aw <= 39 && dw <= 32) { bet = "D"; layer = 1; }
+		  else if (hw >= 40 && ho >= 1.48 && ho <= 2.05 && ho !== ao) { bet = "H"; layer = 2; }
+		  else if (hw >= 40 && ho > 2.05 && ho <= 2.60 && ho !== ao) { bet = "D"; layer = 3; }
+		  else if (aw >= 40 && ao >= 1.50 && ao <= 2.00 && ho !== ao) { bet = "D"; layer = 4; }
+		  else {
+		    layer = 5;
+		    if (ho > ao) {
+		      if (ho >= 10) { bet = "A"; isReverse = true; }
+		      else if (ho > 7.50) { bet = "skip"; }
+		      else { bet = "H"; }
+		    } else if (ao > ho) {
+		      if (ao >= 10) { bet = "H"; isReverse = true; }
+		      else if (ao > 7.50) { bet = "skip"; }
+		      else { bet = "A"; }
+		    } else {
+		      if (hw > aw) { bet = ho > 7.50 ? "skip" : "H"; }
+		      else if (aw > hw) { bet = ao > 7.50 ? "skip" : "A"; }
+		      else { bet = "skip"; }
+		    }
+		  }
+		
+		  let text = "", className = "", ev = null;
+		  if (bet === "H") { text = t.resultH; className = "result-H"; ev = (hw / 100) * ho - 1; }
+		  else if (bet === "A") { text = t.resultA; className = "result-A"; ev = (aw / 100) * ao - 1; }
+		  else if (bet === "D") { text = t.resultD; className = "result-D"; ev = (dw / 100) * doo - 1; }
+		  else { text = t.resultSkip; className = "result-skip"; }
+		
+		  showResult(text, className, layer, bet, ev, isReverse);
+		}
+		
+		function showResult(text, className, layer, bet, ev, isReverse) {
+		  let resultBox = document.getElementById('resultBox');
+		  resultBox.style.display = 'block';
+		  resultBox.className = "result-box " + className;
+		  resultBox.innerText = text;
+		
+		  let evBox = document.getElementById('evBox');
+		  let hintBox = document.getElementById('hintBox');
+		  
+		  if (className === 'result-error') {
+		    evBox.style.display = 'none';
+		    hintBox.style.display = 'none';
+		    hintBox.innerText = '';
+		    window._lastResult = null;
+		    return;
+		  }
+		
+		  const t = translations[currentLang];
+		
+		  if (ev !== null && ev !== undefined && !isNaN(ev)) {
+		    const evPercent = (ev * 100).toFixed(2);
+		    const sign = ev >= 0 ? '+' : '';
+		    const colorClass = ev >= 0 ? 'ev-positive' : 'ev-negative';
+		    evBox.innerHTML = t.evLabel + '<span class="' + colorClass + '">' + sign + evPercent + '%</span>';
+		    evBox.style.display = 'block';
+		  } else {
+		    evBox.style.display = 'none';
+		  }
+		
+		  let hintText = '';
+		  if (bet === "skip") { hintText = t.hintSkip; }
+		  else if (isReverse) { hintText = t.hintReverse; }
+		  else {
+		    switch(layer) {
+		      case 1: hintText = t.hint1; break;
+		      case 2: hintText = t.hint2; break;
+		      case 3: hintText = t.hint3; break;
+		      case 4: hintText = t.hint4; break;
+		      case 5: hintText = t.hint5; break;
+		    }
+		  }
+		  
+		  hintBox.innerText = hintText;
+		  hintBox.style.display = hintText ? 'block' : 'none';
+		  window._lastResult = { text, className, layer, bet, ev, isReverse };
+		}
+		
+		function clearData() {
+		  ['hw','dw','aw','ho','doo','ao'].forEach(id => document.getElementById(id).value = '');
+		  let resultBox = document.getElementById('resultBox');
+		  resultBox.style.display = 'none';
+		  resultBox.innerText = '';
+		  resultBox.className = 'result-box';
+		  let evBox = document.getElementById('evBox');
+		  evBox.style.display = 'none';
+		  evBox.innerText = '';
+		  let hintBox = document.getElementById('hintBox');
+		  hintBox.style.display = 'none';
+		  hintBox.innerText = '';
+		  window._lastResult = null;
+		  checkClearBtn();
+		}
+		
+		applyLanguage('zh-HK');
+		checkClearBtn();
+	</script>
 </body>
 </html>
