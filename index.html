@@ -36,6 +36,27 @@
   }
   .lang-switcher select option { background: #1a1a2e; color: #fff; }
 
+  /* ===== WhatsApp 左上角固定連結 ===== */
+  .whatsapp-top {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9999;
+    background: rgba(26, 26, 46, 0.9);
+    border: 1px solid rgba(37, 211, 102, 0.4);
+    border-radius: 8px;
+    padding: 6px 10px;
+    backdrop-filter: blur(10px);
+    transition: background 0.3s;
+  }
+  .whatsapp-top:hover { background: rgba(26, 26, 46, 1); }
+  .whatsapp-top a {
+    color: #25D366;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
   /* ===== 守則頁面 ===== */
   #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
   .terms-container { 
@@ -117,8 +138,21 @@
   .container input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
   #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
   #calcBtn:hover { background: #0062cc; }
-  #clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
-  #clearBtn:hover { background: #dc2626; }
+  
+  /* 清除按鈕：紅色，無 hover 變色，且預設隱藏 */
+  #clearBtn { 
+    width: 100%; 
+    padding: 15px; 
+    background: #ef4444; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 18px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    margin-top: 10px; 
+    display: none;
+  }
 
   .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
   .result-H { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
@@ -139,15 +173,16 @@
     text-align: left; 
     display: none;
   }
-
-  .whatsapp-footer { text-align: center; margin-top: 25px; padding-bottom: 20px; }
-  .whatsapp-footer a { color: #25D366; font-size: 16px; font-weight: bold; text-decoration: none; transition: color 0.3s; }
-  .whatsapp-footer a:hover { color: #128C7E; text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<!-- ===== 語言切換器 ===== -->
+<!-- ===== 左上角 WhatsApp 連結 ===== -->
+<div class="whatsapp-top">
+  <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
+</div>
+
+<!-- ===== 右上角語言切換器 ===== -->
 <div class="lang-switcher">
   🌐 <select id="langSelect" onchange="changeLang(this.value)">
     <option value="zh-HK">繁體中文 (HK/TW)</option>
@@ -212,27 +247,27 @@
 
     <div class="input-group">
       <label data-i18n="labelHW">主勝率 (%)</label>
-      <input type="text" id="hw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phHW" placeholder="例如：40" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="hw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phHW" placeholder="例如：40" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
     </div>
     <div class="input-group">
       <label data-i18n="labelDW">和勝率 (%)</label>
-      <input type="text" id="dw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phDW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="dw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phDW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
     </div>
     <div class="input-group">
       <label data-i18n="labelAW">客勝率 (%)</label>
-      <input type="text" id="aw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phAW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="aw" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phAW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
     </div>
     <div class="input-group">
       <label data-i18n="labelHO">主賠 (如 158)</label>
-      <input type="text" id="ho" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phHO" placeholder="例如：158" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="ho" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phHO" placeholder="例如：158" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
     </div>
     <div class="input-group">
       <label data-i18n="labelDO">和賠 (如 395)</label>
-      <input type="text" id="doo" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phDO" placeholder="例如：395" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="doo" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phDO" placeholder="例如：395" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
     </div>
     <div class="input-group">
       <label data-i18n="labelAO">客賠 (如 405)</label>
-      <input type="text" id="ao" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phAO" placeholder="例如：405" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="text" id="ao" inputmode="numeric" pattern="[0-9]*" data-i18n-ph="phAO" placeholder="例如：405" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
     </div>
 
     <button id="calcBtn" onclick="calculate()" data-i18n="calcBtn">計算結果</button>
@@ -240,11 +275,6 @@
 
     <div id="resultBox" class="result-box"></div>
     <div id="hintBox" class="hint-box"></div>
-  </div>
-
-  <!-- 底部 WhatsApp 群組連結 -->
-  <div class="whatsapp-footer">
-    <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
   </div>
 
 </div>
@@ -530,33 +560,25 @@ function applyLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
   
-  // 一般文字元素
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (t[key]) el.textContent = t[key];
   });
   
-  // placeholder 元素
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     const key = el.getAttribute('data-i18n-ph');
     if (t[key]) el.placeholder = t[key];
   });
   
-  // 守則內容
   document.getElementById('termsContent').innerHTML = t.termsContent;
-  
-  // 更新語言選擇器
   document.getElementById('langSelect').value = lang;
   
-  // 若同意按鈕已啟用，更新文字
   if (!agreeBtn.disabled) {
     agreeBtn.textContent = t.agreeBtnActive;
   }
   
-  // 重新檢查滾動
   checkScroll();
   
-  // 若有結果顯示，重新顯示（讓結果與提示跟隨語言）
   if (window._lastResult) {
     showResult(window._lastResult.text, window._lastResult.className, window._lastResult.layer, window._lastResult.bet, true);
   }
@@ -589,8 +611,25 @@ agreeBtn.addEventListener('click', function() {
   loadStats();
 });
 
+// ===== 檢查是否需要顯示清除按鈕 =====
+function checkClearBtn() {
+  const hw = document.getElementById('hw').value.trim();
+  const dw = document.getElementById('dw').value.trim();
+  const aw = document.getElementById('aw').value.trim();
+  const ho = document.getElementById('ho').value.trim();
+  const doo = document.getElementById('doo').value.trim();
+  const ao = document.getElementById('ao').value.trim();
+  
+  const clearBtn = document.getElementById('clearBtn');
+  if (hw === '' && dw === '' && aw === '' && ho === '' && doo === '' && ao === '') {
+    clearBtn.style.display = 'none';
+  } else {
+    clearBtn.style.display = 'block';
+  }
+}
+
 // ===== 讀取 Google Sheets 統計數據 =====
-const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
+const SHEET_ID = 'block1zIJSl7'Qt3eVkd3q :XStZItuFvtcatEnL 'dfScy95se0noneWM';
 const SHEET_NAME = '工作表1';
 
 function fetchCell(range) {
@@ -799,9 +838,8 @@ function showResult(text, className, layer, bet, isLangChange = false) {
   }
   
   hintBox.innerText = hintText;
-  hintBox.style.display = hintText ? 'block' : 'none';
+  hintBox.style.display = hintText ? '';
   
-  // 記住最近一次結果，方便切換語言時重新渲染
   window._lastResult = { text, className, layer, bet };
 }
 
@@ -823,10 +861,14 @@ function clearData() {
   hintBox.innerText = '';
   
   window._lastResult = null;
+  
+  // 清空後隱藏清除按鈕
+  checkClearBtn();
 }
 
 // ===== 初始化 =====
 applyLanguage('zh-HK');
+checkClearBtn();
 </script>
 </body>
 </html>
