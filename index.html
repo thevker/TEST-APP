@@ -532,7 +532,7 @@ const translations = {
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
     hint4: '客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
     hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
-    hintReverse: '偵測到極端賠率，系統按最新規則買和局搏高賠回報。'
+    hintReverse: '偵測到主賠 ≥ 6.00（主隊冷門），系統改為買和局搏高賠回報。'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明',
@@ -560,7 +560,7 @@ const translations = {
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
     hint4: '客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
     hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
-    hintReverse: '侦测到极端赔率，系统按最新规则买和局搏高赔回报。'
+    hintReverse: '侦测到主赔 ≥ 6.00（主队冷门），系统改为买和局搏高赔回报。'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement',
@@ -588,7 +588,7 @@ const translations = {
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
     hint4: 'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
     hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
-    hintReverse: 'Detected extreme odds. System switches to Draw bet for high-payout upside.'
+    hintReverse: 'Detected home odds ≥ 6.00 (extreme underdog). System switches to Draw bet.'
   }
 };
 
@@ -857,7 +857,7 @@ function calculate() {
       else { bet = "H"; }
     } else if (ao > ho) {
       // F > D：客賠高
-      if (ao >= 10.00) { bet = "H"; isReverse = true; }
+      if (ao >= 7.50) { bet = "skip"; }
       else { bet = "A"; }
     } else {
       // D = F：按勝率
