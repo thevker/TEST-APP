@@ -534,7 +534,7 @@ const translations = {
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
     hint4: '客勝率高於主勝率，且客賠處於 1.90～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
     hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
-    hintReverse: '偵測到一方賠率高達 8.00 以上，屬於極端冷門。熱門隊勝率極大，幾乎必勝，系統反向買入熱門隊，以穩定概率獲利。'
+    hintReverse: '偵測到一方賠率高達 15.00 以上，屬於極端冷門。系統改為買和局，搏爆冷和局高賠回報。'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明',
@@ -562,7 +562,7 @@ const translations = {
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
     hint4: '客胜率高于主胜率，且客赔处于 1.90～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
     hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
-    hintReverse: '侦测到一方赔率高达 8.00 以上，属于极端冷门。热门队胜率极大，几乎必胜，系统反向买入热门队，以稳定概率获利。'
+    hintReverse: '侦测到一方赔率高达 15.00 以上，属于极端冷门。系统改为买和局，搏爆冷和局高赔回报。'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement',
@@ -590,7 +590,7 @@ const translations = {
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
     hint4: 'Away win rate exceeds home, and away odds fall in the 1.90–2.15 high-value zone. Bet Away Win.',
     hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play — underdog bet.',
-    hintReverse: 'Detected extreme underdog odds (8.00+). The favorite has an extremely high win probability, almost certain. System bets on the favorite for stable returns.'
+    hintReverse: 'Detected extreme underdog odds (15.00+). System switches to Draw bet for high-payout upset potential.'
   }
 };
 
@@ -815,7 +815,7 @@ document.addEventListener('visibilitychange', function() {
   if (!document.hidden) loadStatsWithRetry();
 });
 
-// ==================== 核心計算（已對應最新公式）====================
+// ==================== 核心計算（已對應最新公式，極端門檻 15.00）====================
 function calculate() {
   const t = translations[currentLang];
   let hwVal = document.getElementById('hw').value.trim();
@@ -850,18 +850,18 @@ function calculate() {
   else if (hw >= 40 && ho > 2.05 && ho <= 2.55 && ho !== ao) { bet = "D"; layer = 3; }
   // 第 4 層：C>A 且 1.90≤F≤2.15 → A
   else if (aw > hw && ao >= 1.90 && ao <= 2.15) { bet = "A"; layer = 4; }
-  // 第 5 層：兜底（賠率博弈，反向門檻 8.00）
+  // 第 5 層：兜底（賠率博弈，極端門檻 15.00 → 買和）
   else {
     layer = 5;
     if (ho > ao) {
-      if (ho >= 8.00) { bet = "A"; isReverse = true; }
+      if (ho >= 15.00) { bet = "D"; isReverse = true; }
       else { bet = "H"; }
     } else if (ao > ho) {
-      if (ao >= 8.00) { bet = "H"; isReverse = true; }
+      if (ao >= 15.00) { bet = "D"; isReverse = true; }
       else { bet = "A"; }
     } else {
-      if (hw > aw) { bet = ho > 8.00 ? "skip" : "H"; }
-      else if (aw > hw) { bet = ao > 8.00 ? "skip" : "A"; }
+      if (hw > aw) { bet = ho > 15.00 ? "skip" : "H"; }
+      else if (aw > hw) { bet = ao > 15.00 ? "skip" : "A"; }
       else { bet = "skip"; }
     }
   }
