@@ -7,7 +7,6 @@
 <style>
   * { box-sizing: border-box; }
 
-  /* ===== 主題變數 ===== */
   :root[data-theme="dark"] {
     --bg-body: #121212;
     --bg-card: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -51,7 +50,6 @@
 
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
 
-  /* ✅ 主題切換：左上角 */
   .theme-switcher {
     position: fixed; top: 12px; left: 12px; z-index: 9999;
     background: var(--bg-switcher); border: 1px solid var(--border-switcher);
@@ -59,11 +57,30 @@
     color: var(--text-primary); font-size: 18px; line-height: 1;
     cursor: pointer; backdrop-filter: blur(10px);
     user-select: none; -webkit-tap-highlight-color: transparent;
-    transition: background 0.3s;
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
   }
   .theme-switcher:active { opacity: 0.7; }
 
-  /* ✅ WhatsApp 群組：底部正中央 */
+  .lang-switcher {
+    position: fixed; top: 12px; right: 12px; z-index: 9999;
+    background: var(--bg-switcher); border: 1px solid var(--border-switcher);
+    border-radius: 8px; padding: 6px 10px; color: var(--text-primary); font-size: 13px;
+    cursor: pointer; backdrop-filter: blur(10px);
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+  }
+  .lang-switcher select {
+    background: transparent; color: var(--text-secondary); border: none; outline: none;
+    font-size: 13px; cursor: pointer; font-weight: bold;
+  }
+  .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
+
+  .theme-switcher.hidden,
+  .lang-switcher.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-20px);
+  }
+
   .whatsapp-bottom {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     z-index: 9998;
@@ -75,18 +92,6 @@
     white-space: nowrap;
   }
   .whatsapp-bottom a { color: #25D366; font-size: 14px; font-weight: bold; text-decoration: none; }
-
-  .lang-switcher {
-    position: fixed; top: 12px; right: 12px; z-index: 9999;
-    background: var(--bg-switcher); border: 1px solid var(--border-switcher);
-    border-radius: 8px; padding: 6px 10px; color: var(--text-primary); font-size: 13px;
-    cursor: pointer; backdrop-filter: blur(10px);
-  }
-  .lang-switcher select {
-    background: transparent; color: var(--text-secondary); border: none; outline: none;
-    font-size: 13px; cursor: pointer; font-weight: bold;
-  }
-  .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
 
   #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px; }
   .terms-container { 
@@ -185,7 +190,6 @@
 </head>
 <body>
 
-<!-- ✅ 主題切換：左上角 -->
 <div class="theme-switcher" onclick="toggleTheme()" title="切換主題">
   <span id="themeIcon">🌙</span>
 </div>
@@ -198,7 +202,6 @@
   </select>
 </div>
 
-<!-- ===== 守則頁面 ===== -->
 <div id="termsPage">
   <div class="terms-container">
     <h2 id="termsTitleText">📋 使用守則與風險聲明</h2>
@@ -368,18 +371,18 @@
       <div class="stat-item"><div class="label" data-i18n="winsCount">命中數</div><div class="value" id="stat-wins">—</div></div>
       <div class="stat-item"><div class="label" data-i18n="totalCost">總成本</div><div class="value" id="stat-cost">—</div></div>
       <div class="stat-item"><div class="label" data-i18n="betsCount">出手數</div><div class="value" id="stat-bets">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="roi">盈虧率 (ROI)</div><div class="value" id="stat-roi">—</div></div>
-      <div class="stat-item"><div class="label" data-i18n="hitRate">命中率</div><div class="value" id="stat-hitrate">—</div></div>
+      <div class="stat-item"><div class="label" data-i18n="roi">盈虧率 (ROI)</div><div class="value" id="stat-roi">—</>
+div></div>
+      <div class="stat-item   "><div class="label" data-i18n="hitRate"> <命中率</div><div classp="value" id="stat-hitrate class">—="</div></div>
     </div>
-    <div class="stats-note" data-i18n="statsNote">※ 每注固定 $100，所有數據實時同步</div>
-    <div class="stats-note date-note"><span data-i18n="dbUpdate">📅 資料庫更新日期：</span><span id="stat-update-date">—</span></div>
+   sub <div class="stats-note" data-i18ntitle="statsNote">"※ 每注固定 data $100，所有數據實時同步</div>
+   -i <div class="stats-note date-note"><span data-i18n="dbUpdate">📅 資料庫更新日期：</span><span id="stat-update-date">—</span></div>
     <a class="stats-link" href="https://docs.google.com/spreadsheets/d/1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM/edit?usp=drivesdk" target="_blank" data-i18n="viewDetails">📋 查看詳細賽果 →</a>
   </div>
 
   <div class="dark-card container">
     <h2 data-i18n="mainTitle">⚽ 智能量化預測系統</h2>
-    <p class="subtitle" data-i18n="sub1">勝率數據建議使用 FootballForecastAI 勝率</p>
-    <p class="subtitle" data-i18n="sub2">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
+    <p class="subtitle" data-i18n="sub1">勝率數據建議使用 FootballForecastAI 勝率</p18n="sub2">賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率</p>
 
     <div class="input-group">
       <label data-i18n="labelHW">主勝率</label>
@@ -430,7 +433,6 @@
   </div>
 </div>
 
-<!-- ✅ WhatsApp 群組：底部正中央 -->
 <div class="whatsapp-bottom">
   <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
 </div>
@@ -449,6 +451,24 @@ function toggleTheme() {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
+// ==================== 滾動時隱藏頂部按鈕 ====================
+function handleTopBtnsScroll() {
+  var y = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+  var themeBtn = document.querySelector('.theme-switcher');
+  var langBtn = document.querySelector('.lang-switcher');
+  if (!themeBtn || !langBtn) return;
+  
+  if (y > 100) {
+    themeBtn.classList.add('hidden');
+    langBtn.classList.add('hidden');
+  } else {
+    themeBtn.classList.remove('hidden');
+    langBtn.classList.remove('hidden');
+  }
+}
+window.addEventListener('scroll', handleTopBtnsScroll, { passive: true });
+window.addEventListener('touchmove', handleTopBtnsScroll, { passive: true });
+
 // ==================== 同意按鈕文字字典 ====================
 var agreeTexts = {
   'zh-HK': { scroll: '請滾動閱讀至最底部', agree: '✅ 我已閱讀並同意，進入系統', alert: '請滾動閱讀至最底部，才能按同意。' },
@@ -463,7 +483,6 @@ function updateAgreeBtnText() {
   btn.textContent = btn.classList.contains('active') ? lang.agree : lang.scroll;
 }
 
-// ==================== 處理同意按鈕 ====================
 function handleAgree() {
   var btn = document.getElementById('agreeBtn');
   var lang = agreeTexts[currentLang] || agreeTexts['zh-HK'];
@@ -479,7 +498,6 @@ function handleAgree() {
   loadStatsWithRetry();
 }
 
-// ==================== 翻譯字典 ====================
 const translations = {
   'zh-HK': {
     termsTitle: '📋 使用守則與風險聲明',
@@ -572,7 +590,6 @@ const translations = {
 
 let currentLang = 'zh-HK';
 
-// ===== 滾動偵測：更新按鈕視覺狀態 =====
 function updateAgreeBtnVisual() {
   var s = document.getElementById('termsScroll');
   var btn = document.getElementById('agreeBtn');
@@ -687,7 +704,6 @@ function checkClearBtn() {
   }
 }
 
-// ===== 讀取 Google Sheets =====
 const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
 const SHEET_NAME = '工作表1';
 
@@ -793,7 +809,6 @@ document.addEventListener('visibilitychange', function() {
   if (!document.hidden) loadStatsWithRetry();
 });
 
-// ==================== 核心計算 ====================
 function calculate() {
   const t = translations[currentLang];
   let hwVal = document.getElementById('hw').value.trim();
@@ -915,6 +930,7 @@ function clearData() {
 
 applyLanguage('zh-HK');
 checkClearBtn();
+handleTopBtnsScroll();
 </script>
 </body>
 </html>
