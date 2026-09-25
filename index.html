@@ -404,7 +404,8 @@ const translations = {
     hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
     hint4: '客隊勝率較高但客賠過低，存在大熱必死風險，系統利用和局抵禦客場不確定性，建議買和局。',
-    hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
+    hint5: '客勝率高於主勝率，且客賠處於 1.45～2.15 的價值區間，客隊具備市場價值，建議買客勝。',
+    hint6: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
     hintReverse: '偵測到一方賠率高達 7.50 以上，屬於極端冷門。熱門隊勝率極大，幾乎必勝，系統反向買入熱門隊，以穩定概率獲利。'
   },
   'zh-CN': {
@@ -432,7 +433,8 @@ const translations = {
     hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
     hint4: '客队胜率较高但客赔过低，存在大热必死风险，系统利用和局抵御客场不确定性，建议买和局。',
-    hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
+    hint5: '客胜率高于主胜率，且客赔处于 1.45～2.15 的价值区间，客队具备市场价值，建议买客胜。',
+    hint6: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
     hintReverse: '侦测到一方赔率高达 7.50 以上，属于极端冷门。热门队胜率极大，几乎必胜，系统反向买入热门队，以稳定概率获利。'
   },
   'en-US': {
@@ -460,7 +462,8 @@ const translations = {
     hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
     hint4: 'Away team is favored but odds are too low. Risk of upset. Bet Draw.',
-    hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play — underdog bet.',
+    hint5: 'Away win rate exceeds home, and away odds fall in the 1.45–2.15 value zone. Bet Away Win.',
+    hint6: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play — underdog bet.',
     hintReverse: 'Detected extreme underdog odds (7.50+). The favorite has an extremely high win probability, almost certain. System bets on the favorite for stable returns.'
   }
 };
@@ -712,21 +715,22 @@ function calculate() {
   if (Math.abs(hw - aw) <= 6) { bet = "D"; layer = 1; }
   // 第 2 層：主勝率≥40 且 主賠 1.48～2.05 且 D≠F → 買主
   else if (hw >= 40 && ho >= 1.48 && ho <= 2.05 && ho !== ao) { bet = "H"; layer = 2; }
-  // 第 3 層：主勝率≥40 且 主賠 2.05～2.60 且 D≠F → 買和（防冷）
-  else if (hw >= 40 && ho > 2.05 && ho <= 2.60 && ho !== ao) { bet = "D"; layer = 3; }
+  // 第 3 層：主勝率≥40 且 主賠 2.05～2.55 且 D≠F → 買和（防冷）
+  else if (hw >= 40 && ho > 2.05 && ho <= 2.55 && ho !== ao) { bet = "D"; layer = 3; }
   // 第 4 層：客勝率≥40 且 客賠 1.50～2.00 且 D≠F → 買和（防冷）
   else if (aw >= 40 && ao >= 1.50 && ao <= 2.00 && ho !== ao) { bet = "D"; layer = 4; }
-  // 第 5 層：賠率博弈
+  // 第 5 層：客勝率 > 主勝率 且 客賠 1.45～2.15 → 買客（價值客勝）
+  else if (aw > hw && ao >= 1.45 && ao <= 2.15) { bet = "A"; layer = 5; }
+  // 第 6 層：賠率博弈
   else {
-    layer = 5;
+    layer = 6;
     if (ho > ao) {
-      if (ho >= 7.50) { bet = "A"; isReverse = true; }  // 反向買客
+      if (ho >= 7.50) { bet = "A"; isReverse = true; }
       else { bet = "H"; }
     } else if (ao > ho) {
-      if (ao >= 7.50) { bet = "H"; isReverse = true; }  // 反向買主
+      if (ao >= 7.50) { bet = "H"; isReverse = true; }
       else { bet = "A"; }
     } else {
-      // D = F：按勝率比較，極端賠率時 skip
       if (hw > aw) { bet = ho > 7.50 ? "skip" : "H"; }
       else if (aw > hw) { bet = ao > 7.50 ? "skip" : "A"; }
       else { bet = "skip"; }
@@ -781,6 +785,7 @@ function showResult(text, className, layer, bet, ev, isReverse) {
       case 3: hintText = t.hint3; break;
       case 4: hintText = t.hint4; break;
       case 5: hintText = t.hint5; break;
+      case 6: hintText = t.hint6; break;
     }
   }
   
