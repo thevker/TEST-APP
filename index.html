@@ -27,7 +27,6 @@
     --border-switcher: rgba(255,255,255,0.2);
     --placeholder: rgba(255,255,255,0.4);
     --scroll-thumb: #555;
-    --icon-theme: '🌙';
   }
   :root[data-theme="light"] {
     --bg-body: #eef1f6;
@@ -48,20 +47,34 @@
     --border-switcher: rgba(0,0,0,0.15);
     --placeholder: rgba(0,0,0,0.35);
     --scroll-thumb: #c0c0c0;
-    --icon-theme: '☀️';
   }
 
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
 
+  /* ✅ 主題切換：左上角 */
   .theme-switcher {
-    position: fixed; top: 12px; right: 150px; z-index: 9999;
+    position: fixed; top: 12px; left: 12px; z-index: 9999;
     background: var(--bg-switcher); border: 1px solid var(--border-switcher);
-    border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-size: 16px;
+    border-radius: 8px; padding: 6px 12px;
+    color: var(--text-primary); font-size: 18px; line-height: 1;
     cursor: pointer; backdrop-filter: blur(10px);
     user-select: none; -webkit-tap-highlight-color: transparent;
     transition: background 0.3s;
   }
   .theme-switcher:active { opacity: 0.7; }
+
+  /* ✅ WhatsApp 群組：底部正中央 */
+  .whatsapp-bottom {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 9998;
+    background: var(--bg-switcher);
+    border: 1px solid rgba(37, 211, 102, 0.5);
+    border-radius: 24px; padding: 10px 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    white-space: nowrap;
+  }
+  .whatsapp-bottom a { color: #25D366; font-size: 14px; font-weight: bold; text-decoration: none; }
 
   .lang-switcher {
     position: fixed; top: 12px; right: 12px; z-index: 9999;
@@ -75,18 +88,11 @@
   }
   .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
 
-  .whatsapp-top {
-    position: fixed; top: 12px; left: 12px; z-index: 9999;
-    background: var(--bg-switcher); border: 1px solid rgba(37, 211, 102, 0.4);
-    border-radius: 8px; padding: 6px 10px; backdrop-filter: blur(10px);
-  }
-  .whatsapp-top a { color: #25D366; font-size: 13px; font-weight: bold; text-decoration: none; }
-
-  #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+  #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px; }
   .terms-container { 
     background: var(--bg-card); color: var(--text-primary); 
     border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-    width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 90vh; 
+    width: 100%; max-width: 500px; display: flex; flex-direction: column; max-height: 80vh; 
   }
   .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: var(--text-primary); font-size: 20px; }
   .terms-scroll { 
@@ -111,7 +117,7 @@
   #agreeBtn.active { background: #007aff; color: #fff; }
   #agreeBtn.active:active { background: #0062cc; }
 
-  #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; }
+  #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; padding-bottom: 100px; }
   .dark-card { 
     width: 100%; max-width: 400px; 
     background: var(--bg-card); color: var(--text-primary); 
@@ -179,10 +185,7 @@
 </head>
 <body>
 
-<div class="whatsapp-top">
-  <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
-</div>
-
+<!-- ✅ 主題切換：左上角 -->
 <div class="theme-switcher" onclick="toggleTheme()" title="切換主題">
   <span id="themeIcon">🌙</span>
 </div>
@@ -427,6 +430,11 @@
   </div>
 </div>
 
+<!-- ✅ WhatsApp 群組：底部正中央 -->
+<div class="whatsapp-bottom">
+  <a href="https://chat.whatsapp.com/GgUVLCyny4VDGx6yF8ARDd?s=cl&p=i&mlu=4&ilr=4" target="_blank" data-i18n="whatsapp">📱 加入WhatsApp群組</a>
+</div>
+
 <script>
 // ==================== 主題切換 ====================
 function applyTheme(theme) {
@@ -581,7 +589,6 @@ function updateAgreeBtnVisual() {
 }
 
 window.addEventListener('load', function() {
-  // 載入主題
   var savedTheme = 'dark';
   try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
   applyTheme(savedTheme);
@@ -695,7 +702,6 @@ function fetchCell(range) {
     });
 }
 
-// ===== 更可靠的載入邏輯（含重試） =====
 var statsLoadFailed = 0;
 
 function loadStatsWithRetry() {
