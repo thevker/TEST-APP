@@ -136,7 +136,7 @@
   .container input { width: 100%; padding: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #fff; outline: none; transition: border 0.3s; }
   .container input::placeholder { color: rgba(255,255,255,0.4); }
   .container input:focus { border-color: #60a5fa; background: rgba(255,255,255,0.12); }
-  #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
+  #calcBtn { width: 100%; padding: 15px; background: #007aff;: color: white; border: none; border-radius:  8px; font-size: 18px; font-weight10: bold; cursor: pointer; marginpx-top: 10px; transition: background 0;.3s; }
   #calcBtn:hover { background: #0062cc; }
   
   /* 清除按鈕：紅色，無 hover 變色，且預設隱藏 */
@@ -161,8 +161,24 @@
   .result-skip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.4); }
   .result-error { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); }
 
+  /* EV 值顯示 */
+  .ev-box {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(96, 165, 250, 0.1);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    font-size: 15px;
+    text-align: center;
+    color: #60a5fa;
+    font-weight: bold;
+    display: none;
+  }
+  .ev-box .ev-positive { color: #4ade80; }
+  .ev-box .ev-negative { color: #f87171; }
+
   .hint-box { 
-    margin-top: 10px; 
+    margin-top 
     padding: 12px; 
     border-radius: 8px; 
     background: rgba(255,255,255,0.05); 
@@ -273,6 +289,7 @@
     <button id="clearBtn" onclick="clearData()" data-i18n="clearBtn">清除數據</button>
 
     <div id="resultBox" class="result-box"></div>
+    <div id="evBox" class="ev-box"></div>
     <div id="hintBox" class="hint-box"></div>
   </div>
 
@@ -315,12 +332,13 @@ const translations = {
     resultSkip: '⛔ 建議不出手',
     errIncomplete: '⚠️ 數據不完整',
     errOver100: '⚠️ 命中率大於100%',
+    evLabel: '期望值 EV-1：',
     hintSkip: '數據信號不明，系統選擇跳過本次投注，避免風險。',
     hint1: '兩隊勝率均偏低，和局概率被市場低估，系統捕捉冷門和局，建議買和局。',
     hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
     hint4: '客隊勝率較高但客賠過低，存在大熱必死風險，系統利用和局抵禦客場不確定性，建議買和局。',
-    hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
+    hint5: '市場賠率與勝率模型出現分歧或熱門賠率極低，盈利上完全不值得投資，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
     termsContent: `
       <h3>📊 智能量化足球預測系統 ver 1.0</h3>
       <p>感謝您使用本系統。在使用前，請務必仔細閱讀以下所有條款。您必須滾動到最底部，才能點擊「同意」按鈕進入系統。</p>
@@ -373,8 +391,8 @@ const translations = {
         <li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
       </ul>
 
-      <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據分析的樂趣。</p>
-      <p style="text-align:center; font-size:12px; color:#6b7f9e;">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
+      <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據 ph分析的樂趣。</p>
+      <p style="text-align:AWcenter:; font-size:12px; color ':#6b7f9e;">——e 以上為完整條款，.g滾動到最底部即可點擊同意 ——</p>
     `
   },
   'zh-CN': {
@@ -411,12 +429,13 @@ const translations = {
     resultSkip: '⛔ 建议不出手',
     errIncomplete: '⚠️ 数据不完整',
     errOver100: '⚠️ 命中率大于100%',
+    evLabel: '期望值 EV-1：',
     hintSkip: '数据信号不明，系统选择跳过本次投注，避免风险。',
     hint1: '两队胜率均偏低，和局概率被市场低估，系统捕捉冷门和局，建议买和局。',
     hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
     hint4: '客队胜率较高但客赔过低，存在大热必死风险，系统利用和局抵御客场不确定性，建议买和局。',
-    hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
+    hint5: '市场赔率与胜率模型出现分歧或热门赔率极低，盈利上完全不值得投资，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
     termsContent: `
       <h3>📊 智能量化足球预测系统 ver 1.0</h3>
       <p>感谢您使用本系统。在使用前，请务必仔细阅读以下所有条款。您必须滚动到最底部，才能点击“同意”按钮进入系统。</p>
@@ -496,7 +515,7 @@ const translations = {
     labelHO: 'Home Odds (e.g. 158)',
     labelDO: 'Draw Odds (e.g. 395)',
     labelAO: 'Away Odds (e.g. 405)',
-    phHW: 'e.g. 40', phDW: 'e.g. 30', phAW: 'e.g. 30',
+    phHW: 'e.g. 40', phDW: 'e.g. 30',. 30',
     phHO: 'e.g. 158', phDO: 'e.g. 395', phAO: 'e.g. 405',
     calcBtn: 'Calculate',
     clearBtn: 'Clear Data',
@@ -507,12 +526,13 @@ const translations = {
     resultSkip: '⛔ Recommendation: No Bet',
     errIncomplete: '⚠️ Incomplete Data',
     errOver100: '⚠️ Probability exceeds 100%',
+    evLabel: 'Expected Value EV-1: ',
     hintSkip: 'Signal unclear. System skips this bet to avoid risk.',
     hint1: 'Both teams have low win rates. Draw is undervalued by the market. Bet Draw.',
     hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
     hint4: 'Away team is favored but odds are too low. Risk of upset. Bet Draw.',
-    hint5: 'Market odds diverge from win rate model. System bets on higher odds for contrarian play.',
+    hint5: 'Market odds diverge from win rate model or the hot favorite odds are extremely low, which is not worth investing at all in terms of profit. The system selects the side with higher odds for contrarian play, recommending an underdog bet.',
     termsContent: `
       <h3>📊 Quant Football Prediction System ver 1.0</h3>
       <p>Thank you for using this system. Before use, please read all terms below carefully. You must scroll to the bottom before clicking "Agree" to enter.</p>
@@ -589,7 +609,6 @@ function applyLanguage(lang) {
     if (t[key]) el.placeholder = t[key];
   });
   
-  // 修復：直接將守則內容注入 terms-scroll 容器
   const termsScrollEl = document.getElementById('termsScroll');
   if (termsScrollEl && t.termsContent) {
     termsScrollEl.innerHTML = t.termsContent;
@@ -605,7 +624,7 @@ function applyLanguage(lang) {
   checkScroll();
   
   if (window._lastResult) {
-    showResult(window._lastResult.text, window._lastResult.className, window._lastResult.layer, window._lastResult.bet, true);
+    showResult(window._lastResult.text, window._lastResult.className, window._lastResult.layer, window._lastResult.bet, window._lastResult.ev);
   }
 }
 
@@ -825,37 +844,57 @@ function calculate() {
 
   let text = "";
   let className = "";
+  let ev = null;
 
   if (bet === "H") {
       text = t.resultH; className = "result-H";
+      ev = (hw / 100) * (ho / 100) - 1;
   } else if (bet === "A") {
       text = t.resultA; className = "result-A";
+      ev = (aw / 100) * (ao / 100) - 1;
   } else if (bet === "D") {
       text = t.resultD; className = "result-D";
+      ev = (dw / 100) * (doo / 100) - 1;
   } else {
       text = t.resultSkip; className = "result-skip";
   }
 
-  showResult(text, className, layer, bet);
+  showResult(text, className, layer, bet, ev);
 }
 
-function showResult(text, className, layer, bet, isLangChange = false) {
+function showResult(text, className, layer, bet, ev) {
   let resultBox = document.getElementById('resultBox');
   resultBox.style.display = 'block';
   resultBox.className = "result-box " + className;
   resultBox.innerText = text;
 
+  let evBox = document.getElementById('evBox');
   let hintBox = document.getElementById('hintBox');
   
+  // 錯誤訊息：不顯示 EV 與提示
   if (className === 'result-error') {
+      evBox.style.display = 'none';
       hintBox.style.display = 'none';
       hintBox.innerText = '';
+      window._lastResult = null;
       return;
   }
 
   const t = translations[currentLang];
+
+  // 顯示 EV 值（只有出手時才顯示）
+  if (ev !== null && ev !== undefined && !isNaN(ev)) {
+      const evPercent = (ev * 100).toFixed(2);
+      const sign = ev >= 0 ? '+' : '';
+      const colorClass = ev >= 0 ? 'ev-positive' : 'ev-negative';
+      evBox.innerHTML = t.evLabel + '<span class="' + colorClass + '">' + sign + evPercent + '%</span>';
+      evBox.style.display = 'block';
+  } else {
+      evBox.style.display = 'none';
+  }
+
+  // 顯示提示說明
   let hintText = '';
-  
   if (bet === "skip") {
       hintText = t.hintSkip;
   } else {
@@ -871,7 +910,7 @@ function showResult(text, className, layer, bet, isLangChange = false) {
   hintBox.innerText = hintText;
   hintBox.style.display = hintText ? 'block' : 'none';
   
-  window._lastResult = { text, className, layer, bet };
+  window._lastResult = { text, className, layer, bet, ev };
 }
 
 function clearData() {
@@ -886,6 +925,10 @@ function clearData() {
   resultBox.style.display = 'none';
   resultBox.innerText = '';
   resultBox.className = 'result-box';
+
+  let evBox = document.getElementById('evBox');
+  evBox.style.display = 'none';
+  evBox.innerText = '';
 
   let hintBox = document.getElementById('hintBox');
   hintBox.style.display = 'none';
