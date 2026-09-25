@@ -205,7 +205,7 @@
           <li>极端冷门防御罩：当赔率高达系统设定的警戒线时，系统会强制跳过这些场次。</li>
         </ul>
         <p><strong>4. 动态 EV（期望值）与成本计算模组</strong></p>
-        <p>系统内建期望值与成本的自动计算功能，确保每一注都是在数学上占优的价值投注。</p>
+        <p>系统内建期望值与成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
         <p><strong>5. 全方位绩效仪表板</strong></p>
         <p>自动汇总获利与亏损、显示命中率、反映资金使用效率。</p>
         <h3>📈 系统核心优势</h3>
@@ -404,8 +404,8 @@ const translations = {
     hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
     hint4: '客隊勝率較高但客賠過低，存在大熱必死風險，系統利用和局抵禦客場不確定性，建議買和局。',
-    hint5: '市場賠率與勝率模型出現分歧或熱門賠率極低，盈利上完全不值得投資，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
-    hintReverse: '偵測到一方賠率高達 10.00 以上，屬於極端冷門。熱門隊勝率極大，幾乎必勝，系統反向買入熱門隊，以穩定概率獲利。'
+    hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行反向博弈，建議冷門出手。',
+    hintReverse: '偵測到一方賠率高達 7.50 以上，屬於極端冷門。熱門隊勝率極大，幾乎必勝，系統反向買入熱門隊，以穩定概率獲利。'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明',
@@ -432,8 +432,8 @@ const translations = {
     hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
     hint4: '客队胜率较高但客赔过低，存在大热必死风险，系统利用和局抵御客场不确定性，建议买和局。',
-    hint5: '市场赔率与胜率模型出现分歧或热门赔率极低，盈利上完全不值得投资，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
-    hintReverse: '侦测到一方赔率高达 10.00 以上，属于极端冷门。热门队胜率极大，几乎必胜，系统反向买入热门队，以稳定概率获利。'
+    hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行反向博弈，建议冷门出手。',
+    hintReverse: '侦测到一方赔率高达 7.50 以上，属于极端冷门。热门队胜率极大，几乎必胜，系统反向买入热门队，以稳定概率获利。'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement',
@@ -460,8 +460,8 @@ const translations = {
     hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
     hint4: 'Away team is favored but odds are too low. Risk of upset. Bet Draw.',
-    hint5: 'Market odds diverge from win rate model or the hot favorite odds are extremely low, which is not worth investing at all in terms of profit. The system selects the side with higher odds for contrarian play, recommending an underdog bet.',
-    hintReverse: 'Detected extreme underdog odds (10.00+). The favorite has an extremely high win probability, almost certain. System bets on the favorite for stable returns.'
+    hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play — underdog bet.',
+    hintReverse: 'Detected extreme underdog odds (7.50+). The favorite has an extremely high win probability, almost certain. System bets on the favorite for stable returns.'
   }
 };
 
@@ -599,13 +599,12 @@ function loadStatsWithRetry() {
   function checkDone() {
     okCount++;
     if (okCount === totalCount) {
-      statsLoadFailed = 0; // 全部成功，重置失敗計數
+      statsLoadFailed = 0;
     }
   }
   
   function checkFail() {
     statsLoadFailed++;
-    // 若失敗超過 3 次，3 秒後重試
     if (statsLoadFailed >= 3) {
       statsLoadFailed = 0;
       setTimeout(loadStatsWithRetry, 3000);
@@ -673,18 +672,16 @@ function loadStatsWithRetry() {
   }).catch(checkFail);
 }
 
-// 保留舊函數名供 handleAgree 呼叫
 function loadStats() { loadStatsWithRetry(); }
 
-// 每 15 秒自動更新
 setInterval(loadStatsWithRetry, 15000);
 
-// 頁面重新獲得焦點時也更新一次
 window.addEventListener('focus', loadStatsWithRetry);
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) loadStatsWithRetry();
 });
 
+// ==================== 核心計算 ====================
 function calculate() {
   const t = translations[currentLang];
   let hwVal = document.getElementById('hw').value.trim();
@@ -718,16 +715,14 @@ function calculate() {
   else {
     layer = 5;
     if (ho > ao) {
-      if (ho >= 10) { bet = "A"; isReverse = true; }
-      else if (ho > 7.50) { bet = "skip"; }
+      if (ho >= 7.50) { bet = "A"; isReverse = true; }
       else { bet = "H"; }
     } else if (ao > ho) {
-      if (ao >= 10) { bet = "H"; isReverse = true; }
-      else if (ao > 7.50) { bet = "skip"; }
+      if (ao >= 7.50) { bet = "H"; isReverse = true; }
       else { bet = "A"; }
     } else {
-      if (hw > aw) { bet = ho > 7.50 ? "skip" : "H"; }
-      else if (aw > hw) { bet = ao > 7.50 ? "skip" : "A"; }
+      if (hw > aw) { bet = ho >= 7.50 ? "skip" : "H"; }
+      else if (aw > hw) { bet = ao >= 7.50 ? "skip" : "A"; }
       else { bet = "skip"; }
     }
   }
