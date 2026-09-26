@@ -1,5 +1,7 @@
 # ⚽ 智能量化足球預測系統 ver 1.0
 
+工具: https://thevker.github.io/TEST-APP/
+
 > 一套結合**機率模型、市場定價（賠率）與極致風控**的自動化足球分析工具。用數學邏輯取代人為情緒，適用於足球賽前數據分析與策略驗證。
 
 ![Version](https://img.shields.io/badge/version-1.0-blue)
