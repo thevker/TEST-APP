@@ -19,6 +19,15 @@
   .whatsapp-bottom { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9998; background:var(--bg-switcher); border:1px solid rgba(37,211,102,0.5); border-radius:24px; padding:10px 20px; backdrop-filter:blur(10px); box-shadow:0 4px 12px rgba(0,0,0,0.25); white-space:nowrap; }
   .whatsapp-bottom a { color:#25D366; font-size:14px; font-weight:bold; text-decoration:none; }
 
+  /* ==================== Toast 提示 ==================== */
+  .toast-container { position:fixed; top:80px; left:50%; transform:translateX(-50%); z-index:999999; display:flex; flex-direction:column; gap:8px; pointer-events:none; align-items:center; }
+  .toast { padding:12px 22px; border-radius:10px; font-size:14px; font-weight:bold; backdrop-filter:blur(12px); box-shadow:0 6px 20px rgba(0,0,0,0.35); animation:toastIn .3s ease-out; white-space:nowrap; }
+  .toast.toast-success { background:rgba(34,197,94,0.95); color:#fff; border:1px solid #4ade80; }
+  .toast.toast-error { background:rgba(239,68,68,0.95); color:#fff; border:1px solid #f87171; }
+  .toast.toast-info { background:rgba(96,165,250,0.95); color:#fff; border:1px solid #60a5fa; }
+  @keyframes toastIn { from { opacity:0; transform:translateY(-20px) scale(.9); } to { opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes toastOut { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-20px) scale(.9); } }
+
   #termsPage { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; padding-top:60px; padding-bottom:40px; }
   .terms-container { background:var(--bg-card); color:var(--text-primary); border-radius:16px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.3); width:100%; max-width:400px; display:flex; flex-direction:column; max-height:80vh; }
   .terms-container h2 { text-align:center; margin:0 0 15px 0; color:var(--text-primary); font-size:20px; }
@@ -55,9 +64,9 @@
   .input-group { margin-bottom:15px; }
   .container label { display:block; font-size:14px; margin-bottom:5px; color:var(--text-secondary); }
   .input-wrapper { position:relative; }
-  .input-wrapper input { width:100%; padding:12px; padding-right:32px; background:var(--bg-input); border:1pxa solid5 var(--border-input);fa border-radius:8px; box-sizing:border-box; font-size:16px; color;:var(--text-primary); outline:none; }
-  background .input-wrapper input::placeholder { color:var(--placeholder); }
-  .input-wrapper input:focus { border-color:#60:var(--bg-input-focus); }
+  .input-wrapper input { width:100%; padding:12px; padding-right:32px; background:var(--bg-input); border:1px solid var(--border-input); border-radius:8px; box-sizing:border-box; font-size:16px; color:var(--text-primary); outline:none; }
+  .input-wrapper input::placeholder { color:var(--placeholder); }
+  .input-wrapper input:focus { border-color:#60a5fa; background:var(--bg-input-focus); }
   .input-wrapper .suffix { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:15px; font-weight:bold; pointer-events:none; }
   #calcBtn { width:100%; padding:15px; background:#007aff; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:10px; }
   #clearBtn { width:100%; padding:15px; background:#ef4444; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:10px; display:none; }
@@ -83,6 +92,7 @@
   .game-panel { margin-top:20px; }
   .game-panel h2 { text-align:center; margin:0 0 5px 0; font-size:20px; color:var(--text-primary); }
   .game-panel .game-sub { text-align:center; font-size:13px; color:var(--text-tertiary); margin:3px 0 15px 0; }
+  .db-info { text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:12px; padding:6px 12px; background:var(--bg-panel); border-radius:6px; border:1px dashed var(--border-color); }
   .game-tier { display:none; text-align:center; margin-bottom:20px; padding:20px 15px; border-radius:14px; background:var(--bg-panel); border:1px solid var(--border-color); }
   .game-tier.show { display:block!important; }
   .game-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; }
@@ -106,34 +116,40 @@
   .game-dev-btn:active:not(:disabled) { transform:scale(.97); }
   .game-dev-btn:disabled { opacity:.4; cursor:not-allowed; }
   .game-dev-badge { display:inline-block; padding:3px 8px; background:rgba(34,197,94,0.2); color:#22c55e; border:1px solid rgba(34,197,94,0.5); border-radius:4px; font-size:10px; font-weight:bold; margin-left:6px; }
+
+  /* ==================== 開發者解鎖 ==================== */
   .dev-unlock-row { text-align:center; margin-top:15px; }
   .dev-unlock-btn { background:transparent; border:1px dashed var(--border-color); color:var(--text-muted); font-size:11px; padding:6px 12px; border-radius:6px; cursor:pointer; transition:opacity .3s; }
   .dev-unlock-btn:hover { color:var(--text-secondary); border-color:var(--text-secondary); }
+  #devSettingsRow { display:none; margin-top:10px; }
+  #devSettingsRow.show { display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
+  .dev-settings-btn { padding:12px 14px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.5); transition:transform .15s,background .2s; -webkit-tap-highlight-color:transparent; }
+  .dev-settings-btn:hover { background:rgba(34,197,94,0.25); }
+  .dev-settings-btn:active { transform:scale(.97); }
+  .dev-reset-game-btn { padding:12px 14px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.5); transition:transform .15s,background .2s; -webkit-tap-highlight-color:transparent; }
+  .dev-reset-game-btn:hover { background:rgba(239,68,68,0.25); }
+  .dev-reset-game-btn:active { transform:scale(.97); }
 
-  .dev-panel { display:none; margin-top:15px; padding:15px; background:rgba(34,197,94,0.05); border:2px dashed rgba(34,197,94,0.4); border-radius:10px; transition:padding .3s; }
+  /* ==================== 開發者面板（彈出式） ==================== */
+  .dev-panel { display:none; margin-top:12px; padding:15px; background:rgba(34,197,94,0.05); border:2px dashed rgba(34,197,94,0.4); border-radius:10px; animation:panelIn .25s ease-out; }
   .dev-panel.show { display:block; }
-  .dev-panel-title { font-size:14px; font-weight:900; color:#22c55e; text-align:center; margin-bottom:12px; letter-spacing:1px; transition:font-size .3s,margin-bottom .3s; }
-  .dev-layer { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px; transition:padding .3s,margin-bottom .3s; }
-  .dev-layer-title { font-size:12px; font-weight:bold; color:#22c55e; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color); transition:font-size .3s,margin-bottom .3s,padding-bottom .3s; }
-  .dev-param-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; transition:gap .3s; }
+  @keyframes panelIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  .dev-panel-title { font-size:14px; font-weight:900; color:#22c55e; text-align:center; margin-bottom:12px; letter-spacing:1px; }
+  .dev-layer { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px; }
+  .dev-layer-title { font-size:12px; font-weight:bold; color:#22c55e; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color); }
+  .dev-param-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .dev-param-item { display:flex; flex-direction:column; }
-  .dev-param-item label { font-size:10px; color:var(--text-tertiary); margin-bottom:3px; font-weight:bold; transition:font-size .3s,margin-bottom .3s; }
-  .dev-param-item input { width:100%; padding:6px 8px; background:var(--bg-input); border:1px solid var(--border-input); border-radius:6px; font-size:13px; color:var(--text-primary); outline:none; font-family:monospace; transition:padding .3s,font-size .3s; }
+  .dev-param-item label { font-size:10px; color:var(--text-tertiary); margin-bottom:3px; font-weight:bold; }
+  .dev-param-item input { width:100%; padding:6px 8px; background:var(--bg-input); border:1px solid var(--border-input); border-radius:6px; font-size:13px; color:var(--text-primary); outline:none; font-family:monospace; }
   .dev-param-item input:focus { border-color:#22c55e; background:var(--bg-input-focus); }
-  .dev-panel.compact { padding:8px; margin-top:10px; }
-  .dev-panel.compact .dev-panel-title { font-size:11px; margin-bottom:6px; }
-  .dev-panel.compact .dev-layer { padding:5px 8px; margin-bottom:5px; }
-  .dev-panel.compact .dev-layer-title { font-size:9px; margin-bottom:4px; padding-bottom:3px; }
-  .dev-panel.compact .dev-param-grid { grid-template-columns:1fr 1fr 1fr 1fr; gap:4px; }
-  .dev-panel.compact .dev-param-item label { font-size:8px; margin-bottom:1px; }
-  .dev-panel.compact .dev-param-item input { padding:3px 5px; font-size:11px; }
-  .dev-btn-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; transition:margin-top .3s; }
-  .dev-panel.compact .dev-btn-row { margin-top:6px; }
-  .dev-btn-row button { padding:10px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent; transition:padding .3s,font-size .3s; }
-  .dev-panel.compact .dev-btn-row button { padding:6px; font-size:10px; }
+  .dev-btn-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .dev-btn-row button { padding:12px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent; }
+  .dev-btn-row button:active { transform:scale(.97); }
   .dev-btn-reset { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.4)!important; }
   .dev-btn-apply { background:rgba(34,197,94,0.2); color:#22c55e; border:1px solid rgba(34,197,94,0.5)!important; }
-  .dev-btn-row button:active { transform:scale(.97); }
+  .dev-btn-close { width:100%; padding:10px; margin-top:8px; border-radius:6px; background:transparent; color:var(--text-muted); border:1px dashed var(--border-color); cursor:pointer; font-size:12px; font-weight:bold; -webkit-tap-highlight-color:transparent; }
+  .dev-btn-close:hover { color:var(--text-secondary); border-color:var(--text-secondary); }
+  .dev-btn-close:active { transform:scale(.98); }
 
   .game-skip-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
   .game-skip-btn { flex:1; padding:12px 14px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; transition:transform .15s,opacity .3s; -webkit-tap-highlight-color:transparent; background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.5); }
@@ -145,6 +161,8 @@
   .game-skip-info.exhausted { color:var(--text-muted); opacity:.7; }
 
   .game-match { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:10px; padding:15px; margin-bottom:15px; }
+  .game-match-idx { text-align:center; font-size:12px; color:var(--text-secondary); margin-bottom:10px; padding-bottom:8px; border-bottom:1px dashed var(--border-color); font-weight:bold; letter-spacing:0.5px; }
+  .game-match-idx .num { color:#60a5fa; font-weight:900; font-size:14px; }
   .game-match-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
   .game-match-row:last-child { margin-bottom:0; }
   .game-cell { text-align:center; }
@@ -197,6 +215,8 @@
     <option value="en-US">English (US)</option>
   </select>
 </div>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <div id="termsPage">
   <div class="terms-container">
@@ -355,10 +375,13 @@
     <h2 data-i18n="gameTitle">🎮 猜賽果挑戰</h2>
     <p class="game-sub" data-i18n="gameSub">📚 從資料庫真實數據隨機抽樣，試下你嘅眼光！</p>
 
+    <div class="db-info" id="dbInfo">📚 資料庫載入中...</div>
+
     <div class="game-tier" id="gameTier">
       <div id="tierBadge" style="display:inline-block;padding:18px 42px;border-radius:16px;font-size:52px;font-weight:900;letter-spacing:3px;line-height:1;min-width:150px;color:#9ca3af;background:rgba(156,163,175,0.18);border:2px solid rgba(156,163,175,0.65);">—</div>
       <div id="tierDesc" style="font-size:14px;margin-top:12px;font-weight:bold;color:#9ca3af;"></div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:8px;" data-i18n="tierHint">※ 猜 10 場以上才顯示等級</div>
+      <div id="tierDetail" style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;"></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:8px;" data-i18n="tierHint">※ 猜 20 場以上才顯示等級（命中率 40% + ROI 60%）</div>
     </div>
 
     <div class="game-stats">
@@ -369,6 +392,7 @@
     </div>
 
     <div class="game-match">
+      <div class="game-match-idx" id="gameMatchIdx"></div>
       <div class="game-match-row">
         <div class="game-cell"><span class="game-cell-label" data-i18n="gameHW">主勝率</span><span class="game-cell-value" id="ghw">—</span></div>
         <div class="game-cell"><span class="game-cell-label" data-i18n="gameDW">和勝率</span><span class="game-cell-value" id="gdw">—</span></div>
@@ -393,6 +417,29 @@
       ⚡ 開發者連按模式 <span class="game-dev-badge">DEV</span>
     </button>
 
+    <div class="game-skip-row">
+      <button class="game-skip-btn" id="gbtnSkip" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
+      <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
+    </div>
+
+    <div class="game-skip-help" data-i18n="gameSkipHelp">💡 每場從資料庫真實數據隨機抽樣，預設 2 次跳過機會，每玩 10 場 +1 次</div>
+
+    <div id="gameResult" class="game-result-box"></div>
+
+    <button class="game-new-btn" id="gameNewBtn" data-i18n="gameNewBtn">🎲 開始新一局</button>
+
+    <!-- 開發者解鎖 -->
+    <div class="dev-unlock-row">
+      <button class="dev-unlock-btn" id="devUnlockBtn">🔒 開發者模式</button>
+    </div>
+
+    <!-- 開發者功能按鈕列（解鎖後顯示） -->
+    <div id="devSettingsRow">
+      <button class="dev-settings-btn" id="devSettingsBtn">⚙️ 系統設定</button>
+      <button class="dev-reset-game-btn" id="devResetGameBtn">🔄 重置遊戲</button>
+    </div>
+
+    <!-- 開發者面板（彈出式） -->
     <div class="dev-panel" id="devPanel">
       <div class="dev-panel-title">⚙️ 系統公式參數調整</div>
       <div class="dev-layer">
@@ -442,21 +489,7 @@
         <button class="dev-btn-reset" id="devResetBtn">🔄 重設預設</button>
         <button class="dev-btn-apply" id="devApplyBtn">✅ 套用參數</button>
       </div>
-    </div>
-
-    <div class="game-skip-row">
-      <button class="game-skip-btn" id="gbtnSkip" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
-      <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
-    </div>
-
-    <div class="game-skip-help" data-i18n="gameSkipHelp">💡 每場從資料庫真實數據隨機抽樣，預設 2 次跳過機會，每玩 10 場 +1 次</div>
-
-    <div id="gameResult" class="game-result-box"></div>
-
-    <button class="game-new-btn" id="gameNewBtn" data-i18n="gameNewBtn">🎲 開始新一局</button>
-
-    <div class="dev-unlock-row">
-      <button class="dev-unlock-btn" id="devUnlockBtn">🔒 開發者模式</button>
+      <button class="dev-btn-close" id="devCloseBtn">✖️ 收起面板</button>
     </div>
   </div>
 </div>
@@ -472,6 +505,24 @@ var DEFAULT_PARAMS = JSON.parse(JSON.stringify(PARAMS));
 var CALIBRATION = { FAVORITE_BOOST:0.18, DRAW_BOOST:1.25, DRAW_LOW:150, DRAW_HIGH:210, MARGIN_MIN:1.10, MARGIN_MAX:1.16 };
 var currentLang = 'zh-HK';
 var devMode = false;
+
+var TIER_MIN_PLAYED = 20;
+var TIER_WEIGHT_HITRATE = 0.4;
+var TIER_WEIGHT_ROI = 0.6;
+
+// ==================== Toast 提示系統 ====================
+function showToast(msg, type) {
+  var container = document.getElementById('toastContainer');
+  if (!container) return;
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-' + (type || 'info');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.style.animation = 'toastOut .3s ease-in forwards';
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  }, 2000);
+}
 
 // ==================== 主題切換 ====================
 function applyTheme(theme) {
@@ -532,16 +583,20 @@ const translations = {
     gameAnswer:'正確答案', gameYourGuess:'你的選擇',
     gameStake:'注碼 $100', gameProfit:'本局盈利', gameLoss:'本局虧損',
     gameScoreLabel:'⚽ 比分',
+    gameMatchIdxPrefix:'📋 資料庫第 ',
+    gameMatchIdxSuffix:' 場（A',
+    gameMatchIdxSuffix2:'）',
     resultHShort:'主勝', resultDShort:'和局', resultAShort:'客勝',
     desc_extreme:'💥💥💥 史詩級大爆冷！', desc_huge:'💥💥 大爆冷！', desc_big:'💥 爆冷！',
     desc_upset:'⚡ 冷門出現！', desc_minor:'📈 小冷門', desc_normal:'✅ 正常賽果',
     desc_favorite:'🔥 大熱取勝', desc_strong:'💪 大熱輕鬆取勝',
     desc_D_extreme:'🎯 超罕見超高賠和局！', desc_D_huge:'💰 高賠和局命中！',
     desc_D_high:'📊 中高賠和局', desc_D_normal:'🤝 正常和局',
-    tierHint:'※ 猜 10 場以上才顯示等級（綜合命中率與 ROI）',
+    tierHint:'※ 猜 20 場以上才顯示等級（命中率 40% + ROI 60%）',
     tierEX:'🏆 傳奇！神級預測！', tierS:'🔥 頂尖表現！繼續保持！',
     tierA:'⭐ 優秀！表現出色！', tierC:'📊 一般水平，仍有進步空間',
     tierD:'⚠️ 需要改進，加油！', tierE:'💪 繼續努力！多練習！',
+    tierFormula:'綜合分數 = 命中率 × 40% + ROI × 60%',
     gameSkipBtn:'⏭️ 跳過本場', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
     gameSkipHelp:'💡 每場從資料庫真實數據隨機抽樣，預設 2 次跳過機會，每玩 10 場 +1 次',
     gameSkipExhausted:'❌ 跳過次數已用完', gameSkipToast:'⏭️ 已跳過本場',
@@ -551,7 +606,21 @@ const translations = {
     gameLoading:'⏳ 載入比賽數據中...',
     gameNoData:'⚠️ 暫無比賽數據，請稍後再試',
     gameLoadError:'⚠️ 載入數據失敗，請檢查網絡',
-    gameRealDataBadge:'📚 真實數據'
+    gameRealDataBadge:'📚 真實數據',
+    dbLoading:'📚 資料庫載入中...',
+    dbLoadedPrefix:'📚 資料庫共 ',
+    dbLoadedSuffix:' 場真實比賽',
+    dbLoadFailed:'📚 資料庫載入失敗',
+    toastParamsApplied:'✅ 參數套用成功',
+    toastParamsReset:'🔄 已重設為預設值',
+    toastGameReset:'🔄 遊戲進度已重置',
+    toastGameResetConfirm:'確定要重置遊戲進度嗎？所有已玩場次將被清空。',
+    toastDevUnlocked:'✅ 開發者模式已啟用',
+    toastDevWrongPwd:'❌ 密碼錯誤',
+    devBtnSettings:'⚙️ 系統設定',
+    devBtnResetGame:'🔄 重置遊戲',
+    devBtnClose:'✖️ 收起面板',
+    devUnlockBtn:'🔒 開發者模式'
   },
   'zh-CN': {
     termsTitle:'📋 使用守则与风险声明', statsTitle:'📊 历史数据统计',
@@ -588,16 +657,20 @@ const translations = {
     gameAnswer:'正确答案', gameYourGuess:'你的选择',
     gameStake:'注码 $100', gameProfit:'本局盈利', gameLoss:'本局亏损',
     gameScoreLabel:'⚽ 比分',
+    gameMatchIdxPrefix:'📋 数据库第 ',
+    gameMatchIdxSuffix:' 场（A',
+    gameMatchIdxSuffix2:'）',
     resultHShort:'主胜', resultDShort:'和局', resultAShort:'客胜',
     desc_extreme:'💥💥💥 史诗级大爆冷！', desc_huge:'💥💥 大爆冷！', desc_big:'💥 爆冷！',
     desc_upset:'⚡ 冷门出现！', desc_minor:'📈 小冷门', desc_normal:'✅ 正常赛果',
     desc_favorite:'🔥 大热取胜', desc_strong:'💪 大热轻松取胜',
     desc_D_extreme:'🎯 超罕见超高赔和局！', desc_D_huge:'💰 高赔和局命中！',
     desc_D_high:'📊 中高赔和局', desc_D_normal:'🤝 正常和局',
-    tierHint:'※ 猜 10 场以上才显示等级（综合命中率与 ROI）',
+    tierHint:'※ 猜 20 场以上才显示等级（命中率 40% + ROI 60%）',
     tierEX:'🏆 传奇！神级预测！', tierS:'🔥 顶尖表现！继续保持！',
     tierA:'⭐ 优秀！表现出色！', tierC:'📊 一般水平，仍有进步空间',
     tierD:'⚠️ 需要改进，加油！', tierE:'💪 继续努力！多练习！',
+    tierFormula:'综合分数 = 命中率 × 40% + ROI × 60%',
     gameSkipBtn:'⏭️ 跳过本场', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
     gameSkipHelp:'💡 每场从数据库真实数据随机抽样，预设 2 次跳过机会，每玩 10 场 +1 次',
     gameSkipExhausted:'❌ 跳过次数已用完', gameSkipToast:'⏭️ 已跳过本场',
@@ -607,7 +680,21 @@ const translations = {
     gameLoading:'⏳ 加载比赛数据中...',
     gameNoData:'⚠️ 暂无比赛数据，请稍后再试',
     gameLoadError:'⚠️ 加载数据失败，请检查网络',
-    gameRealDataBadge:'📚 真实数据'
+    gameRealDataBadge:'📚 真实数据',
+    dbLoading:'📚 数据库加载中...',
+    dbLoadedPrefix:'📚 数据库共 ',
+    dbLoadedSuffix:' 场真实比赛',
+    dbLoadFailed:'📚 数据库加载失败',
+    toastParamsApplied:'✅ 参数套用成功',
+    toastParamsReset:'🔄 已重设为默认值',
+    toastGameReset:'🔄 游戏进度已重置',
+    toastGameResetConfirm:'确定要重置游戏进度吗？所有已玩场次将被清空。',
+    toastDevUnlocked:'✅ 开发者模式已启用',
+    toastDevWrongPwd:'❌ 密码错误',
+    devBtnSettings:'⚙️ 系统设置',
+    devBtnResetGame:'🔄 重置游戏',
+    devBtnClose:'✖️ 收起面板',
+    devUnlockBtn:'🔒 开发者模式'
   },
   'en-US': {
     termsTitle:'📋 Terms of Use & Risk Statement', statsTitle:'📊 Historical Statistics',
@@ -644,16 +731,20 @@ const translations = {
     gameAnswer:'Correct answer', gameYourGuess:'Your guess',
     gameStake:'Stake $100', gameProfit:'Round Profit', gameLoss:'Round Loss',
     gameScoreLabel:'⚽ Score',
+    gameMatchIdxPrefix:'📋 DB Row #',
+    gameMatchIdxSuffix:' (A',
+    gameMatchIdxSuffix2:')',
     resultHShort:'Home', resultDShort:'Draw', resultAShort:'Away',
     desc_extreme:'💥💥💥 Epic Upset!', desc_huge:'💥💥 Huge Upset!', desc_big:'💥 Upset!',
     desc_upset:'⚡ Underdog Wins!', desc_minor:'📈 Minor Upset', desc_normal:'✅ Normal Result',
     desc_favorite:'🔥 Favorite Wins', desc_strong:'💪 Dominant Win',
     desc_D_extreme:'🎯 Ultra-Rare High-Odds Draw!', desc_D_huge:'💰 High-Odds Draw Hit!',
     desc_D_high:'📊 Mid-High Odds Draw', desc_D_normal:'🤝 Normal Draw',
-    tierHint:'※ Play 10+ rounds to reveal rank (combined Hit Rate & ROI)',
+    tierHint:'※ Play 20+ rounds to reveal rank (Hit Rate 40% + ROI 60%)',
     tierEX:'🏆 Legendary! Godlike predictions!', tierS:'🔥 Top-tier performance! Keep it up!',
     tierA:'⭐ Excellent! Outstanding performance!', tierC:'📊 Average, room to improve',
     tierD:'⚠️ Needs improvement, keep going!', tierE:'💪 Keep practicing! You\'ll get there!',
+    tierFormula:'Score = Hit Rate × 40% + ROI × 60%',
     gameSkipBtn:'⏭️ Skip Match', gameSkipInfoPrefix:'Left ', gameSkipInfoSuffix:'',
     gameSkipHelp:'💡 Each match is randomly sampled from real database. Default 2 skips, +1 every 10 plays',
     gameSkipExhausted:'❌ No skips left', gameSkipToast:'⏭️ Match skipped',
@@ -663,7 +754,21 @@ const translations = {
     gameLoading:'⏳ Loading match data...',
     gameNoData:'⚠️ No match data available. Please try again later.',
     gameLoadError:'⚠️ Failed to load data. Please check your connection.',
-    gameRealDataBadge:'📚 REAL DATA'
+    gameRealDataBadge:'📚 REAL DATA',
+    dbLoading:'📚 Loading database...',
+    dbLoadedPrefix:'📚 Database has ',
+    dbLoadedSuffix:' real matches',
+    dbLoadFailed:'📚 Database load failed',
+    toastParamsApplied:'✅ Parameters applied',
+    toastParamsReset:'🔄 Reset to default values',
+    toastGameReset:'🔄 Game progress reset',
+    toastGameResetConfirm:'Reset game progress? All played rounds will be cleared.',
+    toastDevUnlocked:'✅ Developer mode enabled',
+    toastDevWrongPwd:'❌ Wrong password',
+    devBtnSettings:'⚙️ Settings',
+    devBtnResetGame:'🔄 Reset Game',
+    devBtnClose:'✖️ Close Panel',
+    devUnlockBtn:'🔒 Developer Mode'
   }
 };
 
@@ -728,10 +833,22 @@ function applyLanguage(lang) {
     });
     document.getElementById('langSelect').value = lang;
     updateAgreeBtnText();
+    // 更新硬編碼的按鈕文字
+    var devSettingsBtn = document.getElementById('devSettingsBtn');
+    if (devSettingsBtn && t.devBtnSettings) devSettingsBtn.textContent = t.devBtnSettings;
+    var devResetGameBtn = document.getElementById('devResetGameBtn');
+    if (devResetGameBtn && t.devBtnResetGame) devResetGameBtn.textContent = t.devBtnResetGame;
+    var devCloseBtn = document.getElementById('devCloseBtn');
+    if (devCloseBtn && t.devBtnClose) devCloseBtn.textContent = t.devBtnClose;
+    var devUnlockBtn = document.getElementById('devUnlockBtn');
+    if (devUnlockBtn && t.devUnlockBtn && !devMode) devUnlockBtn.textContent = t.devUnlockBtn;
+    // 更新資料庫資訊
+    updateDbInfo();
     if (typeof gameState !== 'undefined' && gameState && gameState.lastGuess && gameState.current) renderGameResult(gameState.lastGuess, false);
     if (typeof updateTierDisplay === 'function') updateTierDisplay(false);
     if (typeof updatePnlDisplay === 'function') updatePnlDisplay();
     if (typeof updateSkipDisplay === 'function') updateSkipDisplay();
+    if (typeof gameState !== 'undefined' && gameState && gameState.current) displayMatch(gameState.current);
     if (window._lastResult) {
       const r = window._lastResult;
       let text = "";
@@ -935,15 +1052,28 @@ function devUnlock() {
   if (pwd === null) return;
   if (pwd === 'y511634a') {
     devMode = true;
+    var t = translations[currentLang];
     document.getElementById('gbtnDev').style.display = 'block';
-    document.getElementById('devPanel').classList.add('show');
-    document.getElementById('devUnlockBtn').textContent = '✅ 開發者模式已啟用';
-    document.getElementById('devUnlockBtn').style.borderColor = 'rgba(34,197,94,0.5)';
-    document.getElementById('devUnlockBtn').style.color = '#22c55e';
-    document.getElementById('devUnlockBtn').disabled = true;
+    document.getElementById('devUnlockBtn').style.display = 'none';
+    document.getElementById('devSettingsRow').classList.add('show');
+    showToast(t.toastDevUnlocked || '✅ 開發者模式已啟用', 'success');
   } else {
-    alert('❌ 密碼錯誤');
+    var tl = translations[currentLang];
+    showToast(tl.toastDevWrongPwd || '❌ 密碼錯誤', 'error');
   }
+}
+
+function openDevPanel() {
+  var panel = document.getElementById('devPanel');
+  if (panel) {
+    panel.classList.add('show');
+    // 若有 compact class 先移除
+    panel.classList.remove('compact');
+  }
+}
+function closeDevPanel() {
+  var panel = document.getElementById('devPanel');
+  if (panel) panel.classList.remove('show');
 }
 
 function applyParams() {
@@ -961,17 +1091,9 @@ function applyParams() {
   PARAMS.pb_dmin = Number(document.getElementById('pb_dmin').value) || 600;
   PARAMS.pb_fskip = Number(document.getElementById('pb_fskip').value) || 750;
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
-  var panel = document.getElementById('devPanel');
-  if (panel) panel.classList.add('compact');
-  var btn = document.getElementById('devApplyBtn');
-  if (btn) {
-    btn.textContent = '✏️ 繼續編輯';
-    btn.onclick = function() {
-      panel.classList.remove('compact');
-      btn.textContent = '✅ 套用參數';
-      btn.onclick = applyParams;
-    };
-  }
+  var t = translations[currentLang];
+  closeDevPanel();
+  showToast(t.toastParamsApplied || '✅ 參數套用成功', 'success');
 }
 
 function resetParams() {
@@ -981,11 +1103,32 @@ function resetParams() {
     if (el) el.value = DEFAULT_PARAMS[k];
   });
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
-  var panel = document.getElementById('devPanel');
-  if (panel) panel.classList.remove('compact');
-  var btn = document.getElementById('devApplyBtn');
-  if (btn) { btn.textContent = '✅ 套用參數'; btn.onclick = applyParams; }
-  alert('🔄 已重設為預設值');
+  var t = translations[currentLang];
+  closeDevPanel();
+  showToast(t.toastParamsReset || '🔄 已重設為預設值', 'info');
+}
+
+function resetGameProgress() {
+  var t = translations[currentLang];
+  if (!confirm(t.toastGameResetConfirm || '確定要重置遊戲進度嗎？所有已玩場次將被清空。')) return;
+  gameState.played = 0;
+  gameState.hits = 0;
+  gameState.totalPnl = 0;
+  gameState.skipsUsed = 0;
+  gameState.current = null;
+  gameState.waiting = false;
+  gameState.lastGuess = null;
+  document.getElementById('gamePlayed').textContent = '0';
+  document.getElementById('gameHits').textContent = '0';
+  document.getElementById('gameRate').textContent = '—';
+  updatePnlDisplay();
+  updateTierDisplay(false);
+  var tierEl = document.getElementById('gameTier');
+  if (tierEl) tierEl.style.display = 'none';
+  clearGameMessage();
+  updateSkipDisplay();
+  showToast(t.toastGameReset || '🔄 遊戲進度已重置', 'success');
+  gameNewRound();
 }
 
 function loadSavedParams() {
@@ -1000,6 +1143,18 @@ function loadSavedParams() {
       });
     }
   } catch(e) {}
+}
+
+// ==================== 資料庫資訊 ====================
+function updateDbInfo() {
+  var el = document.getElementById('dbInfo');
+  if (!el) return;
+  var t = translations[currentLang];
+  if (sheetMatchPool && sheetMatchPool.length > 0) {
+    el.textContent = (t.dbLoadedPrefix || '📚 資料庫共 ') + sheetMatchPool.length + (t.dbLoadedSuffix || ' 場真實比賽');
+  } else {
+    el.textContent = t.dbLoading || '📚 資料庫載入中...';
+  }
 }
 
 // ==================== 猜賽果 ====================
@@ -1023,7 +1178,7 @@ function toOddsInt(v) {
   return Math.round(v);
 }
 
-function parseSheetMatchRow(row) {
+function parseSheetMatchRow(row, rowNum) {
   if (!row || !row.c) return null;
   function rawCell(idx) {
     var c = row.c[idx];
@@ -1057,7 +1212,9 @@ function parseSheetMatchRow(row) {
     hw: Math.round(hw), dw: Math.round(dw), aw: Math.round(aw),
     ho: hoInt, doo: dooInt, ao: aoInt,
     score: scoreRaw !== null && scoreRaw !== '' ? String(scoreRaw).trim() : '',
-    result: result
+    result: result,
+    rowNum: rowNum || 0,
+    sheetRow: (rowNum || 0) + 1
   };
 }
 
@@ -1067,12 +1224,13 @@ function fetchSheetMatches() {
     var json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
     var rows = (json.table && json.table.rows) ? json.table.rows : [];
     var pool = [];
-    rows.forEach(function(row) {
-      var m = parseSheetMatchRow(row);
+    rows.forEach(function(row, i) {
+      var m = parseSheetMatchRow(row, i + 1);
       if (m) pool.push(m);
     });
     sheetMatchPool = pool;
     console.log('✅ 載入真實數據比賽：' + pool.length + ' 場');
+    updateDbInfo();
     return pool;
   });
 }
@@ -1088,6 +1246,11 @@ function ensureSheetPool(forceRefresh) {
   }).catch(function(e) {
     sheetPoolPromise = null;
     console.error('❌ 載入失敗：', e);
+    var el = document.getElementById('dbInfo');
+    if (el) {
+      var t = translations[currentLang];
+      el.textContent = t.dbLoadFailed || '📚 資料庫載入失敗';
+    }
     throw e;
   });
   return sheetPoolPromise;
@@ -1123,7 +1286,6 @@ function updateSkipDisplay() {
   else { infoEl.classList.remove('exhausted'); if (btn) btn.disabled = false; }
 }
 
-// ⚠️ 從真實數據 Pool 隨機抽樣（非本地生成）
 function generateMatch() {
   if (!sheetMatchPool || sheetMatchPool.length === 0) return null;
   var idx = Math.floor(Math.random() * sheetMatchPool.length);
@@ -1131,7 +1293,8 @@ function generateMatch() {
   return {
     hw: m.hw, dw: m.dw, aw: m.aw,
     ho: m.ho, doo: m.doo, ao: m.ao,
-    score: m.score, result: m.result
+    score: m.score, result: m.result,
+    rowNum: m.rowNum, sheetRow: m.sheetRow
   };
 }
 
@@ -1143,6 +1306,17 @@ function displayMatch(m) {
   document.getElementById('gho').textContent = (m.ho / 100).toFixed(2);
   document.getElementById('gdoo').textContent = (m.doo / 100).toFixed(2);
   document.getElementById('gao').textContent = (m.ao / 100).toFixed(2);
+  var idxEl = document.getElementById('gameMatchIdx');
+  if (idxEl) {
+    var t = translations[currentLang];
+    var rowNum = m.rowNum || 0;
+    var sheetRow = m.sheetRow || (rowNum + 1);
+    idxEl.innerHTML = (t.gameMatchIdxPrefix || '📋 資料庫第 ') +
+      '<span class="num">' + rowNum + '</span>' +
+      (t.gameMatchIdxSuffix || ' 場（A') +
+      '<span class="num">' + sheetRow + '</span>' +
+      (t.gameMatchIdxSuffix2 || '）');
+  }
 }
 
 function gameNewRound() {
@@ -1340,257 +1514,4 @@ function getMatchDescription(result, match) {
 }
 
 function renderGameResult(guess, animate, roundPnl, isAuto) {
-  if (!gameState.current || !guess) return;
-  var t = translations[currentLang];
-  var result = gameState.current.result;
-  var isWin = (guess === result);
-  var resultText = "";
-  if (result === "H") resultText = t.resultHShort || "主勝";
-  else if (result === "D") resultText = t.resultDShort || "和局";
-  else resultText = t.resultAShort || "客勝";
-  var guessText = "";
-  if (guess === "H") guessText = t.resultHShort || "主勝";
-  else if (guess === "D") guessText = t.resultDShort || "和局";
-  else guessText = t.resultAShort || "客勝";
-  var desc = getMatchDescription(result, gameState.current);
-  if (roundPnl === undefined || roundPnl === null) {
-    if (isWin) {
-      var odds;
-      if (result === "H") odds = gameState.current.ho / 100;
-      else if (result === "D") odds = gameState.current.doo / 100;
-      else odds = gameState.current.ao / 100;
-      roundPnl = Math.round(odds * 100 - 100);
-    } else roundPnl = -100;
-  }
-  var pnlText = roundPnl >= 0 ? '+' + roundPnl : '' + roundPnl;
-  var pnlLabel = isWin ? (t.gameProfit || '本局盈利') : (t.gameLoss || '本局虧損');
-  var autoLabel = isAuto ? '🤖 ' : '';
-  var scoreStr = gameState.current.score ? String(gameState.current.score).trim() : '';
-  var scoreLine = scoreStr ? ('<br>' + (t.gameScoreLabel || '⚽ 比分') + '：<b>' + scoreStr + '</b>') : '';
-  var resultBox = document.getElementById('gameResult');
-  resultBox.style.display = 'block';
-  resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
-  resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
-  resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
-    + '<span class="pnl-big">' + pnlText + '</span>'
-    + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
-    + '📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
-    + desc
-    + scoreLine + '<br>'
-    + (t.gameAnswer || '正確答案') + '：<b>' + resultText + '</b>'
-    + '　|　' + (t.gameYourGuess || '你的選擇') + '：' + guessText + '</small>';
-}
-
-// ==================== Tier ====================
-function getTier(rate) {
-  if (rate >= 70)   return { tier:'EX', descKey:'tierEX' };
-  if (rate >= 67.5) return { tier:'S+', descKey:'tierS' };
-  if (rate >= 65)   return { tier:'S',  descKey:'tierS' };
-  if (rate >= 62.5) return { tier:'S-', descKey:'tierS' };
-  if (rate >= 60)   return { tier:'A+', descKey:'tierA' };
-  if (rate >= 57.5) return { tier:'A',  descKey:'tierA' };
-  if (rate >= 55)   return { tier:'A-', descKey:'tierA' };
-  if (rate >= 52.5) return { tier:'C+', descKey:'tierC' };
-  if (rate >= 50)   return { tier:'C',  descKey:'tierC' };
-  if (rate >= 47.5) return { tier:'C-', descKey:'tierC' };
-  if (rate >= 45)   return { tier:'D+', descKey:'tierD' };
-  if (rate >= 42.5) return { tier:'D',  descKey:'tierD' };
-  if (rate >= 40)   return { tier:'D-', descKey:'tierD' };
-  if (rate >= 37.5) return { tier:'E+', descKey:'tierE' };
-  if (rate > 35)    return { tier:'E',  descKey:'tierE' };
-  return { tier:'E-', descKey:'tierE' };
-}
-
-function updateTierDisplay(withAnimation) {
-  var tierEl = document.getElementById('gameTier');
-  if (!tierEl) return;
-  if (gameState.played < 10) { tierEl.style.display = 'none'; return; }
-  // 命中率（%）
-  var hitRate = (gameState.hits / gameState.played) * 100;
-  // ROI（%）= 總盈虧 ÷ 總成本 × 100
-  var totalCost = gameState.played * 100;
-  var roi = totalCost > 0 ? (gameState.totalPnl / totalCost) * 100 : 0;
-  // 綜合分數 = (命中率 + ROI) / 2 （50:50 比例）
-  var rate = (hitRate + roi) / 2;
-  var tier = getTier(rate);
-  var t = translations[currentLang];
-  var badgeEl = document.getElementById('tierBadge');
-  var descEl = document.getElementById('tierDesc');
-  var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
-
-  var colorMap = {
-    'EX': { color:'#c084fc', bg:'rgba(192,132,252,0.18)', border:'rgba(192,132,252,0.65)', shadow:'0 0 50px rgba(192,132,252,0.6)', isEX:true },
-    'S+': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'S':  { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'S-': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'A+': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
-    'A':  { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
-    'A-': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
-    'C+': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
-    'C':  { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
-    'C-': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
-    'D+': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
-    'D':  { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
-    'D-': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
-    'E+': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
-    'E':  { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
-    'E-': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' }
-  };
-  var style = colorMap[tier.tier] || colorMap['E'];
-
-  badgeEl.style.display = 'inline-block';
-  badgeEl.style.padding = '18px 42px';
-  badgeEl.style.borderRadius = '16px';
-  badgeEl.style.fontSize = '52px';
-  badgeEl.style.fontWeight = '900';
-  badgeEl.style.letterSpacing = '3px';
-  badgeEl.style.lineHeight = '1';
-  badgeEl.style.minWidth = '150px';
-  badgeEl.style.fontFamily = "'Segoe UI', -apple-system, sans-serif";
-  badgeEl.style.border = '2px solid ' + style.border;
-  badgeEl.style.boxShadow = style.shadow;
-  badgeEl.textContent = tier.tier;
-  badgeEl.setAttribute('data-tier', tier.tier);
-
-  if (style.isEX) {
-    badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
-    badgeEl.style.backgroundSize = '400% 400%';
-    badgeEl.style.color = '#fff';
-    badgeEl.style.textShadow = '0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9';
-    badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
-  } else if (tier.tier.indexOf('S') === 0) {
-    badgeEl.style.background = style.bg;
-    badgeEl.style.color = style.color;
-    badgeEl.style.textShadow = '0 0 15px ' + style.color + ', 0 0 30px ' + style.color + ', 0 2px 12px ' + style.color;
-    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-  } else {
-    badgeEl.style.background = style.bg;
-    badgeEl.style.color = style.color;
-    badgeEl.style.textShadow = '0 2px 12px ' + style.color;
-    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-  }
-
-  descEl.style.fontSize = '14px';
-  descEl.style.marginTop = '12px';
-  descEl.style.fontWeight = 'bold';
-  descEl.style.letterSpacing = '0.5px';
-  descEl.style.color = style.isEX ? '#c084fc' : style.color;
-  descEl.textContent = t[tier.descKey] || '';
-
-  tierEl.style.display = 'block';
-  tierEl.style.textAlign = 'center';
-  tierEl.style.marginBottom = '20px';
-  tierEl.style.padding = '20px 15px';
-  tierEl.style.borderRadius = '14px';
-  tierEl.style.background = 'var(--bg-panel)';
-  tierEl.style.border = '1px solid var(--border-color)';
-
-  if (withAnimation && isNewTier) {
-    badgeEl.style.animation = 'tierPop 0.6s ease-out, ' + (style.isEX ? 'tierEXGradient 2s ease infinite, ' : '') + 'tierPulse 2.5s ease-in-out 0.6s infinite';
-    setTimeout(function() {
-      if (style.isEX) badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
-      else badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-    }, 700);
-  }
-}
-
-// ==================== 綁定所有事件 ====================
-window.addEventListener('load', function() {
-  var savedTheme = 'dark';
-  try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
-  applyTheme(savedTheme);
-
-  var themeBtn = document.getElementById('themeSwitcher');
-  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
-
-  var langSel = document.getElementById('langSelect');
-  if (langSel) langSel.addEventListener('change', function() { changeLang(this.value); });
-
-  window.addEventListener('scroll', handleTopBtnsScroll, { passive: true });
-  window.addEventListener('touchmove', handleTopBtnsScroll, { passive: true });
-  handleTopBtnsScroll();
-
-  var s = document.getElementById('termsScroll');
-  if (s) {
-    s.addEventListener('scroll', updateAgreeBtnVisual);
-    s.addEventListener('touchmove', updateAgreeBtnVisual);
-    s.addEventListener('touchend', updateAgreeBtnVisual);
-    s.addEventListener('wheel', updateAgreeBtnVisual, { passive: true });
-    setTimeout(function() {
-      if (s.scrollHeight <= s.clientHeight + 200) {
-        var btn = document.getElementById('agreeBtn');
-        if (btn) btn.classList.add('active');
-        updateAgreeBtnText();
-      }
-    }, 300);
-    setInterval(function() {
-      if (s.scrollTop + s.clientHeight >= s.scrollHeight - 200) {
-        var btn = document.getElementById('agreeBtn');
-        if (btn && !btn.classList.contains('active')) {
-          btn.classList.add('active');
-          updateAgreeBtnText();
-        }
-      }
-    }, 400);
-  }
-  window.addEventListener('resize', updateAgreeBtnVisual);
-  updateAgreeBtnText();
-
-  var agreeBtn = document.getElementById('agreeBtn');
-  if (agreeBtn) agreeBtn.addEventListener('click', handleAgree);
-
-  ['hw','dw','aw'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('input', function() {
-      this.value = this.value.replace(/[^0-9]/g, '');
-      checkClearBtn();
-    });
-  });
-  ['ho','doo','ao'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('input', function() { formatOddsInput(this); checkClearBtn(); });
-      el.addEventListener('blur', function() { formatOddsOnBlur(this); });
-    }
-  });
-
-  var calcBtn = document.getElementById('calcBtn');
-  if (calcBtn) calcBtn.addEventListener('click', calculate);
-  var clearBtn = document.getElementById('clearBtn');
-  if (clearBtn) clearBtn.addEventListener('click', clearData);
-
-  var gbtnH = document.getElementById('gbtnH');
-  if (gbtnH) gbtnH.addEventListener('click', function() { gameGuess('H'); });
-  var gbtnD = document.getElementById('gbtnD');
-  if (gbtnD) gbtnD.addEventListener('click', function() { gameGuess('D'); });
-  var gbtnA = document.getElementById('gbtnA');
-  if (gbtnA) gbtnA.addEventListener('click', function() { gameGuess('A'); });
-  var gbtnAuto = document.getElementById('gbtnAuto');
-  if (gbtnAuto) gbtnAuto.addEventListener('click', gameAutoPredict);
-  var gbtnDev = document.getElementById('gbtnDev');
-  if (gbtnDev) gbtnDev.addEventListener('click', devAutoPredict);
-  var gbtnSkip = document.getElementById('gbtnSkip');
-  if (gbtnSkip) gbtnSkip.addEventListener('click', gameSkip);
-  var gbtnNew = document.getElementById('gameNewBtn');
-  if (gbtnNew) gbtnNew.addEventListener('click', gameNewRound);
-
-  var devUnlockBtn = document.getElementById('devUnlockBtn');
-  if (devUnlockBtn) devUnlockBtn.addEventListener('click', devUnlock);
-  var devApplyBtn = document.getElementById('devApplyBtn');
-  if (devApplyBtn) devApplyBtn.addEventListener('click', applyParams);
-  var devResetBtn = document.getElementById('devResetBtn');
-  if (devResetBtn) devResetBtn.addEventListener('click', resetParams);
-
-  applyLanguage('zh-HK');
-  checkClearBtn();
-  loadSavedParams();
-  loadStatsWithRetry();
-  setInterval(loadStatsWithRetry, 15000);
-  window.addEventListener('focus', loadStatsWithRetry);
-  document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
-
-  ensureSheetPool().catch(function(e) { console.warn('Pool preload failed:', e); });
-});
-</script>
-</body>
-</html>
+  if (!gameState.current ||
