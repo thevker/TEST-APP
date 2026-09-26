@@ -19,7 +19,6 @@
   .whatsapp-bottom { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9998; background:var(--bg-switcher); border:1px solid rgba(37,211,102,0.5); border-radius:24px; padding:10px 20px; backdrop-filter:blur(10px); box-shadow:0 4px 12px rgba(0,0,0,0.25); white-space:nowrap; }
   .whatsapp-bottom a { color:#25D366; font-size:14px; font-weight:bold; text-decoration:none; }
 
-  /* ==================== Toast 提示 ==================== */
   .toast-container { position:fixed; top:80px; left:50%; transform:translateX(-50%); z-index:999999; display:flex; flex-direction:column; gap:8px; pointer-events:none; align-items:center; }
   .toast { padding:12px 22px; border-radius:10px; font-size:14px; font-weight:bold; backdrop-filter:blur(12px); box-shadow:0 6px 20px rgba(0,0,0,0.35); animation:toastIn .3s ease-out; white-space:nowrap; }
   .toast.toast-success { background:rgba(34,197,94,0.95); color:#fff; border:1px solid #4ade80; }
@@ -117,7 +116,6 @@
   .game-dev-btn:disabled { opacity:.4; cursor:not-allowed; }
   .game-dev-badge { display:inline-block; padding:3px 8px; background:rgba(34,197,94,0.2); color:#22c55e; border:1px solid rgba(34,197,94,0.5); border-radius:4px; font-size:10px; font-weight:bold; margin-left:6px; }
 
-  /* ==================== 開發者解鎖 ==================== */
   .dev-unlock-row { text-align:center; margin-top:15px; }
   .dev-unlock-btn { background:transparent; border:1px dashed var(--border-color); color:var(--text-muted); font-size:11px; padding:6px 12px; border-radius:6px; cursor:pointer; transition:opacity .3s; }
   .dev-unlock-btn:hover { color:var(--text-secondary); border-color:var(--text-secondary); }
@@ -130,7 +128,6 @@
   .dev-reset-game-btn:hover { background:rgba(239,68,68,0.25); }
   .dev-reset-game-btn:active { transform:scale(.97); }
 
-  /* ==================== 開發者面板（彈出式） ==================== */
   .dev-panel { display:none; margin-top:12px; padding:15px; background:rgba(34,197,94,0.05); border:2px dashed rgba(34,197,94,0.4); border-radius:10px; animation:panelIn .25s ease-out; }
   .dev-panel.show { display:block; }
   @keyframes panelIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
@@ -161,8 +158,6 @@
   .game-skip-info.exhausted { color:var(--text-muted); opacity:.7; }
 
   .game-match { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:10px; padding:15px; margin-bottom:15px; }
-  .game-match-idx { text-align:center; font-size:12px; color:var(--text-secondary); margin-bottom:10px; padding-bottom:8px; border-bottom:1px dashed var(--border-color); font-weight:bold; letter-spacing:0.5px; }
-  .game-match-idx .num { color:#60a5fa; font-weight:900; font-size:14px; }
   .game-match-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
   .game-match-row:last-child { margin-bottom:0; }
   .game-cell { text-align:center; }
@@ -392,7 +387,6 @@
     </div>
 
     <div class="game-match">
-      <div class="game-match-idx" id="gameMatchIdx"></div>
       <div class="game-match-row">
         <div class="game-cell"><span class="game-cell-label" data-i18n="gameHW">主勝率</span><span class="game-cell-value" id="ghw">—</span></div>
         <div class="game-cell"><span class="game-cell-label" data-i18n="gameDW">和勝率</span><span class="game-cell-value" id="gdw">—</span></div>
@@ -428,18 +422,15 @@
 
     <button class="game-new-btn" id="gameNewBtn" data-i18n="gameNewBtn">🎲 開始新一局</button>
 
-    <!-- 開發者解鎖 -->
     <div class="dev-unlock-row">
       <button class="dev-unlock-btn" id="devUnlockBtn">🔒 開發者模式</button>
     </div>
 
-    <!-- 開發者功能按鈕列（解鎖後顯示） -->
     <div id="devSettingsRow">
       <button class="dev-settings-btn" id="devSettingsBtn">⚙️ 系統設定</button>
       <button class="dev-reset-game-btn" id="devResetGameBtn">🔄 重置遊戲</button>
     </div>
 
-    <!-- 開發者面板（彈出式） -->
     <div class="dev-panel" id="devPanel">
       <div class="dev-panel-title">⚙️ 系統公式參數調整</div>
       <div class="dev-layer">
@@ -583,9 +574,6 @@ const translations = {
     gameAnswer:'正確答案', gameYourGuess:'你的選擇',
     gameStake:'注碼 $100', gameProfit:'本局盈利', gameLoss:'本局虧損',
     gameScoreLabel:'⚽ 比分',
-    gameMatchIdxPrefix:'📋 資料庫第 ',
-    gameMatchIdxSuffix:' 場（A',
-    gameMatchIdxSuffix2:'）',
     resultHShort:'主勝', resultDShort:'和局', resultAShort:'客勝',
     desc_extreme:'💥💥💥 史詩級大爆冷！', desc_huge:'💥💥 大爆冷！', desc_big:'💥 爆冷！',
     desc_upset:'⚡ 冷門出現！', desc_minor:'📈 小冷門', desc_normal:'✅ 正常賽果',
@@ -594,7 +582,8 @@ const translations = {
     desc_D_high:'📊 中高賠和局', desc_D_normal:'🤝 正常和局',
     tierHint:'※ 猜 20 場以上才顯示等級（命中率 40% + ROI 60%）',
     tierEX:'🏆 傳奇！神級預測！', tierS:'🔥 頂尖表現！繼續保持！',
-    tierA:'⭐ 優秀！表現出色！', tierC:'📊 一般水平，仍有進步空間',
+    tierA:'⭐ 優秀！表現出色！', tierB:'🎯 表現不俗！繼續努力！',
+    tierC:'📊 一般水平，仍有進步空間',
     tierD:'⚠️ 需要改進，加油！', tierE:'💪 繼續努力！多練習！',
     tierFormula:'綜合分數 = 命中率 × 40% + ROI × 60%',
     gameSkipBtn:'⏭️ 跳過本場', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
@@ -657,9 +646,6 @@ const translations = {
     gameAnswer:'正确答案', gameYourGuess:'你的选择',
     gameStake:'注码 $100', gameProfit:'本局盈利', gameLoss:'本局亏损',
     gameScoreLabel:'⚽ 比分',
-    gameMatchIdxPrefix:'📋 数据库第 ',
-    gameMatchIdxSuffix:' 场（A',
-    gameMatchIdxSuffix2:'）',
     resultHShort:'主胜', resultDShort:'和局', resultAShort:'客胜',
     desc_extreme:'💥💥💥 史诗级大爆冷！', desc_huge:'💥💥 大爆冷！', desc_big:'💥 爆冷！',
     desc_upset:'⚡ 冷门出现！', desc_minor:'📈 小冷门', desc_normal:'✅ 正常赛果',
@@ -668,7 +654,8 @@ const translations = {
     desc_D_high:'📊 中高赔和局', desc_D_normal:'🤝 正常和局',
     tierHint:'※ 猜 20 场以上才显示等级（命中率 40% + ROI 60%）',
     tierEX:'🏆 传奇！神级预测！', tierS:'🔥 顶尖表现！继续保持！',
-    tierA:'⭐ 优秀！表现出色！', tierC:'📊 一般水平，仍有进步空间',
+    tierA:'⭐ 优秀！表现出色！', tierB:'🎯 表现不俗！继续努力！',
+    tierC:'📊 一般水平，仍有进步空间',
     tierD:'⚠️ 需要改进，加油！', tierE:'💪 继续努力！多练习！',
     tierFormula:'综合分数 = 命中率 × 40% + ROI × 60%',
     gameSkipBtn:'⏭️ 跳过本场', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
@@ -731,9 +718,6 @@ const translations = {
     gameAnswer:'Correct answer', gameYourGuess:'Your guess',
     gameStake:'Stake $100', gameProfit:'Round Profit', gameLoss:'Round Loss',
     gameScoreLabel:'⚽ Score',
-    gameMatchIdxPrefix:'📋 DB Row #',
-    gameMatchIdxSuffix:' (A',
-    gameMatchIdxSuffix2:')',
     resultHShort:'Home', resultDShort:'Draw', resultAShort:'Away',
     desc_extreme:'💥💥💥 Epic Upset!', desc_huge:'💥💥 Huge Upset!', desc_big:'💥 Upset!',
     desc_upset:'⚡ Underdog Wins!', desc_minor:'📈 Minor Upset', desc_normal:'✅ Normal Result',
@@ -742,7 +726,8 @@ const translations = {
     desc_D_high:'📊 Mid-High Odds Draw', desc_D_normal:'🤝 Normal Draw',
     tierHint:'※ Play 20+ rounds to reveal rank (Hit Rate 40% + ROI 60%)',
     tierEX:'🏆 Legendary! Godlike predictions!', tierS:'🔥 Top-tier performance! Keep it up!',
-    tierA:'⭐ Excellent! Outstanding performance!', tierC:'📊 Average, room to improve',
+    tierA:'⭐ Excellent! Outstanding performance!', tierB:'🎯 Decent performance! Keep pushing!',
+    tierC:'📊 Average, room to improve',
     tierD:'⚠️ Needs improvement, keep going!', tierE:'💪 Keep practicing! You\'ll get there!',
     tierFormula:'Score = Hit Rate × 40% + ROI × 60%',
     gameSkipBtn:'⏭️ Skip Match', gameSkipInfoPrefix:'Left ', gameSkipInfoSuffix:'',
@@ -833,7 +818,6 @@ function applyLanguage(lang) {
     });
     document.getElementById('langSelect').value = lang;
     updateAgreeBtnText();
-    // 更新硬編碼的按鈕文字
     var devSettingsBtn = document.getElementById('devSettingsBtn');
     if (devSettingsBtn && t.devBtnSettings) devSettingsBtn.textContent = t.devBtnSettings;
     var devResetGameBtn = document.getElementById('devResetGameBtn');
@@ -842,7 +826,6 @@ function applyLanguage(lang) {
     if (devCloseBtn && t.devBtnClose) devCloseBtn.textContent = t.devBtnClose;
     var devUnlockBtn = document.getElementById('devUnlockBtn');
     if (devUnlockBtn && t.devUnlockBtn && !devMode) devUnlockBtn.textContent = t.devUnlockBtn;
-    // 更新資料庫資訊
     updateDbInfo();
     if (typeof gameState !== 'undefined' && gameState && gameState.lastGuess && gameState.current) renderGameResult(gameState.lastGuess, false);
     if (typeof updateTierDisplay === 'function') updateTierDisplay(false);
@@ -1067,7 +1050,6 @@ function openDevPanel() {
   var panel = document.getElementById('devPanel');
   if (panel) {
     panel.classList.add('show');
-    // 若有 compact class 先移除
     panel.classList.remove('compact');
   }
 }
@@ -1178,7 +1160,7 @@ function toOddsInt(v) {
   return Math.round(v);
 }
 
-function parseSheetMatchRow(row, rowNum) {
+function parseSheetMatchRow(row) {
   if (!row || !row.c) return null;
   function rawCell(idx) {
     var c = row.c[idx];
@@ -1212,9 +1194,7 @@ function parseSheetMatchRow(row, rowNum) {
     hw: Math.round(hw), dw: Math.round(dw), aw: Math.round(aw),
     ho: hoInt, doo: dooInt, ao: aoInt,
     score: scoreRaw !== null && scoreRaw !== '' ? String(scoreRaw).trim() : '',
-    result: result,
-    rowNum: rowNum || 0,
-    sheetRow: (rowNum || 0) + 1
+    result: result
   };
 }
 
@@ -1224,8 +1204,8 @@ function fetchSheetMatches() {
     var json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
     var rows = (json.table && json.table.rows) ? json.table.rows : [];
     var pool = [];
-    rows.forEach(function(row, i) {
-      var m = parseSheetMatchRow(row, i + 1);
+    rows.forEach(function(row) {
+      var m = parseSheetMatchRow(row);
       if (m) pool.push(m);
     });
     sheetMatchPool = pool;
@@ -1293,8 +1273,7 @@ function generateMatch() {
   return {
     hw: m.hw, dw: m.dw, aw: m.aw,
     ho: m.ho, doo: m.doo, ao: m.ao,
-    score: m.score, result: m.result,
-    rowNum: m.rowNum, sheetRow: m.sheetRow
+    score: m.score, result: m.result
   };
 }
 
@@ -1306,17 +1285,6 @@ function displayMatch(m) {
   document.getElementById('gho').textContent = (m.ho / 100).toFixed(2);
   document.getElementById('gdoo').textContent = (m.doo / 100).toFixed(2);
   document.getElementById('gao').textContent = (m.ao / 100).toFixed(2);
-  var idxEl = document.getElementById('gameMatchIdx');
-  if (idxEl) {
-    var t = translations[currentLang];
-    var rowNum = m.rowNum || 0;
-    var sheetRow = m.sheetRow || (rowNum + 1);
-    idxEl.innerHTML = (t.gameMatchIdxPrefix || '📋 資料庫第 ') +
-      '<span class="num">' + rowNum + '</span>' +
-      (t.gameMatchIdxSuffix || ' 場（A') +
-      '<span class="num">' + sheetRow + '</span>' +
-      (t.gameMatchIdxSuffix2 || '）');
-  }
 }
 
 function gameNewRound() {
@@ -1541,18 +1509,14 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
   var autoLabel = isAuto ? '🤖 ' : '';
   var scoreStr = gameState.current.score ? String(gameState.current.score).trim() : '';
   var scoreLine = scoreStr ? ('<br>' + (t.gameScoreLabel || '⚽ 比分') + '：<b>' + scoreStr + '</b>') : '';
-  var rowNum = gameState.current.rowNum || 0;
-  var sheetRow = gameState.current.sheetRow || (rowNum + 1);
-  var rowLine = rowNum > 0 ? ('<br>📋 資料庫第 ' + rowNum + ' 場（A' + sheetRow + '）') : '';
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
   resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
   resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
   resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
-    + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）'
-    + rowLine
-    + '<br>📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
+    + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
+    + '📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
     + desc
     + scoreLine + '<br>'
     + (t.gameAnswer || '正確答案') + '：<b>' + resultText + '</b>'
@@ -1560,6 +1524,7 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
 }
 
 // ==================== Tier ====================
+// 🎯 新 Tier 門檻（19 級，含 B 級，每級差 2.5 分）
 function getTier(rate) {
   if (rate >= 55)   return { tier:'EX', descKey:'tierEX' };
   if (rate >= 52.5) return { tier:'S+', descKey:'tierS' };
@@ -1568,14 +1533,17 @@ function getTier(rate) {
   if (rate >= 45)   return { tier:'A+', descKey:'tierA' };
   if (rate >= 42.5) return { tier:'A',  descKey:'tierA' };
   if (rate >= 40)   return { tier:'A-', descKey:'tierA' };
-  if (rate >= 37.5) return { tier:'C+', descKey:'tierC' };
-  if (rate >= 35)   return { tier:'C',  descKey:'tierC' };
-  if (rate >= 32.5) return { tier:'C-', descKey:'tierC' };
-  if (rate >= 30)   return { tier:'D+', descKey:'tierD' };
-  if (rate >= 27.5) return { tier:'D',  descKey:'tierD' };
-  if (rate >= 25)   return { tier:'D-', descKey:'tierD' };
-  if (rate >= 22.5) return { tier:'E+', descKey:'tierE' };
-  if (rate > 20)    return { tier:'E',  descKey:'tierE' };
+  if (rate >= 37.5) return { tier:'B+', descKey:'tierB' };
+  if (rate >= 35)   return { tier:'B',  descKey:'tierB' };
+  if (rate >= 32.5) return { tier:'B-', descKey:'tierB' };
+  if (rate >= 30)   return { tier:'C+', descKey:'tierC' };
+  if (rate >= 27.5) return { tier:'C',  descKey:'tierC' };
+  if (rate >= 25)   return { tier:'C-', descKey:'tierC' };
+  if (rate >= 22.5) return { tier:'D+', descKey:'tierD' };
+  if (rate >= 20)   return { tier:'D',  descKey:'tierD' };
+  if (rate >= 17.5) return { tier:'D-', descKey:'tierD' };
+  if (rate >= 15)   return { tier:'E+', descKey:'tierE' };
+  if (rate > 12)    return { tier:'E',  descKey:'tierE' };
   return { tier:'E-', descKey:'tierE' };
 }
 
@@ -1594,25 +1562,29 @@ function updateTierDisplay(withAnimation) {
   var detailEl = document.getElementById('tierDetail');
   var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
 
+  // 🎨 每個 Tier 專屬漸變色系（全部有漸變 + 發光）
   var colorMap = {
-    'EX': { color:'#c084fc', bg:'rgba(192,132,252,0.18)', border:'rgba(192,132,252,0.65)', shadow:'0 0 50px rgba(192,132,252,0.6)', isEX:true },
-    'S+': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'S':  { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'S-': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'A+': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
-    'A':  { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
-    'A-': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
-    'C+': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
-    'C':  { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
-    'C-': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
-    'D+': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
-    'D':  { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
-    'D-': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
-    'E+': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
-    'E':  { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
-    'E-': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' }
+    'EX': { grad:'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)', color:'#fff', glow:'0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9', shadow:'0 0 50px rgba(192,132,252,0.6)' },
+    'S+': { grad:'linear-gradient(135deg, #FFD700, #FFA500, #FFED4E, #FFD700, #FFA500)', color:'#fff', glow:'0 0 18px #FFD700, 0 0 36px #FFA500, 0 2px 12px #FFD700', shadow:'0 0 45px rgba(255,215,0,0.6)' },
+    'S':  { grad:'linear-gradient(135deg, #FFD700, #FFB347, #FFED4E, #FFD700)', color:'#fff', glow:'0 0 16px #FFD700, 0 0 32px #FFB347, 0 2px 10px #FFD700', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'S-': { grad:'linear-gradient(135deg, #FFC700, #FF9E2C, #FFD97A, #FFC700)', color:'#fff', glow:'0 0 14px #FFC700, 0 0 28px #FF9E2C, 0 2px 8px #FFC700', shadow:'0 0 35px rgba(255,199,0,0.55)' },
+    'A+': { grad:'linear-gradient(135deg, #60a5fa, #3b82f6, #93c5fd, #60a5fa)', color:'#fff', glow:'0 0 16px #60a5fa, 0 0 32px #3b82f6, 0 2px 10px #60a5fa', shadow:'0 0 35px rgba(96,165,250,0.6)' },
+    'A':  { grad:'linear-gradient(135deg, #4f9df7, #2563eb, #82b9ff, #4f9df7)', color:'#fff', glow:'0 0 14px #4f9df7, 0 0 28px #2563eb, 0 2px 8px #4f9df7', shadow:'0 0 30px rgba(79,157,247,0.55)' },
+    'A-': { grad:'linear-gradient(135deg, #3b82f6, #1d4ed8, #60a5fa, #3b82f6)', color:'#fff', glow:'0 0 12px #3b82f6, 0 0 24px #1d4ed8, 0 2px 6px #3b82f6', shadow:'0 0 25px rgba(59,130,246,0.55)' },
+    'B+': { grad:'linear-gradient(135deg, #22d3ee, #06b6d4, #67e8f9, #22d3ee)', color:'#fff', glow:'0 0 16px #22d3ee, 0 0 32px #06b6d4, 0 2px 10px #22d3ee', shadow:'0 0 30px rgba(34,211,238,0.55)' },
+    'B':  { grad:'linear-gradient(135deg, #14b8a6, #0d9488, #5eead4, #14b8a6)', color:'#fff', glow:'0 0 14px #14b8a6, 0 0 28px #0d9488, 0 2px 8px #14b8a6', shadow:'0 0 25px rgba(20,184,166,0.55)' },
+    'B-': { grad:'linear-gradient(135deg, #10b981, #059669, #6ee7b7, #10b981)', color:'#fff', glow:'0 0 12px #10b981, 0 0 24px #059669, 0 2px 6px #10b981', shadow:'0 0 22px rgba(16,185,129,0.5)' },
+    'C+': { grad:'linear-gradient(135deg, #fbbf24, #f59e0b, #fcd34d, #fbbf24)', color:'#fff', glow:'0 0 14px #fbbf24, 0 0 28px #f59e0b, 0 2px 8px #fbbf24', shadow:'0 0 25px rgba(251,191,36,0.5)' },
+    'C':  { grad:'linear-gradient(135deg, #f59e0b, #d97706, #fbbf24, #f59e0b)', color:'#fff', glow:'0 0 12px #f59e0b, 0 0 24px #d97706, 0 2px 6px #f59e0b', shadow:'0 0 22px rgba(245,158,11,0.5)' },
+    'C-': { grad:'linear-gradient(135deg, #ea580c, #c2410c, #fb923c, #ea580c)', color:'#fff', glow:'0 0 10px #ea580c, 0 0 20px #c2410c, 0 2px 6px #ea580c', shadow:'0 0 20px rgba(234,88,12,0.5)' },
+    'D+': { grad:'linear-gradient(135deg, #f87171, #ef4444, #fca5a5, #f87171)', color:'#fff', glow:'0 0 14px #f87171, 0 0 28px #ef4444, 0 2px 8px #f87171', shadow:'0 0 22px rgba(248,113,113,0.5)' },
+    'D':  { grad:'linear-gradient(135deg, #ef4444, #dc2626, #f87171, #ef4444)', color:'#fff', glow:'0 0 12px #ef4444, 0 0 24px #dc2626, 0 2px 6px #ef4444', shadow:'0 0 20px rgba(239,68,68,0.5)' },
+    'D-': { grad:'linear-gradient(135deg, #dc2626, #991b1b, #ef4444, #dc2626)', color:'#fff', glow:'0 0 10px #dc2626, 0 0 20px #991b1b, 0 2px 6px #dc2626', shadow:'0 0 18px rgba(220,38,38,0.5)' },
+    'E+': { grad:'linear-gradient(135deg, #9ca3af, #6b7280, #d1d5db, #9ca3af)', color:'#fff', glow:'0 0 12px #9ca3af, 0 0 24px #6b7280, 0 2px 6px #9ca3af', shadow:'0 0 18px rgba(156,163,175,0.5)' },
+    'E':  { grad:'linear-gradient(135deg, #6b7280, #4b5563, #9ca3af, #6b7280)', color:'#fff', glow:'0 0 10px #6b7280, 0 0 20px #4b5563, 0 2px 6px #6b7280', shadow:'0 0 15px rgba(107,114,128,0.5)' },
+    'E-': { grad:'linear-gradient(135deg, #4b5563, #374151, #6b7280, #4b5563)', color:'#fff', glow:'0 0 8px #4b5563, 0 0 16px #374151, 0 2px 4px #4b5563', shadow:'0 0 15px rgba(75,85,99,0.5)' }
   };
-  var style = colorMap[tier.tier] || colorMap['E'];
+  var style = colorMap[tier.tier] || colorMap['E-'];
 
   badgeEl.style.display = 'inline-block';
   badgeEl.style.padding = '18px 42px';
@@ -1623,40 +1595,28 @@ function updateTierDisplay(withAnimation) {
   badgeEl.style.lineHeight = '1';
   badgeEl.style.minWidth = '150px';
   badgeEl.style.fontFamily = "'Segoe UI', -apple-system, sans-serif";
-  badgeEl.style.border = '2px solid ' + style.border;
+  badgeEl.style.background = style.grad;
+  badgeEl.style.backgroundSize = '400% 400%';
+  badgeEl.style.color = style.color;
+  badgeEl.style.textShadow = style.glow;
   badgeEl.style.boxShadow = style.shadow;
+  badgeEl.style.border = '2px solid rgba(255,255,255,0.35)';
   badgeEl.textContent = tier.tier;
   badgeEl.setAttribute('data-tier', tier.tier);
-
-  if (style.isEX) {
-    badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
-    badgeEl.style.backgroundSize = '400% 400%';
-    badgeEl.style.color = '#fff';
-    badgeEl.style.textShadow = '0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9';
-    badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
-  } else if (tier.tier.indexOf('S') === 0) {
-    badgeEl.style.background = style.bg;
-    badgeEl.style.color = style.color;
-    badgeEl.style.textShadow = '0 0 15px ' + style.color + ', 0 0 30px ' + style.color + ', 0 2px 12px ' + style.color;
-    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-  } else {
-    badgeEl.style.background = style.bg;
-    badgeEl.style.color = style.color;
-    badgeEl.style.textShadow = '0 2px 12px ' + style.color;
-    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-  }
+  badgeEl.style.animation = 'tierEXGradient 3s ease infinite, tierPulse 2.5s ease-in-out infinite';
 
   descEl.style.fontSize = '14px';
   descEl.style.marginTop = '12px';
   descEl.style.fontWeight = 'bold';
   descEl.style.letterSpacing = '0.5px';
-  descEl.style.color = style.isEX ? '#c084fc' : style.color;
+  descEl.style.color = style.color;
+  descEl.style.textShadow = '0 1px 4px rgba(0,0,0,0.5)';
   descEl.textContent = t[tier.descKey] || '';
 
   if (detailEl) {
     var roiSign = roi >= 0 ? '+' : '';
     detailEl.innerHTML = '📐 ' + (t.tierFormula || '綜合分數 = 命中率 × 40% + ROI × 60%') +
-      '<br>🎯 綜合分數：<b style="color:' + (style.isEX ? '#c084fc' : style.color) + '">' + rate.toFixed(1) + '</b>' +
+      '<br>🎯 綜合分數：<b style="color:' + style.color + ';text-shadow:' + style.glow + '">' + rate.toFixed(1) + '</b>' +
       '　（命中率 ' + hitRate.toFixed(1) + '% × 40% + ROI ' + roiSign + roi.toFixed(1) + '% × 60%）';
   }
 
@@ -1669,10 +1629,9 @@ function updateTierDisplay(withAnimation) {
   tierEl.style.border = '1px solid var(--border-color)';
 
   if (withAnimation && isNewTier) {
-    badgeEl.style.animation = 'tierPop 0.6s ease-out, ' + (style.isEX ? 'tierEXGradient 2s ease infinite, ' : '') + 'tierPulse 2.5s ease-in-out 0.6s infinite';
+    badgeEl.style.animation = 'tierPop 0.6s ease-out, tierEXGradient 3s ease infinite, tierPulse 2.5s ease-in-out 0.6s infinite';
     setTimeout(function() {
-      if (style.isEX) badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
-      else badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+      badgeEl.style.animation = 'tierEXGradient 3s ease infinite, tierPulse 2.5s ease-in-out infinite';
     }, 700);
   }
 }
@@ -1757,7 +1716,6 @@ window.addEventListener('load', function() {
   var gbtnNew = document.getElementById('gameNewBtn');
   if (gbtnNew) gbtnNew.addEventListener('click', gameNewRound);
 
-  // 開發者相關
   var devUnlockBtn = document.getElementById('devUnlockBtn');
   if (devUnlockBtn) devUnlockBtn.addEventListener('click', devUnlock);
   var devSettingsBtn = document.getElementById('devSettingsBtn');
