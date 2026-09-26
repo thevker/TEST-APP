@@ -244,8 +244,8 @@ function getMaxSkips() {
 
 ## 👤 作者
 
-**你的名字**
-- GitHub: [@你的用戶名](https://github.com/你的用戶名)
+**thevker**
+- GitHub: [@thevker](https://github.com/thevker)
 - Email: your.email@example.com
 
 ---
@@ -270,6 +270,6 @@ function getMaxSkips() {
 
 **⚽ 理性參與，享受數據分析嘅樂趣 ⚽**
 
-Made with ❤️ by [你的名字]
+Made with ❤️ by [thevker]
 
 </div>
