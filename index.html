@@ -100,7 +100,7 @@
   }
   .whatsapp-bottom a { color: #25D366; font-size: 14px; font-weight: bold; text-decoration: none; }
 
-  #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; padding-bottom: 100px; }
+  #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; padding-bottom: 40px; }
   .terms-container { 
     background: var(--bg-card); color: var(--text-primary); 
     border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
@@ -133,7 +133,7 @@
   .dark-card { 
     width: 100%; max-width: 400px; 
     background: var(--bg-card); color: var(--text-primary); 
-     border-radius: 16px;165 padding: 25px; box-shadow,: 0 10px  25030px rgba(0,,0,0,0.3); 
+    border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
   }
   .stats-panel { margin-bottom: 20px; }
   .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: var(--text-secondary); letter-spacing: 1px; }
@@ -175,7 +175,7 @@
 
   .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
   .result-H { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.4); }
-  .result-A { background: rgba(96, 165, 250, 0.15); color: #2563eb; border: 1px solid rgba(96, 0.4); }
+  .result-A { background: rgba(96, 165, 250, 0.15); color: #2563eb; border: 1px solid rgba(96, 165, 250, 0.4); }
   .result-D { background: rgba(251, 191, 36, 0.15); color: #d97706; border: 1px solid rgba(251, 191, 36, 0.4); }
   .result-skip { background: rgba(156, 163, 175, 0.15); color: #6b7280; border: 1px solid rgba(156, 163, 175, 0.4); }
   .result-error { background: rgba(248, 113, 113, 0.15); color: #dc2626; border: 1px solid rgba(248, 113, 113, 0.4); }
@@ -198,6 +198,90 @@
   .game-panel { margin-top: 20px; }
   .game-panel h2 { text-align: center; margin: 0 0 5px 0; font-size: 20px; color: var(--text-primary); }
   .game-panel .game-sub { text-align: center; font-size: 13px; color: var(--text-tertiary); margin: 3px 0 15px 0; }
+
+  /* ===== Tier 徽章 ===== */
+  .game-tier {
+    display: none;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px 15px;
+    border-radius: 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+  }
+  .game-tier.show {
+    display: block;
+    animation: tierFadeIn 0.6s ease-out;
+  }
+  @keyframes tierFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tier-badge {
+    display: inline-block;
+    padding: 18px 42px;
+    border-radius: 16px;
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    line-height: 1;
+    min-width: 150px;
+    animation: tierPulse 2.5s ease-in-out infinite;
+    transition: all 0.4s ease;
+    position: relative;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    text-shadow: 0 2px 12px currentColor;
+  }
+
+  .tier-badge.pop {
+    animation: tierPop 0.6s ease-out, tierPulse 2.5s ease-in-out 0.6s infinite;
+  }
+
+  @keyframes tierPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.05); filter: brightness(1.15); }
+  }
+  @keyframes tierPop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.2) rotate(-3deg); }
+    70% { transform: scale(0.95) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  .tier-desc {
+    font-size: 14px;
+    margin-top: 12px;
+    font-weight: bold 2px 12px rgba(234, 88, 12, 0;
+    letter-spacing: 0.5px;
+    transition: color 0.4s;
+  }
+
+  /* Tier 顏色（淺色系）*/
+  .tier-EX { background: rgba(192, 132, 252, 0.18); color: #c084fc; border: 2px solid rgba(192, 132, 252, 0.65); box-shadow: 0 0 40px rgba(192, 132, 252, 0.5), inset 0 0 20px rgba(192, 132, 252, 0.1); }
+  .tier-S  { background: rgba(251, 146, 60, 0.18); color: #fb923c; border: 2px solid rgba(251, 146, 60, 0.65); box-shadow: 0 0 30px rgba(251, 146, 60, 0.4); }
+  .tier-A  { background: rgba(96, 165, 250, 0.18); color: #60a5fa; border: 2px solid rgba(96, 165, 250, 0.65); box-shadow: 0 0 25px rgba(96, 165, 250, 0.3); }
+  .tier-B  { background: rgba(74, 222, 128, 0.18); color: #4ade80; border: 2px solid rgba(74, 222, 128, 0.65); box-shadow: 0 0 20px rgba(74, 222, 128, 0.25); }
+  .tier-C  { background: rgba(251, 191, 36, 0.18); color: #fbbf24; border: 2px solid rgba(251, 191, 36, 0.65); box-shadow: 0 0 18px rgba(251, 191, 36, 0.2); }
+  .tier-D  { background: rgba(248, 113, 113, 0.18); color: #f87171; border: 2px solid rgba(248, 113, 113, 0.65); box-shadow: 0 0 15px rgba(248, 113, 113, 0.2); }
+  .tier-E  { background: rgba(156, 163, 175, 0.18); color: #9ca3af; border: 2px solid rgba(156, 163, 175, 0.65); }
+
+  :root[data-theme="light"] .tier-EX { color: #9333ea; text-shadow: 0 2px 12px rgba(147, 51, 234, 0.3); }
+  :root[data-theme="light"] .tier-S  { color: #ea580c; text-shadow: 0.3); }
+  :root[data-theme="light"] .tier-A  { color: #2563eb; text-shadow: 0 2px 12px rgba(37, 99, 235, 0.3); }
+  :root[data-theme="light"] .tier-B  { color: #16a34a; text-shadow: 0 2px 12px rgba(22, 163, 74, 0.3); }
+  :root[data-theme="light"] .tier-C  { color: #ca8a04; text-shadow: 0 2px 12px rgba(202, 138, 4, 0.3); }
+  :root[data-theme="light"] .tier-D  { color: #dc2626; text-shadow: 0 2px 12px rgba(220, 38, 38, 0.3); }
+  :root[data-theme="light"] .tier-E  { color: #4b5563; text-shadow: 0 2px 12px rgba(75, 85, 99, 0.2); }
+
+  .game-tier .tier-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
   .game-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
   .game-stat { background: var(--bg-stat); border-radius: 8px; padding: 10px; text-align: center; }
   .game-stat-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
@@ -475,6 +559,12 @@
     <h2 data-i18n="gameTitle">🎮 猜賽果挑戰</h2>
     <p class="game-sub" data-i18n="gameSub">隨機生成數據，試下你嘅眼光！</p>
 
+    <div class="game-tier" id="gameTier">
+      <div class="tier-badge" id="tierBadge">—</div>
+      <div class="tier-desc" id="tierDesc"></div>
+      <div class="tier-hint" id="tierHint" data-i18n="tierHint">※ 猜 10 場以上才顯示等級</div>
+    </div>
+
     <div class="game-stats">
       <div class="game-stat">
         <div class="game-stat-label" data-i18n="gamePlayed">已玩</div>
@@ -567,11 +657,22 @@ function updateAgreeBtnText() {
 
 function handleAgree() {
   var btn = document.getElementById('agreeBtn');
+  var s = document.getElementById('termsScroll');
   var lang = agreeTexts[currentLang] || agreeTexts['zh-HK'];
   
-  if (!btn.classList.contains('active')) {
+  var reachedBottom = false;
+  if (s) {
+    reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 100;
+    if (s.scrollHeight <= s.clientHeight + 100) reachedBottom = true;
+  }
+  
+  if (!btn.classList.contains('active') && !reachedBottom) {
     alert(lang.alert);
     return;
+  }
+  
+  if (!btn.classList.contains('active')) {
+    btn.classList.add('active');
   }
   
   document.getElementById('termsPage').style.display = 'none';
@@ -630,7 +731,15 @@ const translations = {
     desc_D_extreme: '🎯 超罕見超高賠和局！',
     desc_D_huge: '💰 高賠和局命中！',
     desc_D_high: '📊 中高賠和局',
-    desc_D_normal: '🤝 正常和局'
+    desc_D_normal: '🤝 正常和局',
+    tierHint: '※ 猜 10 場以上才顯示等級',
+    tierEX: '🏆 傳奇！神級預測！',
+    tierS: '🔥 頂尖表現！繼續保持！',
+    tierA: '⭐ 優秀！表現出色！',
+    tierB: '✅ 良好！保持穩定！',
+    tierC: '📊 一般水平，仍有進步空間',
+    tierD: '⚠️ 需要改進，加油！',
+    tierE: '💪 繼續努力！多練習！'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明',
@@ -680,7 +789,15 @@ const translations = {
     desc_D_extreme: '🎯 超罕见超高赔和局！',
     desc_D_huge: '💰 高赔和局命中！',
     desc_D_high: '📊 中高赔和局',
-    desc_D_normal: '🤝 正常和局'
+    desc_D_normal: '🤝 正常和局',
+    tierHint: '※ 猜 10 场以上才显示等级',
+    tierEX: '🏆 传奇！神级预测！',
+    tierS: '🔥 顶尖表现！继续保持！',
+    tierA: '⭐ 优秀！表现出色！',
+    tierB: '✅ 良好！保持稳定！',
+    tierC: '📊 一般水平，仍有进步空间',
+    tierD: '⚠️ 需要改进，加油！',
+    tierE: '💪 继续努力！多练习！'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement',
@@ -730,7 +847,15 @@ const translations = {
     desc_D_extreme: '🎯 Ultra-Rare High-Odds Draw!',
     desc_D_huge: '💰 High-Odds Draw Hit!',
     desc_D_high: '📊 Mid-High Odds Draw',
-    desc_D_normal: '🤝 Normal Draw'
+    desc_D_normal: '🤝 Normal Draw',
+    tierHint: '※ Play 10+ rounds to reveal your rank',
+    tierEX: '🏆 Legendary! Godlike predictions!',
+    tierS: '🔥 Top-tier performance! Keep it up!',
+    tierA: '⭐ Excellent! Outstanding performance!',
+    tierB: '✅ Good! Stay consistent!',
+    tierC: '📊 Average, room to improve',
+    tierD: '⚠️ Needs improvement, keep going!',
+    tierE: '💪 Keep practicing! You\'ll get there!'
   }
 };
 
@@ -743,7 +868,8 @@ function updateAgreeBtnVisual() {
   
   if (btn.classList.contains('active')) return;
   
-  var reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 30;
+  var reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 100;
+  if (s.scrollHeight <= s.clientHeight + 100) reachedBottom = true;
   
   if (reachedBottom) {
     btn.classList.add('active');
@@ -762,12 +888,22 @@ window.addEventListener('load', function() {
     s.addEventListener('touchmove', updateAgreeBtnVisual);
     s.addEventListener('touchend', updateAgreeBtnVisual);
     setTimeout(function() {
-      if (s.scrollHeight <= s.clientHeight + 5) {
+      if (s.scrollHeight <= s.clientHeight + 100) {
         var btn = document.getElementById('agreeBtn');
         if (btn) btn.classList.add('active');
         updateAgreeBtnText();
       }
     }, 300);
+    
+    setInterval(function() {
+      if (s.scrollTop + s.clientHeight >= s.scrollHeight - 100) {
+        var btn = document.getElementById('agreeBtn');
+        if (btn && !btn.classList.contains('active')) {
+          btn.classList.add('active');
+          updateAgreeBtnText();
+        }
+      }
+    }, 500);
   }
   window.addEventListener('resize', updateAgreeBtnVisual);
   updateAgreeBtnText();
@@ -818,6 +954,7 @@ function applyLanguage(lang) {
   if (gameState && gameState.lastGuess && gameState.current) {
     renderGameResult(gameState.lastGuess, false);
   }
+  updateTierDisplay(false);
   
   if (window._lastResult) {
     const r = window._lastResult;
@@ -936,9 +1073,9 @@ function loadStatsWithRetry() {
   }).catch(checkFail);
   
   fetchCell('L12').then(v => {
-    if ( v ===4 null || v === undefined || v === '') { checkDone.(); return; }
-    let40 numVal;
-    let strVal = String /(v).trim();
+    if (v === null || v === undefined || v === '') { checkDone(); return; }
+    let numVal;
+    let strVal = String(v).trim();
     if (strVal.includes('%')) { numVal = parseFloat(strVal.replace('%', '')); }
     else {
       numVal = parseFloat(strVal);
@@ -1089,48 +1226,39 @@ var gameState = {
 };
 
 function generateMatch() {
-  // 1. 用鐘形曲線生成主勝率（傾向中間值）
-  var r1 = Math.random();
-  var r2 = Math.random();
-  var avg = (r1 + r2) / 2;  // 以 0.5 為中心
-  var hw = Math.round(15 + avg * 65);  // 15-80，集中 45 附近
+  var r1 = Math.random(), r2 = Math.random();
+  var avg = (r1 + r2) / 2;
+  var hw = Math.round(15 + avg * 65);
   
-  // 2. 和勝率 23-32，集中 27 附近
-  var r3 = Math.random();
-  var r4 = Math.random();
+  var r3 = Math.random(), r4 = Math.random();
   var avg2 = (r3 + r4) / 2;
   var dw = Math.round(23 + avg2 * 9);
   
   var aw = 100 - hw - dw;
   
-  // 修正極端值
   if (aw < 3) { aw = 3; hw = 100 - dw - aw; }
   if (aw > 60) { aw = 60; hw = 100 - dw - aw; }
   if (hw < 8) { hw = 8; aw = 100 - dw - hw; }
   if (hw > 82) { hw = 82; aw = 100 - dw - hw; }
   
-  // 3. 用隱含概率反推賠率（抽水 1.08-1.14）
   var margin = 1.08 + Math.random() * 0.06;
   
   var ho  = (100 / hw)  * margin;
   var doo = (100 / dw)  * margin;
   var ao  = (100 / aw)  * margin;
   
-  // 4. 加 ±8% 自然噪聲（模擬市場波動）
   ho  *= (0.92 + Math.random() * 0.16);
   doo *= (0.92 + Math.random() * 0.16);
   ao  *= (0.92 + Math.random() * 0.16);
   
-  // 5. 轉成 ×100 並限制範圍（對應你嘅真實數據）
   ho  = Math.round(ho  * 100);
   doo = Math.round(doo * 100);
   ao  = Math.round(ao  * 100);
   
-  ho  = Math.max(100,  Math.min(5500, ho));   // 主賠 1.00-55.00
-  doo = Math.max(256,  Math.min(2000, doo));  // 和賠 2.56-20.00
-  ao  = Math.max(100,  Math.min(7000, ao));   // 客賠 1.00-70.00
+  ho  = Math.max(100,  Math.min(5500, ho));
+  doo = Math.max(256,  Math.min(2000, doo));
+  ao  = Math.max(100,  Math.min(7000, ao));
   
-  // 6. 用勝率抽樣賽果（加 ±5% 偏差，唔係 100% 跟勝率）
   var hwAdj = hw + (Math.random() - 0.5) * 10;
   var dwAdj = dw + (Math.random() - 0.5) * 6;
   
@@ -1190,6 +1318,8 @@ function gameGuess(guess) {
   document.getElementById('gameHits').textContent = gameState.hits;
   var rate = gameState.played > 0 ? (gameState.hits / gameState.played * 100).toFixed(1) + '%' : '—';
   document.getElementById('gameRate').textContent = rate;
+  
+  updateTierDisplay(true);
 }
 
 function getMatchDescription(result, match) {
@@ -1242,6 +1372,63 @@ function renderGameResult(guess, animate) {
     + '<small>' + desc + '<br>'
     + (t.gameAnswer || '正確答案') + '：' + resultText 
     + '　|　' + (t.gameYourGuess || '你的選擇') + '：' + guessText + '</small>';
+}
+
+// ==================== Tier 系統 ====================
+function getTier(rate) {
+  if (rate >= 95) return { tier: 'EX', cls: 'tier-EX', descKey: 'tierEX' };
+  if (rate >= 90) return { tier: 'S+', cls: 'tier-S',  descKey: 'tierS' };
+  if (rate >= 85) return { tier: 'S',  cls: 'tier-S',  descKey: 'tierS' };
+  if (rate >= 80) return { tier: 'S-', cls: 'tier-S',  descKey: 'tierS' };
+  if (rate >= 75) return { tier: 'A+', cls: 'tier-A',  descKey: 'tierA' };
+  if (rate >= 70) return { tier: 'A',  cls: 'tier-A',  descKey: 'tierA' };
+  if (rate >= 65) return { tier: 'A-', cls: 'tier-A',  descKey: 'tierA' };
+  if (rate >= 60) return { tier: 'B+', cls: 'tier-B',  descKey: 'tierB' };
+  if (rate >= 55) return { tier: 'B',  cls: 'tier-B',  descKey: 'tierB' };
+  if (rate >= 50) return { tier: 'B-', cls: 'tier-B',  descKey: 'tierB' };
+  if (rate >= 45) return { tier: 'C+', cls: 'tier-C',  descKey: 'tierC' };
+  if (rate >= 40) return { tier: 'C',  cls: 'tier-C',  descKey: 'tierC' };
+  if (rate >= 35) return { tier: 'C-', cls: 'tier-C',  descKey: 'tierC' };
+  if (rate >= 30) return { tier: 'D+', cls: 'tier-D',  descKey: 'tierD' };
+  if (rate >= 25) return { tier: 'D',  cls: 'tier-D',  descKey: 'tierD' };
+  if (rate >= 20) return { tier: 'D-', cls: 'tier-D',  descKey: 'tierD' };
+  if (rate >= 15) return { tier: 'E+', cls: 'tier-E',  descKey: 'tierE' };
+  if (rate >= 10) return { tier: 'E',  cls: 'tier-E',  descKey: 'tierE' };
+  return { tier: 'E-', cls: 'tier-E', descKey: 'tierE' };
+}
+
+function updateTierDisplay(withAnimation) {
+  var tierEl = document.getElementById('gameTier');
+  if (!tierEl) return;
+  
+  if (gameState.played < 10) {
+    tierEl.classList.remove('show');
+    return;
+  }
+  
+  var rate = (gameState.hits / gameState.played) * 100;
+  var tier = getTier(rate);
+  var t = translations[currentLang];
+  
+  var badgeEl = document.getElementById('tierBadge');
+  var descEl = document.getElementById('tierDesc');
+  
+  var isNewTier = badgeEl.textContent !== tier.tier;
+  
+  badgeEl.className = 'tier-badge ' + tier.cls;
+  badgeEl.textContent = tier.tier;
+  
+  descEl.textContent = t[tier.descKey] || '';
+  descEl.style.color = getComputedStyle(badgeEl).color;
+  
+  if (!tierEl.classList.contains('show')) {
+    tierEl.classList.add('show');
+  }
+  
+  if (withAnimation && isNewTier) {
+    badgeEl.classList.add('pop');
+    setTimeout(function() { badgeEl.classList.remove('pop'); }, 700);
+  }
 }
 
 applyLanguage('zh-HK');
