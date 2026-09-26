@@ -1514,4 +1514,273 @@ function getMatchDescription(result, match) {
 }
 
 function renderGameResult(guess, animate, roundPnl, isAuto) {
-  if (!gameState.current ||
+  if (!gameState.current || !guess) return;
+  var t = translations[currentLang];
+  var result = gameState.current.result;
+  var isWin = (guess === result);
+  var resultText = "";
+  if (result === "H") resultText = t.resultHShort || "主勝";
+  else if (result === "D") resultText = t.resultDShort || "和局";
+  else resultText = t.resultAShort || "客勝";
+  var guessText = "";
+  if (guess === "H") guessText = t.resultHShort || "主勝";
+  else if (guess === "D") guessText = t.resultDShort || "和局";
+  else guessText = t.resultAShort || "客勝";
+  var desc = getMatchDescription(result, gameState.current);
+  if (roundPnl === undefined || roundPnl === null) {
+    if (isWin) {
+      var odds;
+      if (result === "H") odds = gameState.current.ho / 100;
+      else if (result === "D") odds = gameState.current.doo / 100;
+      else odds = gameState.current.ao / 100;
+      roundPnl = Math.round(odds * 100 - 100);
+    } else roundPnl = -100;
+  }
+  var pnlText = roundPnl >= 0 ? '+' + roundPnl : '' + roundPnl;
+  var pnlLabel = isWin ? (t.gameProfit || '本局盈利') : (t.gameLoss || '本局虧損');
+  var autoLabel = isAuto ? '🤖 ' : '';
+  var scoreStr = gameState.current.score ? String(gameState.current.score).trim() : '';
+  var scoreLine = scoreStr ? ('<br>' + (t.gameScoreLabel || '⚽ 比分') + '：<b>' + scoreStr + '</b>') : '';
+  var rowNum = gameState.current.rowNum || 0;
+  var sheetRow = gameState.current.sheetRow || (rowNum + 1);
+  var rowLine = rowNum > 0 ? ('<br>📋 資料庫第 ' + rowNum + ' 場（A' + sheetRow + '）') : '';
+  var resultBox = document.getElementById('gameResult');
+  resultBox.style.display = 'block';
+  resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
+  resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
+  resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
+    + '<span class="pnl-big">' + pnlText + '</span>'
+    + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）'
+    + rowLine
+    + '<br>📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
+    + desc
+    + scoreLine + '<br>'
+    + (t.gameAnswer || '正確答案') + '：<b>' + resultText + '</b>'
+    + '　|　' + (t.gameYourGuess || '你的選擇') + '：' + guessText + '</small>';
+}
+
+// ==================== Tier ====================
+function getTier(rate) {
+  if (rate >= 55)   return { tier:'EX', descKey:'tierEX' };
+  if (rate >= 52.5) return { tier:'S+', descKey:'tierS' };
+  if (rate >= 50)   return { tier:'S',  descKey:'tierS' };
+  if (rate >= 47.5) return { tier:'S-', descKey:'tierS' };
+  if (rate >= 45)   return { tier:'A+', descKey:'tierA' };
+  if (rate >= 42.5) return { tier:'A',  descKey:'tierA' };
+  if (rate >= 40)   return { tier:'A-', descKey:'tierA' };
+  if (rate >= 37.5) return { tier:'C+', descKey:'tierC' };
+  if (rate >= 35)   return { tier:'C',  descKey:'tierC' };
+  if (rate >= 32.5) return { tier:'C-', descKey:'tierC' };
+  if (rate >= 30)   return { tier:'D+', descKey:'tierD' };
+  if (rate >= 27.5) return { tier:'D',  descKey:'tierD' };
+  if (rate >= 25)   return { tier:'D-', descKey:'tierD' };
+  if (rate >= 22.5) return { tier:'E+', descKey:'tierE' };
+  if (rate > 20)    return { tier:'E',  descKey:'tierE' };
+  return { tier:'E-', descKey:'tierE' };
+}
+
+function updateTierDisplay(withAnimation) {
+  var tierEl = document.getElementById('gameTier');
+  if (!tierEl) return;
+  if (gameState.played < TIER_MIN_PLAYED) { tierEl.style.display = 'none'; return; }
+  var hitRate = (gameState.hits / gameState.played) * 100;
+  var totalCost = gameState.played * 100;
+  var roi = totalCost > 0 ? (gameState.totalPnl / totalCost) * 100 : 0;
+  var rate = hitRate * TIER_WEIGHT_HITRATE + roi * TIER_WEIGHT_ROI;
+  var tier = getTier(rate);
+  var t = translations[currentLang];
+  var badgeEl = document.getElementById('tierBadge');
+  var descEl = document.getElementById('tierDesc');
+  var detailEl = document.getElementById('tierDetail');
+  var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
+
+  var colorMap = {
+    'EX': { color:'#c084fc', bg:'rgba(192,132,252,0.18)', border:'rgba(192,132,252,0.65)', shadow:'0 0 50px rgba(192,132,252,0.6)', isEX:true },
+    'S+': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'S':  { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'S-': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'A+': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
+    'A':  { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
+    'A-': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
+    'C+': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
+    'C':  { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
+    'C-': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
+    'D+': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
+    'D':  { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
+    'D-': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
+    'E+': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
+    'E':  { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
+    'E-': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' }
+  };
+  var style = colorMap[tier.tier] || colorMap['E'];
+
+  badgeEl.style.display = 'inline-block';
+  badgeEl.style.padding = '18px 42px';
+  badgeEl.style.borderRadius = '16px';
+  badgeEl.style.fontSize = '52px';
+  badgeEl.style.fontWeight = '900';
+  badgeEl.style.letterSpacing = '3px';
+  badgeEl.style.lineHeight = '1';
+  badgeEl.style.minWidth = '150px';
+  badgeEl.style.fontFamily = "'Segoe UI', -apple-system, sans-serif";
+  badgeEl.style.border = '2px solid ' + style.border;
+  badgeEl.style.boxShadow = style.shadow;
+  badgeEl.textContent = tier.tier;
+  badgeEl.setAttribute('data-tier', tier.tier);
+
+  if (style.isEX) {
+    badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
+    badgeEl.style.backgroundSize = '400% 400%';
+    badgeEl.style.color = '#fff';
+    badgeEl.style.textShadow = '0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9';
+    badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
+  } else if (tier.tier.indexOf('S') === 0) {
+    badgeEl.style.background = style.bg;
+    badgeEl.style.color = style.color;
+    badgeEl.style.textShadow = '0 0 15px ' + style.color + ', 0 0 30px ' + style.color + ', 0 2px 12px ' + style.color;
+    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+  } else {
+    badgeEl.style.background = style.bg;
+    badgeEl.style.color = style.color;
+    badgeEl.style.textShadow = '0 2px 12px ' + style.color;
+    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+  }
+
+  descEl.style.fontSize = '14px';
+  descEl.style.marginTop = '12px';
+  descEl.style.fontWeight = 'bold';
+  descEl.style.letterSpacing = '0.5px';
+  descEl.style.color = style.isEX ? '#c084fc' : style.color;
+  descEl.textContent = t[tier.descKey] || '';
+
+  if (detailEl) {
+    var roiSign = roi >= 0 ? '+' : '';
+    detailEl.innerHTML = '📐 ' + (t.tierFormula || '綜合分數 = 命中率 × 40% + ROI × 60%') +
+      '<br>🎯 綜合分數：<b style="color:' + (style.isEX ? '#c084fc' : style.color) + '">' + rate.toFixed(1) + '</b>' +
+      '　（命中率 ' + hitRate.toFixed(1) + '% × 40% + ROI ' + roiSign + roi.toFixed(1) + '% × 60%）';
+  }
+
+  tierEl.style.display = 'block';
+  tierEl.style.textAlign = 'center';
+  tierEl.style.marginBottom = '20px';
+  tierEl.style.padding = '20px 15px';
+  tierEl.style.borderRadius = '14px';
+  tierEl.style.background = 'var(--bg-panel)';
+  tierEl.style.border = '1px solid var(--border-color)';
+
+  if (withAnimation && isNewTier) {
+    badgeEl.style.animation = 'tierPop 0.6s ease-out, ' + (style.isEX ? 'tierEXGradient 2s ease infinite, ' : '') + 'tierPulse 2.5s ease-in-out 0.6s infinite';
+    setTimeout(function() {
+      if (style.isEX) badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
+      else badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+    }, 700);
+  }
+}
+
+// ==================== 綁定所有事件 ====================
+window.addEventListener('load', function() {
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
+  applyTheme(savedTheme);
+
+  var themeBtn = document.getElementById('themeSwitcher');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+  var langSel = document.getElementById('langSelect');
+  if (langSel) langSel.addEventListener('change', function() { changeLang(this.value); });
+
+  window.addEventListener('scroll', handleTopBtnsScroll, { passive: true });
+  window.addEventListener('touchmove', handleTopBtnsScroll, { passive: true });
+  handleTopBtnsScroll();
+
+  var s = document.getElementById('termsScroll');
+  if (s) {
+    s.addEventListener('scroll', updateAgreeBtnVisual);
+    s.addEventListener('touchmove', updateAgreeBtnVisual);
+    s.addEventListener('touchend', updateAgreeBtnVisual);
+    s.addEventListener('wheel', updateAgreeBtnVisual, { passive: true });
+    setTimeout(function() {
+      if (s.scrollHeight <= s.clientHeight + 200) {
+        var btn = document.getElementById('agreeBtn');
+        if (btn) btn.classList.add('active');
+        updateAgreeBtnText();
+      }
+    }, 300);
+    setInterval(function() {
+      if (s.scrollTop + s.clientHeight >= s.scrollHeight - 200) {
+        var btn = document.getElementById('agreeBtn');
+        if (btn && !btn.classList.contains('active')) {
+          btn.classList.add('active');
+          updateAgreeBtnText();
+        }
+      }
+    }, 400);
+  }
+  window.addEventListener('resize', updateAgreeBtnVisual);
+  updateAgreeBtnText();
+
+  var agreeBtn = document.getElementById('agreeBtn');
+  if (agreeBtn) agreeBtn.addEventListener('click', handleAgree);
+
+  ['hw','dw','aw'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '');
+      checkClearBtn();
+    });
+  });
+  ['ho','doo','ao'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() { formatOddsInput(this); checkClearBtn(); });
+      el.addEventListener('blur', function() { formatOddsOnBlur(this); });
+    }
+  });
+
+  var calcBtn = document.getElementById('calcBtn');
+  if (calcBtn) calcBtn.addEventListener('click', calculate);
+  var clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) clearBtn.addEventListener('click', clearData);
+
+  var gbtnH = document.getElementById('gbtnH');
+  if (gbtnH) gbtnH.addEventListener('click', function() { gameGuess('H'); });
+  var gbtnD = document.getElementById('gbtnD');
+  if (gbtnD) gbtnD.addEventListener('click', function() { gameGuess('D'); });
+  var gbtnA = document.getElementById('gbtnA');
+  if (gbtnA) gbtnA.addEventListener('click', function() { gameGuess('A'); });
+  var gbtnAuto = document.getElementById('gbtnAuto');
+  if (gbtnAuto) gbtnAuto.addEventListener('click', gameAutoPredict);
+  var gbtnDev = document.getElementById('gbtnDev');
+  if (gbtnDev) gbtnDev.addEventListener('click', devAutoPredict);
+  var gbtnSkip = document.getElementById('gbtnSkip');
+  if (gbtnSkip) gbtnSkip.addEventListener('click', gameSkip);
+  var gbtnNew = document.getElementById('gameNewBtn');
+  if (gbtnNew) gbtnNew.addEventListener('click', gameNewRound);
+
+  // 開發者相關
+  var devUnlockBtn = document.getElementById('devUnlockBtn');
+  if (devUnlockBtn) devUnlockBtn.addEventListener('click', devUnlock);
+  var devSettingsBtn = document.getElementById('devSettingsBtn');
+  if (devSettingsBtn) devSettingsBtn.addEventListener('click', openDevPanel);
+  var devResetGameBtn = document.getElementById('devResetGameBtn');
+  if (devResetGameBtn) devResetGameBtn.addEventListener('click', resetGameProgress);
+  var devCloseBtn = document.getElementById('devCloseBtn');
+  if (devCloseBtn) devCloseBtn.addEventListener('click', closeDevPanel);
+  var devApplyBtn = document.getElementById('devApplyBtn');
+  if (devApplyBtn) devApplyBtn.addEventListener('click', applyParams);
+  var devResetBtn = document.getElementById('devResetBtn');
+  if (devResetBtn) devResetBtn.addEventListener('click', resetParams);
+
+  applyLanguage('zh-HK');
+  checkClearBtn();
+  loadSavedParams();
+  loadStatsWithRetry();
+  setInterval(loadStatsWithRetry, 15000);
+  window.addEventListener('focus', loadStatsWithRetry);
+  document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
+
+  ensureSheetPool().catch(function(e) { console.warn('Pool preload failed:', e); });
+});
+</script>
+</body>
+</html>
