@@ -112,7 +112,6 @@
   :root[data-theme="dark"] .game-stat-value.negative { color: #f87171; }
   .game-stat-value.neutral { color: var(--text-primary); }
 
-  /* 跳過按鈕樣式 */
   .game-skip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .game-skip-btn { flex: 1; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.5); }
   .game-skip-btn:hover:not(:disabled) { background: rgba(156, 163, 175, 0.25); }
@@ -147,7 +146,6 @@
   .game-new-btn { width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .game-new-btn:active { background: #0062cc; }
 
-  /* 說明框 */
   .game-skip-help { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 12px; line-height: 1.5; padding: 8px 10px; background: var(--bg-panel); border-radius: 6px; border: 1px dashed var(--border-color); }
 
   @keyframes tierPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.15); } }
@@ -565,7 +563,8 @@ const translations = {
     gameSkipInfoSuffix: ' 次',
     gameSkipHelp: '💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次',
     gameSkipExhausted: '❌ 跳過次數已用完',
-    gameSkipToast: '⏭️ 已跳過本場'
+    gameSkipToast: '⏭️ 已跳過本場',
+    gameMustGuess: '⚠️ 請先預測本場答案，才能開始新一局'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明', statsTitle: '📊 历史数据统计',
@@ -617,7 +616,8 @@ const translations = {
     gameSkipInfoSuffix: ' 次',
     gameSkipHelp: '💡 每场随机生成，预设 2 次跳过机会，每玩 10 场 +1 次',
     gameSkipExhausted: '❌ 跳过次数已用完',
-    gameSkipToast: '⏭️ 已跳过本场'
+    gameSkipToast: '⏭️ 已跳过本场',
+    gameMustGuess: '⚠️ 请先预测本场答案，才能开始新一局'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement', statsTitle: '📊 Historical Statistics',
@@ -669,7 +669,8 @@ const translations = {
     gameSkipInfoSuffix: '',
     gameSkipHelp: '💡 Each match is random. Default 2 skips, +1 every 10 plays',
     gameSkipExhausted: '❌ No skips left',
-    gameSkipToast: '⏭️ Match skipped'
+    gameSkipToast: '⏭️ Match skipped',
+    gameMustGuess: '⚠️ Please guess the current match before starting a new one'
   }
 };
 
@@ -939,7 +940,6 @@ var gameState = {
 };
 
 function getMaxSkips() {
-  // 預設 2 次，每玩 10 場 +1 次
   return 2 + Math.floor(gameState.played / 10);
 }
 
@@ -999,6 +999,22 @@ function generateMatch() {
 }
 
 function gameNewRound() {
+  // ✅ 檢查：仲未估就唔准開新局
+  if (gameState.waiting && gameState.current) {
+    var t = translations[currentLang];
+    var resultBox = document.getElementById('gameResult');
+    resultBox.style.display = 'block';
+    resultBox.className = 'game-result-box game-lose';
+    resultBox.style.background = '';
+    resultBox.style.color = '';
+    resultBox.style.border = '';
+    resultBox.innerHTML = (t.gameMustGuess || '⚠️ 請先預測本場答案，才能開始新一局');
+    setTimeout(function() {
+      if (gameState.waiting) resultBox.style.display = 'none';
+    }, 1800);
+    return;
+  }
+  
   gameState.current = generateMatch();
   gameState.waiting = true;
   gameState.lastGuess = null;
@@ -1012,6 +1028,9 @@ function gameNewRound() {
   resultBox.style.display = 'none';
   resultBox.innerText = '';
   resultBox.className = 'game-result-box';
+  resultBox.style.background = '';
+  resultBox.style.color = '';
+  resultBox.style.border = '';
   ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
     var b = document.getElementById(id);
     b.disabled = false;
@@ -1020,16 +1039,17 @@ function gameNewRound() {
   updateSkipDisplay();
 }
 
-// 跳過本場
 function gameSkip() {
   if (!gameState.waiting || !gameState.current) return;
   var remaining = getRemainingSkips();
   if (remaining <= 0) {
     var t = translations[currentLang];
-    // 顯示提示（用結果框簡單顯示）
     var resultBox = document.getElementById('gameResult');
     resultBox.style.display = 'block';
     resultBox.className = 'game-result-box game-lose';
+    resultBox.style.background = '';
+    resultBox.style.color = '';
+    resultBox.style.border = '';
     resultBox.innerHTML = (t.gameSkipExhausted || '❌ 跳過次數已用完');
     setTimeout(function() {
       if (!gameState.waiting) resultBox.style.display = 'none';
@@ -1039,7 +1059,6 @@ function gameSkip() {
   
   gameState.skipsUsed++;
   
-  // 顯示 toast 效果
   var t = translations[currentLang];
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
@@ -1050,9 +1069,26 @@ function gameSkip() {
   resultBox.innerHTML = (t.gameSkipToast || '⏭️ 已跳過本場');
   
   setTimeout(function() {
-    // 生成下一場
-    gameNewRound();
+    // 直接生成新場（唔經 gameNewRound 避免警告）
+    gameState.current = generateMatch();
+    gameState.waiting = true;
+    gameState.lastGuess = null;
+    document.getElementById('ghw').textContent = gameState.current.hw + '%';
+    document.getElementById('gdw').textContent = gameState.current.dw + '%';
+    document.getElementById('gaw').textContent = gameState.current.aw + '%';
+    document.getElementById('gho').textContent = (gameState.current.ho / 100).toFixed(2);
+    document.getElementById('gdoo').textContent = (gameState.current.doo / 100).toFixed(2);
+    document.getElementById('gao').textContent = (gameState.current.ao / 100).toFixed(2);
     resultBox.style.display = 'none';
+    resultBox.style.background = '';
+    resultBox.style.color = '';
+    resultBox.style.border = '';
+    ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
+      var b = document.getElementById(id);
+      b.disabled = false;
+      b.style.opacity = '1';
+    });
+    updateSkipDisplay();
   }, 400);
   
   updateSkipDisplay();
