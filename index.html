@@ -780,7 +780,6 @@ function applyLanguage(lang) {
   
   updateAgreeBtnText();
   
-  // 重新渲染遊戲結果（如果有）
   if (gameState && gameState.lastGuess && gameState.current) {
     renderGameResult(gameState.lastGuess, false);
   }
@@ -1055,35 +1054,47 @@ var gameState = {
 };
 
 function generateMatch() {
-  // 主勝率 18-72
-  var hw = Math.floor(Math.random() * 55) + 18;
-  // 和勝率 24-32
-  var dw = Math.floor(Math.random() * 9) + 24;
-  // 客勝率 = 100 - 主 - 和
-  var aw = 100 - hw - dw;
+  // 1. 生成勝率（參考真實數據範圍）
+  var hw = Math.floor(Math.random() * 66) + 15;  // 主勝率 15-80%
+  var dw = Math.floor(Math.random() * 13) + 23;  // 和勝率 23-35%
+  var aw = 100 - hw - dw;                        // 客勝率 = 100 - 主 - 和
   
+  // 修正極端值，保證三個勝率都在合理範圍
   if (aw < 5) { aw = 5; hw = 100 - dw - aw; }
-  if (aw > 60) { aw = 60; hw = 100 - dw - aw; }
+  if (aw > 65) { aw = 65; hw = 100 - dw - aw; }
   if (hw < 10) { hw = 10; aw = 100 - dw - hw; }
+  if (hw > 80) { hw = 80; aw = 100 - dw - hw; }
   
-  // 用隱含概率反推賠率
-  var margin = 1.10 + Math.random() * 0.06; // 1.10-1.16
-  var ho = Math.round(100 * margin / (hw / 100));
-  var doo = Math.round(100 * margin / (dw / 100));
-  var ao = Math.round(100 * margin / (aw / 100));
+  // 2. 計算合理賠率
+  var margin = 1.08 + Math.random() * 0.07;  // 抽水 1.08-1.15
   
-  // 加隨機噪聲，限制喺合理範圍
-  ho = Math.max(100, Math.min(1500, Math.round(ho * (0.92 + Math.random() * 0.16))));
-  doo = Math.max(256, Math.min(1200, Math.round(doo * (0.92 + Math.random() * 0.16))));
-  ao = Math.max(100, Math.min(2500, Math.round(ao * (0.92 + Math.random() * 0.16))));
+  var ho  = (100 / hw)  * margin;  // 基礎賠率 = 100 / 勝率 × 抽水
+  var doo = (100 / dw)  * margin;
+  var ao  = (100 / aw)  * margin;
   
-  // 用隱含概率抽樣結果
-  var pD = 1 / ho, pE = 1 / doo, pF = 1 / ao;
-  var total = pD + pE + pF;
-  var r = Math.random() * total;
+  // 3. 加 ±8% 自然噪聲（模擬市場波動）
+  ho  *= (0.92 + Math.random() * 0.16);
+  doo *= (0.92 + Math.random() * 0.16);
+  ao  *= (0.92 + Math.random() * 0.16);
+  
+  // 4. 轉成 ×100 並限制合理範圍
+  ho  = Math.round(ho  * 100);
+  doo = Math.round(doo * 100);
+  ao  = Math.round(ao  * 100);
+  
+  ho  = Math.max(105,  Math.min(2000, ho));   // 主賠 1.05 - 20.00
+  doo = Math.max(256,  Math.min(1500, doo));  // 和賠 2.56 - 15.00
+  ao  = Math.max(105,  Math.min(3000, ao));   // 客賠 1.05 - 30.00
+  
+  // 5. 用勝率抽樣賽果（加少量偏差，唔係100%跟勝率）
+  var hwAdj = hw + (Math.random() - 0.5) * 8;
+  var dwAdj = dw + (Math.random() - 0.5) * 5;
+  var awAdj = 100 - hwAdj - dwAdj;
+  
+  var r = Math.random() * 100;
   var result;
-  if (r < pD) result = "H";
-  else if (r < pD + pE) result = "D";
+  if (r < hwAdj) result = "H";
+  else if (r < hwAdj + dwAdj) result = "D";
   else result = "A";
   
   return { hw: hw, dw: dw, aw: aw, ho: ho, doo: doo, ao: ao, result: result };
