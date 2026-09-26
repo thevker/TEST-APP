@@ -963,31 +963,66 @@ function updateSkipDisplay() {
   }
 }
 
+// ✅ 修正後嘅 generateMatch()：正確計算賠率，確保倒數和 ≥ 1.10
 function generateMatch() {
+  // 1. 生成勝率
   var r1 = Math.random(), r2 = Math.random();
   var avg = (r1 + r2) / 2;
-  var hw = Math.round(15 + avg * 65);
+  var hw = Math.round(15 + avg * 65);  // 主勝率 15-80%
+
   var r3 = Math.random(), r4 = Math.random();
   var avg2 = (r3 + r4) / 2;
-  var dw = Math.round(23 + avg2 * 9);
+  var dw = Math.round(23 + avg2 * 9);  // 和勝率 23-32%
+
   var aw = 100 - hw - dw;
+
+  // 修正極端值
   if (aw < 3) { aw = 3; hw = 100 - dw - aw; }
   if (aw > 60) { aw = 60; hw = 100 - dw - aw; }
   if (hw < 8) { hw = 8; aw = 100 - dw - hw; }
   if (hw > 82) { hw = 82; aw = 100 - dw - hw; }
-  var margin = 1.08 + Math.random() * 0.06;
-  var ho  = (100 / hw)  * margin;
-  var doo = (100 / dw)  * margin;
-  var ao  = (100 / aw)  * margin;
-  ho  *= (0.92 + Math.random() * 0.16);
-  doo *= (0.92 + Math.random() * 0.16);
-  ao  *= (0.92 + Math.random() * 0.16);
+
+  // 2. 正確計算賠率：ho = 100 / (hw * margin)
+  //    確保 1/ho + 1/doo + 1/ao = margin (1.10-1.16)
+  var margin = 1.10 + Math.random() * 0.06;
+
+  var ho  = 100 / (hw  * margin);
+  var doo = 100 / (dw  * margin);
+  var ao  = 100 / (aw  * margin);
+
+  // 3. 加 ±4% 自然噪聲
+  ho  *= (0.96 + Math.random() * 0.08);
+  doo *= (0.96 + Math.random() * 0.08);
+  ao  *= (0.96 + Math.random() * 0.08);
+
+  // 4. 檢查倒數和，如果 < 1.10 就整體調整
+  var s = 1/ho + 1/doo + 1/ao;
+  if (s < 1.10) {
+    var factor = s / 1.10;
+    ho  *= factor;
+    doo *= factor;
+    ao  *= factor;
+  }
+
+  // 5. 轉成 ×100 並限制範圍
   ho  = Math.round(ho  * 100);
   doo = Math.round(doo * 100);
   ao  = Math.round(ao  * 100);
+
   ho  = Math.max(100,  Math.min(5500, ho));
   doo = Math.max(256,  Math.min(2000, doo));
   ao  = Math.max(100,  Math.min(7000, ao));
+
+  // 6. 二次檢查（範圍限制後確保倒數和 ≥ 1.10）
+  var s2 = 100/ho + 100/doo + 100/ao;
+  if (s2 < 1.10) {
+    var factor2 = s2 / 1.10;
+    ho  = Math.round(ho  * factor2);
+    doo = Math.round(doo * factor2);
+    ao  = Math.round(ao  * factor2);
+  }
+
+  // 7. 用勝率抽樣賽果（加 ±5% 偏差）
   var hwAdj = hw + (Math.random() - 0.5) * 10;
   var dwAdj = dw + (Math.random() - 0.5) * 6;
   var r = Math.random() * 100;
@@ -995,11 +1030,12 @@ function generateMatch() {
   if (r < hwAdj) result = "H";
   else if (r < hwAdj + dwAdj) result = "D";
   else result = "A";
+
   return { hw: hw, dw: dw, aw: aw, ho: ho, doo: doo, ao: ao, result: result };
 }
 
 function gameNewRound() {
-  // ✅ 檢查：仲未估就唔准開新局
+  // 檢查：仲未估就唔准開新局
   if (gameState.waiting && gameState.current) {
     var t = translations[currentLang];
     var resultBox = document.getElementById('gameResult');
@@ -1014,7 +1050,7 @@ function gameNewRound() {
     }, 1800);
     return;
   }
-  
+
   gameState.current = generateMatch();
   gameState.waiting = true;
   gameState.lastGuess = null;
@@ -1056,9 +1092,9 @@ function gameSkip() {
     }, 1500);
     return;
   }
-  
+
   gameState.skipsUsed++;
-  
+
   var t = translations[currentLang];
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
@@ -1067,9 +1103,8 @@ function gameSkip() {
   resultBox.style.color = 'var(--text-secondary)';
   resultBox.style.border = '1px solid rgba(156,163,175,0.4)';
   resultBox.innerHTML = (t.gameSkipToast || '⏭️ 已跳過本場');
-  
+
   setTimeout(function() {
-    // 直接生成新場（唔經 gameNewRound 避免警告）
     gameState.current = generateMatch();
     gameState.waiting = true;
     gameState.lastGuess = null;
@@ -1090,7 +1125,7 @@ function gameSkip() {
     });
     updateSkipDisplay();
   }, 400);
-  
+
   updateSkipDisplay();
 }
 
@@ -1183,8 +1218,8 @@ function renderGameResult(guess, animate, roundPnl) {
     } else roundPnl = -100;
   }
   var pnlText = roundPnl >= 0 ? '+' + roundPnl : '' + roundPnl;
-  var pnlLabel = isWin 
-    ? (t.gameProfit || '本局盈利') 
+  var pnlLabel = isWin
+    ? (t.gameProfit || '本局盈利')
     : (t.gameLoss || '本局虧損');
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
@@ -1196,7 +1231,7 @@ function renderGameResult(guess, animate, roundPnl) {
     + '<span class="pnl-big">' + pnlText + '</span>'
     + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
     + desc + '<br>'
-    + (t.gameAnswer || '正確答案') + '：' + resultText 
+    + (t.gameAnswer || '正確答案') + '：' + resultText
     + '　|　' + (t.gameYourGuess || '你的選擇') + '：' + guessText + '</small>';
 }
 
@@ -1230,7 +1265,7 @@ function updateTierDisplay(withAnimation) {
   var badgeEl = document.getElementById('tierBadge');
   var descEl = document.getElementById('tierDesc');
   var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
-  
+
   var colorMap = {
     'EX': { color: '#c084fc', bg: 'rgba(192,132,252,0.18)', border: 'rgba(192,132,252,0.65)', shadow: '0 0 50px rgba(192,132,252,0.6)', isEX: true },
     'S+': { color: '#FFD700', bg: 'rgba(255,215,0,0.15)', border: 'rgba(255,215,0,0.75)', shadow: '0 0 40px rgba(255,215,0,0.55)' },
@@ -1250,7 +1285,7 @@ function updateTierDisplay(withAnimation) {
     'E-': { color: '#9ca3af', bg: 'rgba(156,163,175,0.18)', border: 'rgba(156,163,175,0.65)', shadow: 'none' }
   };
   var style = colorMap[tier.tier] || colorMap['E'];
-  
+
   badgeEl.style.display = 'inline-block';
   badgeEl.style.padding = '18px 42px';
   badgeEl.style.borderRadius = '16px';
@@ -1264,7 +1299,7 @@ function updateTierDisplay(withAnimation) {
   badgeEl.style.boxShadow = style.shadow;
   badgeEl.textContent = tier.tier;
   badgeEl.setAttribute('data-tier', tier.tier);
-  
+
   if (style.isEX) {
     badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
     badgeEl.style.backgroundSize = '400% 400%';
@@ -1286,14 +1321,14 @@ function updateTierDisplay(withAnimation) {
       badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
     }
   }
-  
+
   descEl.style.fontSize = '14px';
   descEl.style.marginTop = '12px';
   descEl.style.fontWeight = 'bold';
   descEl.style.letterSpacing = '0.5px';
   descEl.style.color = style.isEX ? '#c084fc' : style.color;
   descEl.textContent = t[tier.descKey] || '';
-  
+
   tierEl.style.display = 'block';
   tierEl.style.textAlign = 'center';
   tierEl.style.marginBottom = '20px';
@@ -1301,7 +1336,7 @@ function updateTierDisplay(withAnimation) {
   tierEl.style.borderRadius = '14px';
   tierEl.style.background = 'var(--bg-panel)';
   tierEl.style.border = '1px solid var(--border-color)';
-  
+
   if (withAnimation && isNewTier) {
     badgeEl.style.animation = 'tierPop 0.6s ease-out, ' + (style.isEX ? 'tierEXGradient 2s ease infinite, ' : '') + 'tierPulse 2.5s ease-in-out 0.6s infinite';
     setTimeout(function() {
