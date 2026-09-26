@@ -193,6 +193,38 @@
   :root[data-theme="dark"] .ev-box .ev-negative { color: #f87171; }
 
   .hint-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: var(--bg-panel); border: 1px solid var(--border-color); font-size: 13px; line-height: 1.6; color: var(--text-secondary); text-align: left; display: none; }
+
+  /* ===== 猜賽果挑戰 ===== */
+  .game-panel { margin-top: 20px; }
+  .game-panel h2 { text-align: center; margin: 0 0 5px 0; font-size: 20px; color: var(--text-primary); }
+  .game-panel .game-sub { text-align: center; font-size: 13px; color: var(--text-tertiary); margin: 3px 0 15px 0; }
+  .game-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .game-stat { background: var(--bg-stat); border-radius: 8px; padding: 10px; text-align: center; }
+  .game-stat-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .game-stat-value { font-size: 18px; font-weight: bold; color: var(--text-primary); }
+  .game-match { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+  .game-match-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .game-match-row:last-child { margin-bottom: 0; }
+  .game-cell { text-align: center; }
+  .game-cell-label { display: block; font-size: 11px; color: var(--text-tertiary); margin-bottom: 3px; }
+  .game-cell-value { display: block; font-size: 15px; font-weight: bold; color: var(--text-primary); }
+  .game-guess-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .game-guess-btn { padding: 14px 8px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; }
+  .game-guess-btn:active:not(:disabled) { transform: scale(0.95); }
+  .guess-H { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.5); }
+  .guess-D { background: rgba(251, 191, 36, 0.15); color: #d97706; border: 1px solid rgba(251, 191, 36, 0.5); }
+  .guess-A { background: rgba(96, 165, 250, 0.15); color: #2563eb; border: 1px solid rgba(96, 165, 250, 0.5); }
+  :root[data-theme="dark"] .guess-H { color: #4ade80; }
+  :root[data-theme="dark"] .guess-D { color: #fbbf24; }
+  :root[data-theme="dark"] .guess-A { color: #60a5fa; }
+  .game-result-box { padding: 15px; border-radius: 10px; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; display: none; }
+  .game-result-box small { font-weight: normal; font-size: 12px; opacity: 0.85; display: block; margin-top: 6px; }
+  .game-win { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.4); }
+  .game-lose { background: rgba(248, 113, 113, 0.15); color: #dc2626; border: 1px solid rgba(248, 113, 113, 0.4); }
+  :root[data-theme="dark"] .game-win { color: #4ade80; }
+  :root[data-theme="dark"] .game-lose { color: #f87171; }
+  .game-new-btn { width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .game-new-btn:active { background: #0062cc; }
 </style>
 </head>
 <body>
@@ -438,6 +470,50 @@
     <div id="evBox" class="ev-box"></div>
     <div id="hintBox" class="hint-box"></div>
   </div>
+
+  <!-- ===== 猜賽果挑戰 ===== -->
+  <div class="dark-card game-panel">
+    <h2 data-i18n="gameTitle">🎮 猜賽果挑戰</h2>
+    <p class="game-sub" data-i18n="gameSub">隨機生成數據，試下你嘅眼光！</p>
+
+    <div class="game-stats">
+      <div class="game-stat">
+        <div class="game-stat-label" data-i18n="gamePlayed">已玩</div>
+        <div class="game-stat-value" id="gamePlayed">0</div>
+      </div>
+      <div class="game-stat">
+        <div class="game-stat-label" data-i18n="gameHits">命中</div>
+        <div class="game-stat-value" id="gameHits">0</div>
+      </div>
+      <div class="game-stat">
+        <div class="game-stat-label" data-i18n="gameRate">命中率</div>
+        <div class="game-stat-value" id="gameRate">—</div>
+      </div>
+    </div>
+
+    <div class="game-match">
+      <div class="game-match-row">
+        <div class="game-cell"><span class="game-cell-label" data-i18n="gameHW">主勝率</span><span class="game-cell-value" id="ghw">—</span></div>
+        <div class="game-cell"><span class="game-cell-label" data-i18n="gameDW">和勝率</span><span class="game-cell-value" id="gdw">—</span></div>
+        <div class="game-cell"><span class="game-cell-label" data-i18n="gameAW">客勝率</span><span class="game-cell-value" id="gaw">—</span></div>
+      </div>
+      <div class="game-match-row">
+        <div class="game-cell"><span class="game-cell-label" data-i18n="gameHO">主賠</span><span class="game-cell-value" id="gho">—</span></div>
+        <div class="game-cell"><span class="game-cell-label" data-i18n="gameDO">和賠</span><span class="game-cell-value" id="gdoo">—</span></div>
+        <div class="game-cell"><span class="game-cell-label" data-i18n="gameAO">客賠</span><span class="game-cell-value" id="gao">—</span></div>
+      </div>
+    </div>
+
+    <div class="game-guess-btns">
+      <button class="game-guess-btn guess-H" id="gbtnH" onclick="gameGuess('H')" data-i18n="resultHShort">主勝</button>
+      <button class="game-guess-btn guess-D" id="gbtnD" onclick="gameGuess('D')" data-i18n="resultDShort">和局</button>
+      <button class="game-guess-btn guess-A" id="gbtnA" onclick="gameGuess('A')" data-i18n="resultAShort">客勝</button>
+    </div>
+
+    <div id="gameResult" class="game-result-box"></div>
+
+    <button class="game-new-btn" onclick="gameNewRound()" data-i18n="gameNewBtn">🎲 開始新一局</button>
+  </div>
 </div>
 
 <div class="whatsapp-bottom">
@@ -503,6 +579,7 @@ function handleAgree() {
   document.getElementById('calcPage').style.display = 'flex';
   window.scrollTo(0, 0);
   loadStatsWithRetry();
+  gameNewRound();
 }
 
 const translations = {
@@ -530,9 +607,19 @@ const translations = {
     hint1: '主客勝率相近（相差 6 以內），和局概率被市場低估，系統捕捉高價值和局，建議買和局。',
     hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
     hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
-    hint4: '客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
-    hint5: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
-    hintReverse: '偵測到主賠 ≥ 6.00（主隊冷門），系統改為買和局搏高賠回報。'
+    hint4: '客勝率高於主勝率，客隊略為冷門，系統反向買主隊，搏主場優勢。',
+    hint5: '客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
+    hint6: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
+    hintReverse: '偵測到極端冷門賠率，系統按最新規則買和局搏高賠回報。',
+    gameTitle: '🎮 猜賽果挑戰',
+    gameSub: '隨機生成數據，試下你嘅眼光！',
+    gamePlayed: '已玩', gameHits: '命中', gameRate: '命中率',
+    gameHW: '主勝率', gameDW: '和勝率', gameAW: '客勝率',
+    gameHO: '主賠', gameDO: '和賠', gameAO: '客賠',
+    gameNewBtn: '🎲 開始新一局',
+    gameWin: '🎉 恭喜！答中！', gameLose: '❌ 差啲！答錯',
+    gameAnswer: '正確答案', gameYourGuess: '你的選擇',
+    resultHShort: '主勝', resultDShort: '和局', resultAShort: '客勝'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明',
@@ -558,9 +645,19 @@ const translations = {
     hint1: '主客胜率相近（相差 6 以内），和局概率被市场低估，系统捕捉高价值和局，建议买和局。',
     hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
     hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
-    hint4: '客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
-    hint5: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
-    hintReverse: '侦测到主赔 ≥ 6.00（主队冷门），系统改为买和局搏高赔回报。'
+    hint4: '客胜率高于主胜率，客队略为冷门，系统反向买主队，搏主场优势。',
+    hint5: '客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
+    hint6: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
+    hintReverse: '侦测到极端冷门赔率，系统按最新规则买和局搏高赔回报。',
+    gameTitle: '🎮 猜赛果挑战',
+    gameSub: '随机生成数据，试试你的眼光！',
+    gamePlayed: '已玩', gameHits: '命中', gameRate: '命中率',
+    gameHW: '主胜率', gameDW: '和胜率', gameAW: '客胜率',
+    gameHO: '主赔', gameDO: '和赔', gameAO: '客赔',
+    gameNewBtn: '🎲 开始新一局',
+    gameWin: '🎉 恭喜！答中！', gameLose: '❌ 差一点！答错',
+    gameAnswer: '正确答案', gameYourGuess: '你的选择',
+    resultHShort: '主胜', resultDShort: '和局', resultAShort: '客胜'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement',
@@ -586,9 +683,19 @@ const translations = {
     hint1: 'Home and away win rates are close (within 6). Draw is undervalued. Bet Draw.',
     hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
     hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
-    hint4: 'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
-    hint5: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
-    hintReverse: 'Detected home odds ≥ 6.00 (extreme underdog). System switches to Draw bet.'
+    hint4: 'Away win rate exceeds home, away team slightly underdog. System bets Home Win as contrarian play.',
+    hint5: 'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
+    hint6: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
+    hintReverse: 'Detected extreme underdog odds. System switches to Draw bet for high-payout upside.',
+    gameTitle: '🎮 Guess the Result',
+    gameSub: 'Random data generated. Try your luck!',
+    gamePlayed: 'Played', gameHits: 'Correct', gameRate: 'Accuracy',
+    gameHW: 'Home Win %', gameDW: 'Draw %', gameAW: 'Away Win %',
+    gameHO: 'Home Odds', gameDO: 'Draw Odds', gameAO: 'Away Odds',
+    gameNewBtn: '🎲 New Round',
+    gameWin: '🎉 Correct!', gameLose: '❌ Wrong!',
+    gameAnswer: 'Correct answer', gameYourGuess: 'Your guess',
+    resultHShort: 'Home', resultDShort: 'Draw', resultAShort: 'Away'
   }
 };
 
@@ -672,6 +779,11 @@ function applyLanguage(lang) {
   document.getElementById('langSelect').value = lang;
   
   updateAgreeBtnText();
+  
+  // 重新渲染遊戲結果（如果有）
+  if (gameState && gameState.lastGuess && gameState.current) {
+    renderGameResult(gameState.lastGuess, false);
+  }
   
   if (window._lastResult) {
     const r = window._lastResult;
@@ -813,7 +925,7 @@ document.addEventListener('visibilitychange', function() {
   if (!document.hidden) loadStatsWithRetry();
 });
 
-// ==================== 核心計算（已對應最新公式）====================
+// ==================== 核心計算（對應最新公式）====================
 function calculate() {
   const t = translations[currentLang];
   let hwVal = document.getElementById('hw').value.trim();
@@ -840,27 +952,20 @@ function calculate() {
 
   let bet = "skip", layer = 0, isReverse = false;
 
-  // 第 1 層：|A − C| ≤ 6 → D
   if (Math.abs(hw - aw) <= 6) { bet = "D"; layer = 1; }
-  // 第 2 層：A≥42 且 1.55≤D<2.05 且 D≠F → H
   else if (hw >= 42 && ho >= 1.55 && ho < 2.05 && ho !== ao) { bet = "H"; layer = 2; }
-  // 第 3 層：A≥40 且 2.10<D≤2.45 且 D≠F → D
   else if (hw >= 40 && ho > 2.10 && ho <= 2.45 && ho !== ao) { bet = "D"; layer = 3; }
-  // 第 4 層：C>A 且 1.85≤F≤2.15 → A
-  else if (aw > hw && ao >= 1.85 && ao <= 2.15) { bet = "A"; layer = 4; }
-  // 第 5 層：兜底（賠率博弈）
+  else if (aw > hw && ao > ho && ao < 5.50) { bet = "H"; layer = 4; }
+  else if (aw > hw && ao >= 1.85 && ao <= 2.15) { bet = "A"; layer = 5; }
   else {
-    layer = 5;
+    layer = 6;
     if (ho > ao) {
-      // D > F：主賠高
-      if (ho >= 6.00) { bet = "D"; isReverse = true; }
+      if (hw >= 30 && ho >= 6.00) { bet = "D"; isReverse = true; }
       else { bet = "H"; }
     } else if (ao > ho) {
-      // F > D：客賠高
       if (ao >= 7.50) { bet = "skip"; }
       else { bet = "A"; }
     } else {
-      // D = F：按勝率
       if (hw > aw) { bet = "H"; }
       else if (aw > hw) { bet = "A"; }
       else { bet = "skip"; }
@@ -915,6 +1020,7 @@ function showResult(text, className, layer, bet, ev, isReverse, errKey) {
       case 3: hintText = t.hint3; break;
       case 4: hintText = t.hint4; break;
       case 5: hintText = t.hint5; break;
+      case 6: hintText = t.hint6; break;
     }
   }
   
@@ -937,6 +1043,123 @@ function clearData() {
   hintBox.innerText = '';
   window._lastResult = null;
   checkClearBtn();
+}
+
+// ==================== 猜賽果挑戰 ====================
+var gameState = {
+  current: null,
+  played: 0,
+  hits: 0,
+  waiting: false,
+  lastGuess: null
+};
+
+function generateMatch() {
+  // 主勝率 18-72
+  var hw = Math.floor(Math.random() * 55) + 18;
+  // 和勝率 24-32
+  var dw = Math.floor(Math.random() * 9) + 24;
+  // 客勝率 = 100 - 主 - 和
+  var aw = 100 - hw - dw;
+  
+  if (aw < 5) { aw = 5; hw = 100 - dw - aw; }
+  if (aw > 60) { aw = 60; hw = 100 - dw - aw; }
+  if (hw < 10) { hw = 10; aw = 100 - dw - hw; }
+  
+  // 用隱含概率反推賠率
+  var margin = 1.10 + Math.random() * 0.06; // 1.10-1.16
+  var ho = Math.round(100 * margin / (hw / 100));
+  var doo = Math.round(100 * margin / (dw / 100));
+  var ao = Math.round(100 * margin / (aw / 100));
+  
+  // 加隨機噪聲，限制喺合理範圍
+  ho = Math.max(100, Math.min(1500, Math.round(ho * (0.92 + Math.random() * 0.16))));
+  doo = Math.max(256, Math.min(1200, Math.round(doo * (0.92 + Math.random() * 0.16))));
+  ao = Math.max(100, Math.min(2500, Math.round(ao * (0.92 + Math.random() * 0.16))));
+  
+  // 用隱含概率抽樣結果
+  var pD = 1 / ho, pE = 1 / doo, pF = 1 / ao;
+  var total = pD + pE + pF;
+  var r = Math.random() * total;
+  var result;
+  if (r < pD) result = "H";
+  else if (r < pD + pE) result = "D";
+  else result = "A";
+  
+  return { hw: hw, dw: dw, aw: aw, ho: ho, doo: doo, ao: ao, result: result };
+}
+
+function gameNewRound() {
+  gameState.current = generateMatch();
+  gameState.waiting = true;
+  gameState.lastGuess = null;
+  
+  document.getElementById('ghw').textContent = gameState.current.hw + '%';
+  document.getElementById('gdw').textContent = gameState.current.dw + '%';
+  document.getElementById('gaw').textContent = gameState.current.aw + '%';
+  document.getElementById('gho').textContent = (gameState.current.ho / 100).toFixed(2);
+  document.getElementById('gdoo').textContent = (gameState.current.doo / 100).toFixed(2);
+  document.getElementById('gao').textContent = (gameState.current.ao / 100).toFixed(2);
+  
+  var resultBox = document.getElementById('gameResult');
+  resultBox.style.display = 'none';
+  resultBox.innerText = '';
+  resultBox.className = 'game-result-box';
+  
+  ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
+    var b = document.getElementById(id);
+    b.disabled = false;
+    b.style.opacity = '1';
+  });
+}
+
+function gameGuess(guess) {
+  if (!gameState.waiting || !gameState.current) return;
+  
+  gameState.lastGuess = guess;
+  var result = gameState.current.result;
+  var isWin = (guess === result);
+  
+  gameState.played++;
+  if (isWin) gameState.hits++;
+  gameState.waiting = false;
+  
+  renderGameResult(guess, true);
+  
+  ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
+    var b = document.getElementById(id);
+    b.disabled = true;
+    b.style.opacity = '0.5';
+  });
+  
+  document.getElementById('gamePlayed').textContent = gameState.played;
+  document.getElementById('gameHits').textContent = gameState.hits;
+  var rate = gameState.played > 0 ? (gameState.hits / gameState.played * 100).toFixed(1) + '%' : '—';
+  document.getElementById('gameRate').textContent = rate;
+}
+
+function renderGameResult(guess, animate) {
+  if (!gameState.current || !guess) return;
+  
+  var t = translations[currentLang];
+  var result = gameState.current.result;
+  var isWin = (guess === result);
+  
+  var resultText = "";
+  if (result === "H") resultText = t.resultHShort || "主勝";
+  else if (result === "D") resultText = t.resultDShort || "和局";
+  else resultText = t.resultAShort || "客勝";
+  
+  var guessText = "";
+  if (guess === "H") guessText = t.resultHShort || "主勝";
+  else if (guess === "D") guessText = t.resultDShort || "和局";
+  else guessText = t.resultAShort || "客勝";
+  
+  var resultBox = document.getElementById('gameResult');
+  resultBox.style.display = 'block';
+  resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
+  resultBox.innerHTML = (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
+    + '<small>' + (t.gameAnswer || '正確答案') + '：' + resultText + '　|　' + (t.gameYourGuess || '你的選擇') + '：' + guessText + '</small>';
 }
 
 applyLanguage('zh-HK');
