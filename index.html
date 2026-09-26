@@ -138,6 +138,93 @@
   .dev-unlock-btn { background: transparent; border: 1px dashed var(--border-color); color: var(--text-muted); font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: opacity 0.3s; }
   .dev-unlock-btn:hover { color: var(--text-secondary); border-color: var(--text-secondary); }
 
+  /* 開發者參數面板 */
+  .dev-panel {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(34, 197, 94, 0.05);
+    border: 2px dashed rgba(34, 197, 94, 0.4);
+    border-radius: 10px;
+  }
+  .dev-panel.show { display: block; }
+  .dev-panel-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: #22c55e;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  .dev-layer {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .dev-layer-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #22c55e;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .dev-param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .dev-param-item { display: flex; flex-direction: column; }
+  .dev-param-item label {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-bottom: 3px;
+    font-weight: bold;
+  }
+  .dev-param-item input {
+    width: 100%;
+    padding: 6px 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    font-family: monospace;
+  }
+  .dev-param-item input:focus {
+    border-color: #22c55e;
+    background: var(--bg-input-focus);
+  }
+  .dev-btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .dev-btn-row button {
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dev-btn-reset {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  }
+  .dev-btn-apply {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.5) !important;
+  }
+  .dev-btn-row button:active { transform: scale(0.97); }
+
   .game-skip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .game-skip-btn { flex: 1; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.5); }
   .game-skip-btn:hover:not(:disabled) { background: rgba(156, 163, 175, 0.25); }
@@ -471,6 +558,71 @@
       ⚡ 開發者連按模式 <span class="game-dev-badge">DEV</span>
     </button>
 
+    <!-- 開發者參數面板 -->
+    <div class="dev-panel" id="devPanel">
+      <div class="dev-panel-title">⚙️ 系統公式參數調整</div>
+
+      <!-- 第 1 層 -->
+      <div class="dev-layer">
+        <div class="dev-layer-title">第 1 層：勝率差距 → 買和</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>勝率差上限 (A−C)</label><input type="text" id="p1_gap" value="6" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- 第 2 層 -->
+      <div class="dev-layer">
+        <div class="dev-layer-title">第 2 層：主強 + 主賠低 → 買主</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>主勝率下限</label><input type="text" id="p2_hmin" value="42" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>主賠下限</label><input type="text" id="p2_dmin" value="155" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>主賠上限</label><input type="text" id="p2_dmax" value="205" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- 第 3 層 -->
+      <div class="dev-layer">
+        <div class="dev-layer-title">第 3 層：主強 + 主賠中 → 買和</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>主勝率下限</label><input type="text" id="p3_hmin" value="40" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>主賠下限</label><input type="text" id="p3_dmin" value="210" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>主賠上限</label><input type="text" id="p3_dmax" value="245" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- 第 4 層 -->
+      <div class="dev-layer">
+        <div class="dev-layer-title">第 4 層：客強客冷 → 反向買主</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>客賠上限</label><input type="text" id="p4_fmax" value="550" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- 第 5 層 -->
+      <div class="dev-layer">
+        <div class="dev-layer-title">第 5 層：客強 + 客賠價值 → 買客</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>客賠下限</label><input type="text" id="p5_fmin" value="185" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>客賠上限</label><input type="text" id="p5_fmax" value="215" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <!-- 兜底層 -->
+      <div class="dev-layer">
+        <div class="dev-layer-title">兜底層：賠率博弈</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>主勝率下限(買和)</label><input type="text" id="pb_hmin" value="30" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>主賠下限(買和)</label><input type="text" id="pb_dmin" value="600" inputmode="numeric"></div>
+          <div class="dev-param-item"><label>客賠 skip 門檻</label><input type="text" id="pb_fskip" value="750" inputmode="numeric"></div>
+        </div>
+      </div>
+
+      <div class="dev-btn-row">
+        <button class="dev-btn-reset" onclick="resetParams()">🔄 重設預設</button>
+        <button class="dev-btn-apply" onclick="applyParams()">✅ 套用參數</button>
+      </div>
+    </div>
+
     <div class="game-skip-row">
       <button class="game-skip-btn" id="gbtnSkip" onclick="gameSkip()" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
       <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
@@ -493,16 +645,35 @@
 </div>
 
 <script>
-// ==================== 大數據校準參數 ====================
-var CALIBRATION = {
-  FAVORITE_BOOST: 0.18,     // 熱門概率 +18%（Favourite-Longshot Bias）
-  DRAW_BOOST: 1.25,         // 主賠 1.5-2.1 區間平局概率 ×1.25
-  DRAW_LOW: 150,            // 平局加成下限（主賠）
-  DRAW_HIGH: 210,           // 平局加成上限（主賠）
-  MARGIN_MIN: 1.10,         // 抽水下限
-  MARGIN_MAX: 1.16          // 抽水上限
+// ==================== 全域參數 ====================
+var PARAMS = {
+  p1_gap: 6,
+  p2_hmin: 42, p2_dmin: 155, p2_dmax: 205,
+  p3_hmin: 40, p3_dmin: 210, p3_dmax: 245,
+  p4_fmax: 550,
+  p5_fmin: 185, p5_fmax: 215,
+  pb_hmin: 30, pb_dmin: 600, pb_fskip: 750
 };
 
+var DEFAULT_PARAMS = {
+  p1_gap: 6,
+  p2_hmin: 42, p2_dmin: 155, p2_dmax: 205,
+  p3_hmin: 40, p3_dmin: 210, p3_dmax: 245,
+  p4_fmax: 550,
+  p5_fmin: 185, p5_fmax: 215,
+  pb_hmin: 30, pb_dmin: 600, pb_fskip: 750
+};
+
+var CALIBRATION = {
+  FAVORITE_BOOST: 0.18,
+  DRAW_BOOST: 1.25,
+  DRAW_LOW: 150,
+  DRAW_HIGH: 210,
+  MARGIN_MIN: 1.10,
+  MARGIN_MAX: 1.16
+};
+
+// ==================== 主題 / 語言 ====================
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   var icon = document.getElementById('themeIcon');
@@ -884,24 +1055,39 @@ setInterval(loadStatsWithRetry, 15000);
 window.addEventListener('focus', loadStatsWithRetry);
 document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
 
-// ==================== 核心公式 ====================
+// ==================== 核心公式（動態參數）====================
 function calcBet(hw, dw, aw, ho, doo, ao) {
-  if (Math.abs(hw - aw) <= 6) return "D";
-  if (hw >= 42 && ho >= 1.55 && ho < 2.05 && ho !== ao) return "H";
-  if (hw >= 40 && ho > 2.10 && ho <= 2.45 && ho !== ao) return "D";
-  if (aw > hw && ao > ho && ao < 5.50) return "H";
-  if (aw > hw && ao >= 1.85 && ao <= 2.15) return "A";
+  // 第1層：勝率差距
+  if (Math.abs(hw - aw) <= PARAMS.p1_gap) return "D";
+  // 第2層：主強 + 主賠低
+  if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return "H";
+  // 第3層：主強 + 主賠中
+  if (hw >= PARAMS.p3_hmin && ho > PARAMS.p3_dmin/100 && ho <= PARAMS.p3_dmax/100 && ho !== ao) return "D";
+  // 第4層：客強客冷 → 反向買主
+  if (aw > hw && ao > ho && ao < PARAMS.p4_fmax/100) return "H";
+  // 第5層：客強 + 客賠價值
+  if (aw > hw && ao >= PARAMS.p5_fmin/100 && ao <= PARAMS.p5_fmax/100) return "A";
+  // 兜底層
   if (ho > ao) {
-    if (hw >= 30 && ho >= 6.00) return "D";
+    if (hw >= PARAMS.pb_hmin && ho >= PARAMS.pb_dmin/100) return "D";
     return "H";
   } else if (ao > ho) {
-    if (ao >= 7.50) return "skip";
+    if (ao >= PARAMS.pb_fskip/100) return "skip";
     return "A";
   } else {
     if (hw > aw) return "H";
     if (aw > hw) return "A";
     return "skip";
   }
+}
+
+function calcLayer(hw, dw, aw, ho, doo, ao) {
+  if (Math.abs(hw - aw) <= PARAMS.p1_gap) return 1;
+  if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return 2;
+  if (hw >= PARAMS.p3_hmin && ho > PARAMS.p3_dmin/100 && ho <= PARAMS.p3_dmax/100 && ho !== ao) return 3;
+  if (aw > hw && ao > ho && ao < PARAMS.p4_fmax/100) return 4;
+  if (aw > hw && ao >= PARAMS.p5_fmin/100 && ao <= PARAMS.p5_fmax/100) return 5;
+  return 6;
 }
 
 function calculate() {
@@ -922,16 +1108,9 @@ function calculate() {
   }
   if (hw + dw + aw > 100) { showResult(t.errOver100, "result-error", 0, "skip", null, false, 'over100'); return; }
   var bet = calcBet(hw, dw, aw, ho, doo, ao);
-  var layer = 0, isReverse = false;
-  if (Math.abs(hw - aw) <= 6) layer = 1;
-  else if (hw >= 42 && ho >= 1.55 && ho < 2.05 && ho !== ao) layer = 2;
-  else if (hw >= 40 && ho > 2.10 && ho <= 2.45 && ho !== ao) layer = 3;
-  else if (aw > hw && ao > ho && ao < 5.50) layer = 4;
-  else if (aw > hw && ao >= 1.85 && ao <= 2.15) layer = 5;
-  else {
-    layer = 6;
-    if (ho > ao && hw >= 30 && ho >= 6.00) isReverse = true;
-  }
+  var layer = calcLayer(hw, dw, aw, ho, doo, ao);
+  var isReverse = false;
+  if (layer === 6 && ho > ao && hw >= PARAMS.pb_hmin && ho >= PARAMS.pb_dmin/100) isReverse = true;
   let text = "", className = "", ev = null;
   if (bet === "H") { text = t.resultH; className = "result-H"; ev = (hw / 100) * ho - 1; }
   else if (bet === "A") { text = t.resultA; className = "result-A"; ev = (aw / 100) * ao - 1; }
@@ -994,6 +1173,7 @@ function devUnlock() {
   if (pwd === 'y511634a') {
     devMode = true;
     document.getElementById('gbtnDev').style.display = 'block';
+    document.getElementById('devPanel').classList.add('show');
     document.getElementById('devUnlockBtn').textContent = '✅ 開發者模式已啟用';
     document.getElementById('devUnlockBtn').style.borderColor = 'rgba(34,197,94,0.5)';
     document.getElementById('devUnlockBtn').style.color = '#22c55e';
@@ -1003,15 +1183,73 @@ function devUnlock() {
   }
 }
 
+function applyParams() {
+  PARAMS.p1_gap = Number(document.getElementById('p1_gap').value) || 6;
+  PARAMS.p2_hmin = Number(document.getElementById('p2_hmin').value) || 42;
+  PARAMS.p2_dmin = Number(document.getElementById('p2_dmin').value) || 155;
+  PARAMS.p2_dmax = Number(document.getElementById('p2_dmax').value) || 205;
+  PARAMS.p3_hmin = Number(document.getElementById('p3_hmin').value) || 40;
+  PARAMS.p3_dmin = Number(document.getElementById('p3_dmin').value) || 210;
+  PARAMS.p3_dmax = Number(document.getElementById('p3_dmax').value) || 245;
+  PARAMS.p4_fmax = Number(document.getElementById('p4_fmax').value) || 550;
+  PARAMS.p5_fmin = Number(document.getElementById('p5_fmin').value) || 185;
+  PARAMS.p5_fmax = Number(document.getElementById('p5_fmax').value) || 215;
+  PARAMS.pb_hmin = Number(document.getElementById('pb_hmin').value) || 30;
+  PARAMS.pb_dmin = Number(document.getElementById('pb_dmin').value) || 600;
+  PARAMS.pb_fskip = Number(document.getElementById('pb_fskip').value) || 750;
+  try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
+  alert('✅ 參數已套用');
+}
+
+function resetParams() {
+  PARAMS = JSON.parse(JSON.stringify(DEFAULT_PARAMS));
+  document.getElementById('p1_gap').value = DEFAULT_PARAMS.p1_gap;
+  document.getElementById('p2_hmin').value = DEFAULT_PARAMS.p2_hmin;
+  document.getElementById('p2_dmin').value = DEFAULT_PARAMS.p2_dmin;
+  document.getElementById('p2_dmax').value = DEFAULT_PARAMS.p2_dmax;
+  document.getElementById('p3_hmin').value = DEFAULT_PARAMS.p3_hmin;
+  document.getElementById('p3_dmin').value = DEFAULT_PARAMS.p3_dmin;
+  document.getElementById('p3_dmax').value = DEFAULT_PARAMS.p3_dmax;
+  document.getElementById('p4_fmax').value = DEFAULT_PARAMS.p4_fmax;
+  document.getElementById('p5_fmin').value = DEFAULT_PARAMS.p5_fmin;
+  document.getElementById('p5_fmax').value = DEFAULT_PARAMS.p5_fmax;
+  document.getElementById('pb_hmin').value = DEFAULT_PARAMS.pb_hmin;
+  document.getElementById('pb_dmin').value = DEFAULT_PARAMS.pb_dmin;
+  document.getElementById('pb_fskip').value = DEFAULT_PARAMS.pb_fskip;
+  try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
+  alert('🔄 已重設為預設值');
+}
+
+function loadSavedParams() {
+  try {
+    var saved = localStorage.getItem('qfp_params');
+    if (saved) {
+      var p = JSON.parse(saved);
+      PARAMS = Object.assign({}, DEFAULT_PARAMS, p);
+      // 更新面板顯示
+      if (document.getElementById('p1_gap')) {
+        document.getElementById('p1_gap').value = PARAMS.p1_gap;
+        document.getElementById('p2_hmin').value = PARAMS.p2_hmin;
+        document.getElementById('p2_dmin').value = PARAMS.p2_dmin;
+        document.getElementById('p2_dmax').value = PARAMS.p2_dmax;
+        document.getElementById('p3_hmin').value = PARAMS.p3_hmin;
+        document.getElementById('p3_dmin').value = PARAMS.p3_dmin;
+        document.getElementById('p3_dmax').value = PARAMS.p3_dmax;
+        document.getElementById('p4_fmax').value = PARAMS.p4_fmax;
+        document.getElementById('p5_fmin').value = PARAMS.p5_fmin;
+        document.getElementById('p5_fmax').value = PARAMS.p5_fmax;
+        document.getElementById('pb_hmin').value = PARAMS.pb_hmin;
+        document.getElementById('pb_dmin').value = PARAMS.pb_dmin;
+        document.getElementById('pb_fskip').value = PARAMS.pb_fskip;
+      }
+    }
+  } catch(e) {}
+}
+
 // ==================== 猜賽果挑戰 ====================
 var gameState = {
-  current: null,
-  played: 0,
-  hits: 0,
-  waiting: false,
-  lastGuess: null,
-  totalPnl: 0,
-  skipsUsed: 0
+  current: null, played: 0, hits: 0, waiting: false,
+  lastGuess: null, totalPnl: 0, skipsUsed: 0
 };
 
 function getMaxSkips() { return 2 + Math.floor(gameState.played / 10); }
@@ -1032,9 +1270,7 @@ function updateSkipDisplay() {
   }
 }
 
-// ==================== 賠率生成（大數據校準版）====================
 function generateMatch() {
-  // 1. 生成勝率
   var r1 = Math.random(), r2 = Math.random();
   var avg = (r1 + r2) / 2;
   var hw = Math.round(15 + avg * 65);
@@ -1047,60 +1283,39 @@ function generateMatch() {
   if (hw < 8) { hw = 8; aw = 100 - dw - hw; }
   if (hw > 82) { hw = 82; aw = 100 - dw - hw; }
 
-  // 2. 計算賠率
   var margin = CALIBRATION.MARGIN_MIN + Math.random() * (CALIBRATION.MARGIN_MAX - CALIBRATION.MARGIN_MIN);
   var ho  = 100 / (hw  * margin);
   var doo = 100 / (dw  * margin);
   var ao  = 100 / (aw  * margin);
-
-  // 3. 加 ±3% 小噪聲
   ho  *= (0.97 + Math.random() * 0.06);
   doo *= (0.97 + Math.random() * 0.06);
   ao  *= (0.97 + Math.random() * 0.06);
-
-  // 4. 檢查倒數和 ≥ 1.10
   var s = 1/ho + 1/doo + 1/ao;
   if (s < 1.10) { var f = s / 1.10; ho *= f; doo *= f; ao *= f; }
-
-  // 5. 轉 ×100 並限範圍
   ho  = Math.round(ho  * 100);
   doo = Math.round(doo * 100);
   ao  = Math.round(ao  * 100);
   ho  = Math.max(100,  Math.min(5500, ho));
   doo = Math.max(256,  Math.min(2000, doo));
   ao  = Math.max(100,  Math.min(7000, ao));
-
-  // 6. 二次檢查
   var s2 = 100/ho + 100/doo + 100/ao;
   if (s2 < 1.10) { var f2 = s2 / 1.10; ho = Math.round(ho * f2); doo = Math.round(doo * f2); ao = Math.round(ao * f2); }
 
-  // ===== 7. 賽果抽樣（大數據校準版）=====
+  // 校準版賽果抽樣
   var invH = 100 / ho, invD = 100 / doo, invA = 100 / ao;
   var totalInv = invH + invD + invA;
   var pH = invH / totalInv, pD = invD / totalInv, pA = invA / totalInv;
 
-  // 7A. 熱門-冷門偏差校正（Favourite-Longshot Bias）
   var boost = CALIBRATION.FAVORITE_BOOST;
-  if (ho < ao) {
-    // 主隊熱門
-    pH *= (1 + boost);
-    pA *= (1 - boost);
-  } else if (ao < ho) {
-    // 客隊熱門
-    pA *= (1 + boost);
-    pH *= (1 - boost);
-  }
-  var t1 = pH + pD + pA;
-  pH /= t1; pD /= t1; pA /= t1;
+  if (ho < ao) { pH *= (1 + boost); pA *= (1 - boost); }
+  else if (ao < ho) { pA *= (1 + boost); pH *= (1 - boost); }
+  var t1 = pH + pD + pA; pH /= t1; pD /= t1; pA /= t1;
 
-  // 7B. 平局區間校正（主賠 1.5-2.1 平局概率 +25%）
   if (ho >= CALIBRATION.DRAW_LOW && ho <= CALIBRATION.DRAW_HIGH) {
     pD *= CALIBRATION.DRAW_BOOST;
-    var t2 = pH + pD + pA;
-    pH /= t2; pD /= t2; pA /= t2;
+    var t2 = pH + pD + pA; pH /= t2; pD /= t2; pA /= t2;
   }
 
-  // 7C. 抽樣
   var r = Math.random();
   var result;
   if (r < pH) result = "H";
@@ -1125,13 +1340,9 @@ function gameNewRound() {
     var resultBox = document.getElementById('gameResult');
     resultBox.style.display = 'block';
     resultBox.className = 'game-result-box game-lose';
-    resultBox.style.background = '';
-    resultBox.style.color = '';
-    resultBox.style.border = '';
+    resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
     resultBox.innerHTML = (t.gameMustGuess || '⚠️ 請先預測本場答案，才能開始新一局');
-    setTimeout(function() {
-      if (gameState.waiting) resultBox.style.display = 'none';
-    }, 1800);
+    setTimeout(function() { if (gameState.waiting) resultBox.style.display = 'none'; }, 1800);
     return;
   }
   gameState.current = generateMatch();
@@ -1139,12 +1350,8 @@ function gameNewRound() {
   gameState.lastGuess = null;
   displayMatch(gameState.current);
   var resultBox = document.getElementById('gameResult');
-  resultBox.style.display = 'none';
-  resultBox.innerText = '';
-  resultBox.className = 'game-result-box';
-  resultBox.style.background = '';
-  resultBox.style.color = '';
-  resultBox.style.border = '';
+  resultBox.style.display = 'none'; resultBox.innerText = ''; resultBox.className = 'game-result-box';
+  resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
   ['gbtnH','gbtnD','gbtnA','gbtnAuto','gbtnDev'].forEach(function(id){
     var b = document.getElementById(id);
     if (b) { b.disabled = false; b.style.opacity = '1'; }
@@ -1160,13 +1367,9 @@ function gameSkip() {
     var resultBox = document.getElementById('gameResult');
     resultBox.style.display = 'block';
     resultBox.className = 'game-result-box game-lose';
-    resultBox.style.background = '';
-    resultBox.style.color = '';
-    resultBox.style.border = '';
+    resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
     resultBox.innerHTML = (t.gameSkipExhausted || '❌ 跳過次數已用完');
-    setTimeout(function() {
-      if (!gameState.waiting) resultBox.style.display = 'none';
-    }, 1500);
+    setTimeout(function() { if (!gameState.waiting) resultBox.style.display = 'none'; }, 1500);
     return;
   }
   gameState.skipsUsed++;
@@ -1184,9 +1387,7 @@ function gameSkip() {
     gameState.lastGuess = null;
     displayMatch(gameState.current);
     resultBox.style.display = 'none';
-    resultBox.style.background = '';
-    resultBox.style.color = '';
-    resultBox.style.border = '';
+    resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
     ['gbtnH','gbtnD','gbtnA','gbtnAuto','gbtnDev'].forEach(function(id){
       var b = document.getElementById(id);
       if (b) { b.disabled = false; b.style.opacity = '1'; }
@@ -1209,9 +1410,7 @@ function gameAutoPredict() {
     resultBox.style.color = 'var(--text-secondary)';
     resultBox.style.border = '1px solid rgba(156,163,175,0.4)';
     resultBox.innerHTML = (t.gameAutoSkip || '🤖 系統建議不出手（Skip），請手動選擇或跳過');
-    setTimeout(function() {
-      if (gameState.waiting) resultBox.style.display = 'none';
-    }, 2000);
+    setTimeout(function() { if (gameState.waiting) resultBox.style.display = 'none'; }, 2000);
     return;
   }
   performGuess(bet, true);
@@ -1230,9 +1429,7 @@ function performGuess(bet, isAuto) {
     else if (result === "D") odds = m.doo / 100;
     else odds = m.ao / 100;
     roundPnl = Math.round(odds * 100 - 100);
-  } else {
-    roundPnl = -100;
-  }
+  } else roundPnl = -100;
   gameState.played++;
   if (isWin) gameState.hits++;
   gameState.totalPnl += roundPnl;
@@ -1355,9 +1552,7 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
   resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
-  resultBox.style.background = '';
-  resultBox.style.color = '';
-  resultBox.style.border = '';
+  resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
   resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
     + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
@@ -1483,6 +1678,7 @@ function updateTierDisplay(withAnimation) {
 applyLanguage('zh-HK');
 checkClearBtn();
 handleTopBtnsScroll();
+loadSavedParams();
 </script>
 </body>
 </html>
