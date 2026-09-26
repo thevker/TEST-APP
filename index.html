@@ -10,7 +10,6 @@
   :root[data-theme="light"] { --bg-body:#eef1f6;--bg-card:linear-gradient(135deg,#ffffff,#eef3ff);--bg-switcher:rgba(255,255,255,0.95);--bg-panel:rgba(0,0,0,0.03);--bg-stat:rgba(0,0,0,0.05);--bg-input:rgba(0,0,0,0.04);--bg-input-focus:rgba(0,0,0,0.07);--text-primary:#1a1a2e;--text-secondary:#3b5aa0;--text-tertiary:#5a7bc0;--text-muted:#8a9ab0;--text-content:#444;--text-btn-disabled:#aaa;--border-color:rgba(0,0,0,0.1);--border-input:rgba(0,0,0,0.15);--border-switcher:rgba(0,0,0,0.15);--placeholder:rgba(0,0,0,0.35);--scroll-thumb:#c0c0c0; }
   body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background-color:var(--bg-body); color:var(--text-primary); margin:0; padding:0; min-height:100vh; transition:background-color .3s; }
 
-  /* 頂部按鈕 - 強制可點 */
   .theme-switcher { position:fixed!important; top:12px!important; left:12px!important; z-index:99999!important; background:var(--bg-switcher); border:1px solid var(--border-switcher); border-radius:8px; height:32px; padding:0 12px; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:16px; line-height:1; cursor:pointer; backdrop-filter:blur(10px); user-select:none; -webkit-tap-highlight-color:transparent; pointer-events:auto!important; }
   .theme-switcher:active { opacity:.7; }
   .lang-switcher { position:fixed!important; top:12px!important; right:12px!important; z-index:99999!important; background:var(--bg-switcher); border:1px solid var(--border-switcher); border-radius:8px; height:32px; padding:0 10px; display:flex; align-items:center; color:var(--text-primary); font-size:13px; cursor:pointer; backdrop-filter:blur(10px); pointer-events:auto!important; }
@@ -959,7 +958,6 @@ function applyParams() {
   PARAMS.pb_dmin = Number(document.getElementById('pb_dmin').value) || 600;
   PARAMS.pb_fskip = Number(document.getElementById('pb_fskip').value) || 750;
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
-  
   var panel = document.getElementById('devPanel');
   if (panel) panel.classList.add('compact');
   var btn = document.getElementById('devApplyBtn');
@@ -1002,7 +1000,7 @@ function loadSavedParams() {
 }
 
 // ==================== 猜賽果 ====================
-// === 從 Sheet A2:H 抽樣 ===
+// 從 Google Sheet A2:H 逐行讀取，每行代表一場數據
 var sheetMatchPool = null;
 var sheetPoolPromise = null;
 
@@ -1014,6 +1012,13 @@ function normalizeResult(v) {
   if (s === 'D' || s === '1' || s === '和' || s === '和局' || s === 'DRAW' || s === 'X') return 'D';
   if (s === 'A' || s === '0' || s === '客' || s === '客勝' || s === '客胜' || s === 'AWAY' || s === 'L' || s === 'LOSE') return 'A';
   return null;
+}
+
+// 賠率統一轉為整數格式：150 = 1.50；若輸入 1.50 則自動 *100 = 150
+function toOddsInt(v) {
+  if (v === null || v === undefined) return null;
+  if (v < 100) return Math.round(v * 100);
+  return Math.round(v);
 }
 
 function parseSheetMatchRow(row) {
@@ -1038,14 +1043,14 @@ function parseSheetMatchRow(row) {
   if (hw > 0 && hw <= 1) hw *= 100;
   if (dw > 0 && dw <= 1) dw *= 100;
   if (aw > 0 && aw <= 1) aw *= 100;
-  var hoInt  = Math.round(ho * 100);
-  var dooInt = Math.round(doo * 100);
-  var aoInt  = Math.round(ao * 100);
+  var hoInt  = toOddsInt(ho);
+  var dooInt = toOddsInt(doo);
+  var aoInt  = toOddsInt(ao);
   var result = normalizeResult(resultRaw);
   if (!result) return null;
-  if (hoInt < 100 || hoInt > 10000) return null;
-  if (dooInt < 100 || dooInt > 10000) return null;
-  if (aoInt < 100 || aoInt > 10000) return null;
+  if (hoInt === null || hoInt < 100 || hoInt > 10000) return null;
+  if (dooInt === null || dooInt < 100 || dooInt > 10000) return null;
+  if (aoInt === null || aoInt < 100 || aoInt > 10000) return null;
   return {
     hw: Math.round(hw), dw: Math.round(dw), aw: Math.round(aw),
     ho: hoInt, doo: dooInt, ao: aoInt,
@@ -1065,6 +1070,7 @@ function fetchSheetMatches() {
       if (m) pool.push(m);
     });
     sheetMatchPool = pool;
+    console.log('✅ 載入比賽數據：' + pool.length + ' 場');
     return pool;
   });
 }
@@ -1079,6 +1085,7 @@ function ensureSheetPool(forceRefresh) {
     return pool;
   }).catch(function(e) {
     sheetPoolPromise = null;
+    console.error('❌ 載入失敗：', e);
     throw e;
   });
   return sheetPoolPromise;
@@ -1477,27 +1484,22 @@ function updateTierDisplay(withAnimation) {
   }
 }
 
-// ==================== 綁定所有事件（使用 addEventListener 更可靠）====================
+// ==================== 綁定所有事件 ====================
 window.addEventListener('load', function() {
-  // 主題初始化
   var savedTheme = 'dark';
   try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
   applyTheme(savedTheme);
 
-  // 主題切換按鈕
   var themeBtn = document.getElementById('themeSwitcher');
   if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
 
-  // 語言切換
   var langSel = document.getElementById('langSelect');
   if (langSel) langSel.addEventListener('change', function() { changeLang(this.value); });
 
-  // 滾動隱藏
   window.addEventListener('scroll', handleTopBtnsScroll, { passive: true });
   window.addEventListener('touchmove', handleTopBtnsScroll, { passive: true });
   handleTopBtnsScroll();
 
-  // 條款滾動
   var s = document.getElementById('termsScroll');
   if (s) {
     s.addEventListener('scroll', updateAgreeBtnVisual);
@@ -1524,11 +1526,9 @@ window.addEventListener('load', function() {
   window.addEventListener('resize', updateAgreeBtnVisual);
   updateAgreeBtnText();
 
-  // 同意按鈕
   var agreeBtn = document.getElementById('agreeBtn');
   if (agreeBtn) agreeBtn.addEventListener('click', handleAgree);
 
-  // 輸入框
   ['hw','dw','aw'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', function() {
@@ -1544,13 +1544,11 @@ window.addEventListener('load', function() {
     }
   });
 
-  // 計算 / 清除
   var calcBtn = document.getElementById('calcBtn');
   if (calcBtn) calcBtn.addEventListener('click', calculate);
   var clearBtn = document.getElementById('clearBtn');
   if (clearBtn) clearBtn.addEventListener('click', clearData);
 
-  // 猜賽果按鈕
   var gbtnH = document.getElementById('gbtnH');
   if (gbtnH) gbtnH.addEventListener('click', function() { gameGuess('H'); });
   var gbtnD = document.getElementById('gbtnD');
@@ -1566,7 +1564,6 @@ window.addEventListener('load', function() {
   var gbtnNew = document.getElementById('gameNewBtn');
   if (gbtnNew) gbtnNew.addEventListener('click', gameNewRound);
 
-  // 開發者
   var devUnlockBtn = document.getElementById('devUnlockBtn');
   if (devUnlockBtn) devUnlockBtn.addEventListener('click', devUnlock);
   var devApplyBtn = document.getElementById('devApplyBtn');
@@ -1574,7 +1571,6 @@ window.addEventListener('load', function() {
   var devResetBtn = document.getElementById('devResetBtn');
   if (devResetBtn) devResetBtn.addEventListener('click', resetParams);
 
-  // 初始化
   applyLanguage('zh-HK');
   checkClearBtn();
   loadSavedParams();
