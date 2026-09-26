@@ -6,345 +6,193 @@
 <title>智能量化足球預測系統 ver 1.0</title>
 <style>
   * { box-sizing: border-box; }
-  :root[data-theme="dark"] {
-    --bg-body: #121212; --bg-card: linear-gradient(135deg, #1a1a2e, #16213e);
-    --bg-switcher: rgba(26, 26, 46, 0.9); --bg-panel: rgba(255,255,255,0.05);
-    --bg-stat: rgba(255,255,255,0.08); --bg-input: rgba(255,255,255,0.08);
-    --bg-input-focus: rgba(255,255,255,0.12); --text-primary: #fff;
-    --text-secondary: #a0c4ff; --text-tertiary: #8db4e2; --text-muted: #6b7f9e;
-    --text-content: #ccc; --text-btn-disabled: #888;
-    --border-color: rgba(255,255,255,0.1); --border-input: rgba(255,255,255,0.2);
-    --border-switcher: rgba(255,255,255,0.2); --placeholder: rgba(255,255,255,0.4);
-    --scroll-thumb: #555;
-  }
-  :root[data-theme="light"] {
-    --bg-body: #eef1f6; --bg-card: linear-gradient(135deg, #ffffff, #eef3ff);
-    --bg-switcher: rgba(255, 255, 255, 0.95); --bg-panel: rgba(0,0,0,0.03);
-    --bg-stat: rgba(0,0,0,0.05); --bg-input: rgba(0,0,0,0.04);
-    --bg-input-focus: rgba(0,0,0,0.07); --text-primary: #1a1a2e;
-    --text-secondary: #3b5aa0; --text-tertiary: #5a7bc0; --text-muted: #8a9ab0;
-    --text-content: #444; --text-btn-disabled: #aaa;
-    --border-color: rgba(0,0,0,0.1); --border-input: rgba(0,0,0,0.15);
-    --border-switcher: rgba(0,0,0,0.15); --placeholder: rgba(0,0,0,0.35);
-    --scroll-thumb: #c0c0c0;
-  }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
-  .theme-switcher { position: fixed; top: 12px; left: 12px; z-index: 9999; background: var(--bg-switcher); border: 1px solid var(--border-switcher); border-radius: 8px; height: 32px; padding: 0 12px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; color: var(--text-primary); font-size: 16px; line-height: 1; cursor: pointer; backdrop-filter: blur(10px); user-select: none; -webkit-tap-highlight-color: transparent; transition: opacity 0.3s, background 0.3s; }
-  .theme-switcher:active { opacity: 0.7; }
-  .lang-switcher { position: fixed; top: 12px; right: 12px; z-index: 9999; background: var(--bg-switcher); border: 1px solid var(--border-switcher); border-radius: 8px; height: 32px; padding: 0 10px; display: flex; align-items: center; box-sizing: border-box; color: var(--text-primary); font-size: 13px; cursor: pointer; backdrop-filter: blur(10px); transition: opacity 0.3s, background 0.3s; }
-  .lang-switcher select { background: transparent; color: var(--text-secondary); border: none; outline: none; font-size: 13px; cursor: pointer; font-weight: bold; height: 100%; }
-  .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
-  .theme-switcher.hidden, .lang-switcher.hidden { opacity: 0; pointer-events: none; }
-  .whatsapp-bottom { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9998; background: var(--bg-switcher); border: 1px solid rgba(37, 211, 102, 0.5); border-radius: 24px; padding: 10px 20px; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.25); white-space: nowrap; }
-  .whatsapp-bottom a { color: #25D366; font-size: 14px; font-weight: bold; text-decoration: none; }
-  #termsPage { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; padding-bottom: 40px; }
-  .terms-container { background: var(--bg-card); color: var(--text-primary); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; max-width: 400px; display: flex; flex-direction: column; max-height: 80vh; }
-  .terms-container h2 { text-align: center; margin: 0 0 15px 0; color: var(--text-primary); font-size: 20px; }
-  .terms-scroll { overflow-y: auto; flex: 1; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-panel); }
-  .terms-scroll h3 { color: var(--text-secondary); font-size: 15px; margin: 15px 0 8px 0; }
-  .terms-scroll p, .terms-scroll li { font-size: 14px; line-height: 1.6; color: var(--text-content); margin: 5px 0; }
-  .terms-scroll ul { padding-left: 20px; margin: 5px 0; }
-  .terms-scroll::-webkit-scrollbar { width: 6px; }
-  .terms-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
-  .terms-scroll::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
-  #agreeBtn { width: 100%; padding: 15px; background: #333; color: var(--text-btn-disabled); border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.3s; -webkit-tap-highlight-color: transparent; }
-  #agreeBtn.active { background: #007aff; color: #fff; }
-  #agreeBtn.active:active { background: #0062cc; }
-  #calcPage { display: none; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; padding-top: 60px; padding-bottom: 100px; }
-  .dark-card { width: 100%; max-width: 400px; background: var(--bg-card); color: var(--text-primary); border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-  .stats-panel { margin-bottom: 20px; }
-  .stats-panel h3 { text-align: center; font-size: 15px; margin: 0 0 15px 0; color: var(--text-secondary); letter-spacing: 1px; }
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .stat-item { background: var(--bg-stat); border-radius: 10px; padding: 12px; text-align: center; }
-  .stat-item .label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
-  .stat-item .value { font-size: 20px; font-weight: bold; }
-  .stat-item .value.positive { color: #16a34a; }
-  .stat-item .value.negative { color: #dc2626; }
-  .stat-item .value.neutral { color: #d97706; }
-  :root[data-theme="dark"] .stat-item .value.positive { color: #4ade80; }
-  :root[data-theme="dark"] .stat-item .value.negative { color: #f87171; }
-  :root[data-theme="dark"] .stat-item .value.neutral { color: #fbbf24; }
-  .stats-note { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 12px; }
-  .stats-note.date-note { margin-top: 5px; color: var(--text-secondary); }
-  .stats-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: #60a5fa; text-decoration: none; border-top: 1px solid var(--border-color); padding-top: 10px; }
-  .container h2 { text-align: center; margin-bottom: 5px; color: var(--text-primary); font-size: 20px; }
-  .container .subtitle { text-align: center; font-size: 13px; color: var(--text-tertiary); margin: 3px 0; }
-  .input-group { margin-bottom: 15px; }
-  .container label { display: block; font-size: 14px; margin-bottom: 5px; color: var(--text-secondary); }
-  .input-wrapper { position: relative; }
-  .input-wrapper input { width: 100%; padding: 12px; padding-right: 32px; background: var(--bg-input); border: 1px solid var(--border-input); border-radius: 8px; box-sizing: border-box; font-size: 16px; color: var(--text-primary); outline: none; }
-  .input-wrapper input::placeholder { color: var(--placeholder); }
-  .input-wrapper input:focus { border-color: #60a5fa; background: var(--bg-input-focus); }
-  .input-wrapper .suffix { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 15px; font-weight: bold; pointer-events: none; }
-  #calcBtn { width: 100%; padding: 15px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-  #clearBtn { width: 100%; padding: 15px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
-  .result-box { margin-top: 25px; padding: 20px; border-radius: 12px; text-align: center; font-size: 22px; font-weight: bold; display: none; }
-  .result-H { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.4); }
-  .result-A { background: rgba(96, 165, 250, 0.15); color: #2563eb; border: 1px solid rgba(96, 165, 250, 0.4); }
-  .result-D { background: rgba(251, 191, 36, 0.15); color: #d97706; border: 1px solid rgba(251, 191, 36, 0.4); }
-  .result-skip { background: rgba(156, 163, 175, 0.15); color: #6b7280; border: 1px solid rgba(156, 163, 175, 0.4); }
-  .result-error { background: rgba(248, 113, 113, 0.15); color: #dc2626; border: 1px solid rgba(248, 113, 113, 0.4); }
-  :root[data-theme="dark"] .result-H { color: #4ade80; }
-  :root[data-theme="dark"] .result-A { color: #60a5fa; }
-  :root[data-theme="dark"] .result-D { color: #fbbf24; }
-  :root[data-theme="dark"] .result-skip { color: #9ca3af; }
-  :root[data-theme="dark"] .result-error { color: #f87171; }
-  .ev-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); font-size: 15px; text-align: center; color: #2563eb; font-weight: bold; display: none; }
-  .ev-box .ev-positive { color: #16a34a; }
-  .ev-box .ev-negative { color: #dc2626; }
-  :root[data-theme="dark"] .ev-box { color: #60a5fa; }
-  :root[data-theme="dark"] .ev-box .ev-positive { color: #4ade80; }
-  :root[data-theme="dark"] .ev-box .ev-negative { color: #f87171; }
-  .hint-box { margin-top: 10px; padding: 12px; border-radius: 8px; background: var(--bg-panel); border: 1px solid var(--border-color); font-size: 13px; line-height: 1.6; color: var(--text-secondary); text-align: left; display: none; }
+  :root[data-theme="dark"] { --bg-body:#121212;--bg-card:linear-gradient(135deg,#1a1a2e,#16213e);--bg-switcher:rgba(26,26,46,0.9);--bg-panel:rgba(255,255,255,0.05);--bg-stat:rgba(255,255,255,0.08);--bg-input:rgba(255,255,255,0.08);--bg-input-focus:rgba(255,255,255,0.12);--text-primary:#fff;--text-secondary:#a0c4ff;--text-tertiary:#8db4e2;--text-muted:#6b7f9e;--text-content:#ccc;--text-btn-disabled:#888;--border-color:rgba(255,255,255,0.1);--border-input:rgba(255,255,255,0.2);--border-switcher:rgba(255,255,255,0.2);--placeholder:rgba(255,255,255,0.4);--scroll-thumb:#555; }
+  :root[data-theme="light"] { --bg-body:#eef1f6;--bg-card:linear-gradient(135deg,#ffffff,#eef3ff);--bg-switcher:rgba(255,255,255,0.95);--bg-panel:rgba(0,0,0,0.03);--bg-stat:rgba(0,0,0,0.05);--bg-input:rgba(0,0,0,0.04);--bg-input-focus:rgba(0,0,0,0.07);--text-primary:#1a1a2e;--text-secondary:#3b5aa0;--text-tertiary:#5a7bc0;--text-muted:#8a9ab0;--text-content:#444;--text-btn-disabled:#aaa;--border-color:rgba(0,0,0,0.1);--border-input:rgba(0,0,0,0.15);--border-switcher:rgba(0,0,0,0.15);--placeholder:rgba(0,0,0,0.35);--scroll-thumb:#c0c0c0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background-color:var(--bg-body); color:var(--text-primary); margin:0; padding:0; min-height:100vh; transition:background-color .3s; }
 
-  .game-panel { margin-top: 20px; }
-  .game-panel h2 { text-align: center; margin: 0 0 5px 0; font-size: 20px; color: var(--text-primary); }
-  .game-panel .game-sub { text-align: center; font-size: 13px; color: var(--text-tertiary); margin: 3px 0 15px 0; }
-  .game-tier { display: none; text-align: center; margin-bottom: 20px; padding: 20px 15px; border-radius: 14px; background: var(--bg-panel); border: 1px solid var(--border-color); }
-  .game-tier.show { display: block !important; }
-  .game-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-  .game-stat { background: var(--bg-stat); border-radius: 8px; padding: 10px; text-align: center; }
-  .game-stat-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; }
-  .game-stat-value { font-size: 18px; font-weight: bold; color: var(--text-primary); }
-  .game-stat-value.positive { color: #16a34a; }
-  .game-stat-value.negative { color: #dc2626; }
-  :root[data-theme="dark"] .game-stat-value.positive { color: #4ade80; }
-  :root[data-theme="dark"] .game-stat-value.negative { color: #f87171; }
-  .game-stat-value.neutral { color: var(--text-primary); }
+  /* 頂部按鈕 - 強制可點 */
+  .theme-switcher { position:fixed!important; top:12px!important; left:12px!important; z-index:99999!important; background:var(--bg-switcher); border:1px solid var(--border-switcher); border-radius:8px; height:32px; padding:0 12px; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:16px; line-height:1; cursor:pointer; backdrop-filter:blur(10px); user-select:none; -webkit-tap-highlight-color:transparent; pointer-events:auto!important; }
+  .theme-switcher:active { opacity:.7; }
+  .lang-switcher { position:fixed!important; top:12px!important; right:12px!important; z-index:99999!important; background:var(--bg-switcher); border:1px solid var(--border-switcher); border-radius:8px; height:32px; padding:0 10px; display:flex; align-items:center; color:var(--text-primary); font-size:13px; cursor:pointer; backdrop-filter:blur(10px); pointer-events:auto!important; }
+  .lang-switcher select { background:transparent; color:var(--text-secondary); border:none; outline:none; font-size:13px; cursor:pointer; font-weight:bold; height:100%; }
+  .lang-switcher select option { background:var(--bg-body); color:var(--text-primary); }
+  .theme-switcher.hidden, .lang-switcher.hidden { opacity:0; pointer-events:none; }
+  .whatsapp-bottom { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9998; background:var(--bg-switcher); border:1px solid rgba(37,211,102,0.5); border-radius:24px; padding:10px 20px; backdrop-filter:blur(10px); box-shadow:0 4px 12px rgba(0,0,0,0.25); white-space:nowrap; }
+  .whatsapp-bottom a { color:#25D366; font-size:14px; font-weight:bold; text-decoration:none; }
 
-  .game-auto-btn { width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; background: linear-gradient(135deg, rgba(192,132,252,0.20), rgba(96,165,250,0.20)); color: #c084fc; border: 1px solid rgba(192,132,252,0.55); margin-bottom: 10px; }
-  .game-auto-btn:hover:not(:disabled) { background: linear-gradient(135deg, rgba(192,132,252,0.30), rgba(96,165,250,0.30)); }
-  .game-auto-btn:active:not(:disabled) { transform: scale(0.97); }
-  .game-auto-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  :root[data-theme="dark"] .game-auto-btn { color: #c084fc; }
+  #termsPage { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; padding-top:60px; padding-bottom:40px; }
+  .terms-container { background:var(--bg-card); color:var(--text-primary); border-radius:16px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.3); width:100%; max-width:400px; display:flex; flex-direction:column; max-height:80vh; }
+  .terms-container h2 { text-align:center; margin:0 0 15px 0; color:var(--text-primary); font-size:20px; }
+  .terms-scroll { overflow-y:auto; flex:1; padding:15px; margin-bottom:15px; border:1px solid var(--border-color); border-radius:8px; background:var(--bg-panel); -webkit-overflow-scrolling:touch; }
+  .terms-scroll h3 { color:var(--text-secondary); font-size:15px; margin:15px 0 8px 0; }
+  .terms-scroll p,.terms-scroll li { font-size:14px; line-height:1.6; color:var(--text-content); margin:5px 0; }
+  .terms-scroll ul { padding-left:20px; margin:5px 0; }
+  .terms-scroll::-webkit-scrollbar { width:6px; }
+  .terms-scroll::-webkit-scrollbar-track { background:rgba(0,0,0,0.1); border-radius:3px; }
+  .terms-scroll::-webkit-scrollbar-thumb { background:var(--scroll-thumb); border-radius:3px; }
+  #agreeBtn { width:100%; padding:15px; background:#333; color:var(--text-btn-disabled); border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; transition:background .3s; -webkit-tap-highlight-color:transparent; }
+  #agreeBtn.active { background:#007aff; color:#fff; }
+  #agreeBtn.active:active { background:#0062cc; }
 
-  .game-dev-btn {
-    width: 100%; padding: 16px; border-radius: 8px; font-size: 17px; font-weight: 900;
-    cursor: pointer; transition: transform 0.1s;
-    -webkit-tap-highlight-color: transparent;
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    color: #fff; border: 2px solid #4ade80;
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-    margin-bottom: 10px;
-    display: none;
-    letter-spacing: 1px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  }
-  .game-dev-btn:hover:not(:disabled) { background: linear-gradient(135deg, #15803d, #16a34a); }
-  .game-dev-btn:active:not(:disabled) { transform: scale(0.97); }
-  .game-dev-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .game-dev-badge { display: inline-block; padding: 3px 8px; background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 6px; }
-  .dev-unlock-row { text-align: center; margin-top: 15px; }
-  .dev-unlock-btn { background: transparent; border: 1px dashed var(--border-color); color: var(--text-muted); font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: opacity 0.3s; }
-  .dev-unlock-btn:hover { color: var(--text-secondary); border-color: var(--text-secondary); }
+  #calcPage { display:none; flex-direction:column; justify-content:center; align-items:center; min-height:100vh; padding:20px; padding-top:60px; padding-bottom:100px; }
+  .dark-card { width:100%; max-width:400px; background:var(--bg-card); color:var(--text-primary); border-radius:16px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+  .stats-panel { margin-bottom:20px; }
+  .stats-panel h3 { text-align:center; font-size:15px; margin:0 0 15px 0; color:var(--text-secondary); letter-spacing:1px; }
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat-item { background:var(--bg-stat); border-radius:10px; padding:12px; text-align:center; }
+  .stat-item .label { font-size:11px; color:var(--text-tertiary); margin-bottom:4px; }
+  .stat-item .value { font-size:20px; font-weight:bold; }
+  .stat-item .value.positive { color:#16a34a; }
+  .stat-item .value.negative { color:#dc2626; }
+  .stat-item .value.neutral { color:#d97706; }
+  :root[data-theme="dark"] .stat-item .value.positive { color:#4ade80; }
+  :root[data-theme="dark"] .stat-item .value.negative { color:#f87171; }
+  :root[data-theme="dark"] .stat-item .value.neutral { color:#fbbf24; }
+  .stats-note { text-align:center; font-size:11px; color:var(--text-muted); margin-top:12px; }
+  .stats-note.date-note { margin-top:5px; color:var(--text-secondary); }
+  .stats-link { display:block; text-align:center; margin-top:10px; font-size:13px; color:#60a5fa; text-decoration:none; border-top:1px solid var(--border-color); padding-top:10px; }
+  .container h2 { text-align:center; margin-bottom:5px; color:var(--text-primary); font-size:20px; }
+  .container .subtitle { text-align:center; font-size:13px; color:var(--text-tertiary); margin:3px 0; }
+  .input-group { margin-bottom:15px; }
+  .container label { display:block; font-size:14px; margin-bottom:5px; color:var(--text-secondary); }
+  .input-wrapper { position:relative; }
+  .input-wrapper input { width:100%; padding:12px; padding-right:32px; background:var(--bg-input); border:1px solid var(--border-input); border-radius:8px; box-sizing:border-box; font-size:16px; color:var(--text-primary); outline:none; }
+  .input-wrapper input::placeholder { color:var(--placeholder); }
+  .input-wrapper input:focus { border-color:#60a5fa; background:var(--bg-input-focus); }
+  .input-wrapper .suffix { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:15px; font-weight:bold; pointer-events:none; }
+  #calcBtn { width:100%; padding:15px; background:#007aff; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:10px; }
+  #clearBtn { width:100%; padding:15px; background:#ef4444; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:10px; display:none; }
+  .result-box { margin-top:25px; padding:20px; border-radius:12px; text-align:center; font-size:22px; font-weight:bold; display:none; }
+  .result-H { background:rgba(74,222,128,0.15); color:#16a34a; border:1px solid rgba(74,222,128,0.4); }
+  .result-A { background:rgba(96,165,250,0.15); color:#2563eb; border:1px solid rgba(96,165,250,0.4); }
+  .result-D { background:rgba(251,191,36,0.15); color:#d97706; border:1px solid rgba(251,191,36,0.4); }
+  .result-skip { background:rgba(156,163,175,0.15); color:#6b7280; border:1px solid rgba(156,163,175,0.4); }
+  .result-error { background:rgba(248,113,113,0.15); color:#dc2626; border:1px solid rgba(248,113,113,0.4); }
+  :root[data-theme="dark"] .result-H { color:#4ade80; }
+  :root[data-theme="dark"] .result-A { color:#60a5fa; }
+  :root[data-theme="dark"] .result-D { color:#fbbf24; }
+  :root[data-theme="dark"] .result-skip { color:#9ca3af; }
+  :root[data-theme="dark"] .result-error { color:#f87171; }
+  .ev-box { margin-top:10px; padding:12px; border-radius:8px; background:rgba(96,165,250,0.1); border:1px solid rgba(96,165,250,0.3); font-size:15px; text-align:center; color:#2563eb; font-weight:bold; display:none; }
+  .ev-box .ev-positive { color:#16a34a; }
+  .ev-box .ev-negative { color:#dc2626; }
+  :root[data-theme="dark"] .ev-box { color:#60a5fa; }
+  :root[data-theme="dark"] .ev-box .ev-positive { color:#4ade80; }
+  :root[data-theme="dark"] .ev-box .ev-negative { color:#f87171; }
+  .hint-box { margin-top:10px; padding:12px; border-radius:8px; background:var(--bg-panel); border:1px solid var(--border-color); font-size:13px; line-height:1.6; color:var(--text-secondary); text-align:left; display:none; }
 
-  /* 開發者參數面板 */
-  .dev-panel {
-    display: none;
-    margin-top: 15px;
-    padding: 15px;
-    background: rgba(34, 197, 94, 0.05);
-    border: 2px dashed rgba(34, 197, 94, 0.4);
-    border-radius: 10px;
-    transition: padding 0.3s;
-  }
-  .dev-panel.show { display: block; }
-  .dev-panel-title {
-    font-size: 14px;
-    font-weight: 900;
-    color: #22c55e;
-    text-align: center;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
-    transition: font-size 0.3s, margin-bottom 0.3s;
-  }
-  .dev-layer {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 10px;
-    transition: padding 0.3s, margin-bottom 0.3s;
-  }
-  .dev-layer-title {
-    font-size: 12px;
-    font-weight: bold;
-    color: #22c55e;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border-color);
-    transition: font-size 0.3s, margin-bottom 0.3s, padding-bottom 0.3s;
-  }
-  .dev-param-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    transition: gap 0.3s;
-  }
-  .dev-param-item { display: flex; flex-direction: column; }
-  .dev-param-item label {
-    font-size: 10px;
-    color: var(--text-tertiary);
-    margin-bottom: 3px;
-    font-weight: bold;
-    transition: font-size 0.3s, margin-bottom 0.3s;
-  }
-  .dev-param-item input {
-    width: 100%;
-    padding: 6px 8px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-input);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--text-primary);
-    outline: none;
-    font-family: monospace;
-    transition: padding 0.3s, font-size 0.3s;
-  }
-  .dev-param-item input:focus {
-    border-color: #22c55e;
-    background: var(--bg-input-focus);
-  }
+  .game-panel { margin-top:20px; }
+  .game-panel h2 { text-align:center; margin:0 0 5px 0; font-size:20px; color:var(--text-primary); }
+  .game-panel .game-sub { text-align:center; font-size:13px; color:var(--text-tertiary); margin:3px 0 15px 0; }
+  .game-tier { display:none; text-align:center; margin-bottom:20px; padding:20px 15px; border-radius:14px; background:var(--bg-panel); border:1px solid var(--border-color); }
+  .game-tier.show { display:block!important; }
+  .game-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; }
+  .game-stat { background:var(--bg-stat); border-radius:8px; padding:10px; text-align:center; }
+  .game-stat-label { font-size:11px; color:var(--text-tertiary); margin-bottom:4px; }
+  .game-stat-value { font-size:18px; font-weight:bold; color:var(--text-primary); }
+  .game-stat-value.positive { color:#16a34a; }
+  .game-stat-value.negative { color:#dc2626; }
+  :root[data-theme="dark"] .game-stat-value.positive { color:#4ade80; }
+  :root[data-theme="dark"] .game-stat-value.negative { color:#f87171; }
+  .game-stat-value.neutral { color:var(--text-primary); }
 
-  /* 縮小模式 */
-  .dev-panel.compact {
-    padding: 8px;
-    margin-top: 10px;
-  }
-  .dev-panel.compact .dev-panel-title {
-    font-size: 11px;
-    margin-bottom: 6px;
-  }
-  .dev-panel.compact .dev-layer {
-    padding: 5px 8px;
-    margin-bottom: 5px;
-  }
-  .dev-panel.compact .dev-layer-title {
-    font-size: 9px;
-    margin-bottom: 4px;
-    padding-bottom: 3px;
-  }
-  .dev-panel.compact .dev-param-grid {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 4px;
-  }
-  .dev-panel.compact .dev-param-item label {
-    font-size: 8px;
-    margin-bottom: 1px;
-  }
-  .dev-panel.compact .dev-param-item input {
-    padding: 3px 5px;
-    font-size: 11px;
-  }
+  .game-auto-btn { width:100%; padding:14px; border-radius:8px; font-size:15px; font-weight:bold; cursor:pointer; transition:transform .15s,opacity .3s; -webkit-tap-highlight-color:transparent; background:linear-gradient(135deg,rgba(192,132,252,0.20),rgba(96,165,250,0.20)); color:#c084fc; border:1px solid rgba(192,132,252,0.55); margin-bottom:10px; }
+  .game-auto-btn:hover:not(:disabled) { background:linear-gradient(135deg,rgba(192,132,252,0.30),rgba(96,165,250,0.30)); }
+  .game-auto-btn:active:not(:disabled) { transform:scale(.97); }
+  .game-auto-btn:disabled { opacity:.4; cursor:not-allowed; }
+  :root[data-theme="dark"] .game-auto-btn { color:#c084fc; }
 
-  .dev-btn-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 10px;
-    transition: margin-top 0.3s;
-  }
-  .dev-panel.compact .dev-btn-row {
-    margin-top: 6px;
-  }
-  .dev-btn-row button {
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    -webkit-tap-highlight-color: transparent;
-    transition: padding 0.3s, font-size 0.3s;
-  }
-  .dev-panel.compact .dev-btn-row button {
-    padding: 6px;
-    font-size: 10px;
-  }
-  .dev-btn-reset {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.4) !important;
-  }
-  .dev-btn-apply {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.5) !important;
-  }
-  .dev-btn-row button:active { transform: scale(0.97); }
+  .game-dev-btn { width:100%; padding:16px; border-radius:8px; font-size:17px; font-weight:900; cursor:pointer; transition:transform .1s; -webkit-tap-highlight-color:transparent; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:2px solid #4ade80; box-shadow:0 0 20px rgba(34,197,94,0.5); margin-bottom:10px; display:none; letter-spacing:1px; text-shadow:0 1px 4px rgba(0,0,0,0.3); }
+  .game-dev-btn:hover:not(:disabled) { background:linear-gradient(135deg,#15803d,#16a34a); }
+  .game-dev-btn:active:not(:disabled) { transform:scale(.97); }
+  .game-dev-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .game-dev-badge { display:inline-block; padding:3px 8px; background:rgba(34,197,94,0.2); color:#22c55e; border:1px solid rgba(34,197,94,0.5); border-radius:4px; font-size:10px; font-weight:bold; margin-left:6px; }
+  .dev-unlock-row { text-align:center; margin-top:15px; }
+  .dev-unlock-btn { background:transparent; border:1px dashed var(--border-color); color:var(--text-muted); font-size:11px; padding:6px 12px; border-radius:6px; cursor:pointer; transition:opacity .3s; }
+  .dev-unlock-btn:hover { color:var(--text-secondary); border-color:var(--text-secondary); }
 
-  .game-skip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .game-skip-btn { flex: 1; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.5); }
-  .game-skip-btn:hover:not(:disabled) { background: rgba(156, 163, 175, 0.25); }
-  .game-skip-btn:active:not(:disabled) { transform: scale(0.97); }
-  .game-skip-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  :root[data-theme="dark"] .game-skip-btn { color: #d1d5db; }
-  .game-skip-info { flex: 0 0 auto; font-size: 12px; font-weight: bold; color: var(--text-secondary); padding: 6px 10px; background: var(--bg-stat); border-radius: 6px; min-width: 70px; text-align: center; white-space: nowrap; }
-  .game-skip-info.exhausted { color: var(--text-muted); opacity: 0.7; }
+  .dev-panel { display:none; margin-top:15px; padding:15px; background:rgba(34,197,94,0.05); border:2px dashed rgba(34,197,94,0.4); border-radius:10px; transition:padding .3s; }
+  .dev-panel.show { display:block; }
+  .dev-panel-title { font-size:14px; font-weight:900; color:#22c55e; text-align:center; margin-bottom:12px; letter-spacing:1px; transition:font-size .3s,margin-bottom .3s; }
+  .dev-layer { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-bottom:10px; transition:padding .3s,margin-bottom .3s; }
+  .dev-layer-title { font-size:12px; font-weight:bold; color:#22c55e; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color); transition:font-size .3s,margin-bottom .3s,padding-bottom .3s; }
+  .dev-param-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; transition:gap .3s; }
+  .dev-param-item { display:flex; flex-direction:column; }
+  .dev-param-item label { font-size:10px; color:var(--text-tertiary); margin-bottom:3px; font-weight:bold; transition:font-size .3s,margin-bottom .3s; }
+  .dev-param-item input { width:100%; padding:6px 8px; background:var(--bg-input); border:1px solid var(--border-input); border-radius:6px; font-size:13px; color:var(--text-primary); outline:none; font-family:monospace; transition:padding .3s,font-size .3s; }
+  .dev-param-item input:focus { border-color:#22c55e; background:var(--bg-input-focus); }
+  .dev-panel.compact { padding:8px; margin-top:10px; }
+  .dev-panel.compact .dev-panel-title { font-size:11px; margin-bottom:6px; }
+  .dev-panel.compact .dev-layer { padding:5px 8px; margin-bottom:5px; }
+  .dev-panel.compact .dev-layer-title { font-size:9px; margin-bottom:4px; padding-bottom:3px; }
+  .dev-panel.compact .dev-param-grid { grid-template-columns:1fr 1fr 1fr 1fr; gap:4px; }
+  .dev-panel.compact .dev-param-item label { font-size:8px; margin-bottom:1px; }
+  .dev-panel.compact .dev-param-item input { padding:3px 5px; font-size:11px; }
+  .dev-btn-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; transition:margin-top .3s; }
+  .dev-panel.compact .dev-btn-row { margin-top:6px; }
+  .dev-btn-row button { padding:10px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent; transition:padding .3s,font-size .3s; }
+  .dev-panel.compact .dev-btn-row button { padding:6px; font-size:10px; }
+  .dev-btn-reset { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.4)!important; }
+  .dev-btn-apply { background:rgba(34,197,94,0.2); color:#22c55e; border:1px solid rgba(34,197,94,0.5)!important; }
+  .dev-btn-row button:active { transform:scale(.97); }
 
-  .game-match { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
-  .game-match-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .game-match-row:last-child { margin-bottom: 0; }
-  .game-cell { text-align: center; }
-  .game-cell-label { display: block; font-size: 11px; color: var(--text-tertiary); margin-bottom: 3px; }
-  .game-cell-value { display: block; font-size: 15px; font-weight: bold; color: var(--text-primary); }
-  .game-guess-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .game-guess-btn { padding: 14px 8px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; }
-  .game-guess-btn:active:not(:disabled) { transform: scale(0.95); }
-  .guess-H { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.5); }
-  .guess-D { background: rgba(251, 191, 36, 0.15); color: #d97706; border: 1px solid rgba(251, 191, 36, 0.5); }
-  .guess-A { background: rgba(96, 165, 250, 0.15); color: #2563eb; border: 1px solid rgba(96, 165, 250, 0.5); }
-  :root[data-theme="dark"] .guess-H { color: #4ade80; }
-  :root[data-theme="dark"] .guess-D { color: #fbbf24; }
-  :root[data-theme="dark"] .guess-A { color: #60a5fa; }
-  .game-result-box { padding: 15px; border-radius: 10px; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 12px; display: none; line-height: 1.5; }
-  .game-result-box small { font-weight: normal; font-size: 12px; opacity: 0.9; display: block; margin-top: 8px; line-height: 1.7; }
-  .game-result-box .pnl-big { display: block; font-size: 22px; font-weight: 900; margin: 8px 0 4px 0; letter-spacing: 0.5px; }
-  .game-win { background: rgba(74, 222, 128, 0.15); color: #16a34a; border: 1px solid rgba(74, 222, 128, 0.4); }
-  .game-lose { background: rgba(248, 113, 113, 0.15); color: #dc2626; border: 1px solid rgba(248, 113, 113, 0.4); }
-  :root[data-theme="dark"] .game-win { color: #4ade80; }
-  :root[data-theme="dark"] .game-lose { color: #f87171; }
-  .game-new-btn { width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .game-new-btn:active { background: #0062cc; }
-  .game-skip-help { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 12px; line-height: 1.5; padding: 8px 10px; background: var(--bg-panel); border-radius: 6px; border: 1px dashed var(--border-color); }
+  .game-skip-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .game-skip-btn { flex:1; padding:12px 14px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; transition:transform .15s,opacity .3s; -webkit-tap-highlight-color:transparent; background:rgba(156,163,175,0.15); color:#9ca3af; border:1px solid rgba(156,163,175,0.5); }
+  .game-skip-btn:hover:not(:disabled) { background:rgba(156,163,175,0.25); }
+  .game-skip-btn:active:not(:disabled) { transform:scale(.97); }
+  .game-skip-btn:disabled { opacity:.4; cursor:not-allowed; }
+  :root[data-theme="dark"] .game-skip-btn { color:#d1d5db; }
+  .game-skip-info { flex:0 0 auto; font-size:12px; font-weight:bold; color:var(--text-secondary); padding:6px 10px; background:var(--bg-stat); border-radius:6px; min-width:70px; text-align:center; white-space:nowrap; }
+  .game-skip-info.exhausted { color:var(--text-muted); opacity:.7; }
 
-  @keyframes tierPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.15); } }
-  @keyframes tierPop { 0% { transform: scale(1); } 40% { transform: scale(1.2) rotate(-3deg); } 70% { transform: scale(0.95) rotate(2deg); } 100% { transform: scale(1) rotate(0); } }
-  @keyframes tierEXGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  .game-match { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:10px; padding:15px; margin-bottom:15px; }
+  .game-match-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+  .game-match-row:last-child { margin-bottom:0; }
+  .game-cell { text-align:center; }
+  .game-cell-label { display:block; font-size:11px; color:var(--text-tertiary); margin-bottom:3px; }
+  .game-cell-value { display:block; font-size:15px; font-weight:bold; color:var(--text-primary); }
+  .game-guess-btns { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
+  .game-guess-btn { padding:14px 8px; border-radius:8px; font-size:15px; font-weight:bold; cursor:pointer; transition:transform .15s,opacity .3s; -webkit-tap-highlight-color:transparent; }
+  .game-guess-btn:active:not(:disabled) { transform:scale(.95); }
+  .guess-H { background:rgba(74,222,128,0.15); color:#16a34a; border:1px solid rgba(74,222,128,0.5); }
+  .guess-D { background:rgba(251,191,36,0.15); color:#d97706; border:1px solid rgba(251,191,36,0.5); }
+  .guess-A { background:rgba(96,165,250,0.15); color:#2563eb; border:1px solid rgba(96,165,250,0.5); }
+  :root[data-theme="dark"] .guess-H { color:#4ade80; }
+  :root[data-theme="dark"] .guess-D { color:#fbbf24; }
+  :root[data-theme="dark"] .guess-A { color:#60a5fa; }
+  .game-result-box { padding:15px; border-radius:10px; text-align:center; font-size:16px; font-weight:bold; margin-bottom:12px; display:none; line-height:1.5; }
+  .game-result-box small { font-weight:normal; font-size:12px; opacity:.9; display:block; margin-top:8px; line-height:1.7; }
+  .game-result-box .pnl-big { display:block; font-size:22px; font-weight:900; margin:8px 0 4px 0; letter-spacing:.5px; }
+  .game-win { background:rgba(74,222,128,0.15); color:#16a34a; border:1px solid rgba(74,222,128,0.4); }
+  .game-lose { background:rgba(248,113,113,0.15); color:#dc2626; border:1px solid rgba(248,113,113,0.4); }
+  :root[data-theme="dark"] .game-win { color:#4ade80; }
+  :root[data-theme="dark"] .game-lose { color:#f87171; }
+  .game-new-btn { width:100%; padding:14px; background:#007aff; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .game-new-btn:active { background:#0062cc; }
+  .game-skip-help { font-size:11px; color:var(--text-muted); text-align:center; margin-bottom:12px; line-height:1.5; padding:8px 10px; background:var(--bg-panel); border-radius:6px; border:1px dashed var(--border-color); }
 
-  /* ==================== 桌面版三欄對稱佈局 ==================== */
-  @media (min-width: 1024px) {
-    #calcPage {
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 16px;
-      padding: 80px 20px 40px;
-      min-height: auto;
-    }
-    #calcPage .dark-card {
-      flex: 1 1 0;
-      max-width: 380px;
-      min-width: 280px;
-      max-height: calc(100vh - 130px);
-      overflow-y: auto;
-      margin-top: 0 !important;
-    }
-    #calcPage .dark-card::-webkit-scrollbar { width: 6px; }
-    #calcPage .dark-card::-webkit-scrollbar-track { background: transparent; }
-    #calcPage .dark-card::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
-    .game-panel { margin-top: 0; }
+  @keyframes tierPulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.05); filter:brightness(1.15); } }
+  @keyframes tierPop { 0% { transform:scale(1); } 40% { transform:scale(1.2) rotate(-3deg); } 70% { transform:scale(.95) rotate(2deg); } 100% { transform:scale(1) rotate(0); } }
+  @keyframes tierEXGradient { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+
+  @media (min-width:1024px) {
+    #calcPage { flex-direction:row; align-items:flex-start; justify-content:center; gap:16px; padding:80px 20px 40px; min-height:auto; }
+    #calcPage .dark-card { flex:1 1 0; max-width:380px; min-width:280px; max-height:calc(100vh - 130px); overflow-y:auto; margin-top:0!important; }
+    #calcPage .dark-card::-webkit-scrollbar { width:6px; }
+    #calcPage .dark-card::-webkit-scrollbar-track { background:transparent; }
+    #calcPage .dark-card::-webkit-scrollbar-thumb { background:var(--scroll-thumb); border-radius:3px; }
+    .game-panel { margin-top:0; }
   }
 </style>
 </head>
 <body>
 
-<div class="theme-switcher" onclick="toggleTheme()" title="切換主題">
+<div class="theme-switcher" id="themeSwitcher" title="切換主題">
   <span id="themeIcon">🌙</span>
 </div>
 
 <div class="lang-switcher">
-  🌐 <select id="langSelect" onchange="changeLang(this.value)">
+  🌐 <select id="langSelect">
     <option value="zh-HK">繁體中文 (HK/TW)</option>
     <option value="zh-CN">简体中文 (CN)</option>
     <option value="en-US">English (US)</option>
@@ -362,45 +210,21 @@
         <p>本系統是一套結合機率模型、市場定價（賠率）與極致風控的自動化量化分析工具。系統嚴格執行數學邏輯，旨在杜絕人為情緒干擾，協助用戶進行數據分析。</p>
         <h3>🛠️ 核心功能模組</h3>
         <p><strong>1. 勝率與市場賠率的綜合過濾</strong></p>
-        <ul>
-          <li>核心勝率線：低於系統設定的勝率基準，除非有特殊賠率價值，否則系統一律放棄。</li>
-          <li>冷門捕捉機制：當雙方勝率陷入低迷且市場對和局缺乏防備時，系統會自動捕捉高價值的冷門和局。</li>
-        </ul>
+        <ul><li>核心勝率線：低於系統設定的勝率基準，除非有特殊賠率價值，否則系統一律放棄。</li><li>冷門捕捉機制：當雙方勝率陷入低迷且市場對和局缺乏防備時，系統會自動捕捉高價值的冷門和局。</li></ul>
         <p><strong>2. 精細化賠率區間與防冷機制</strong></p>
-        <ul>
-          <li>主場價值投資：數據看好主隊且賠率處於合理回報區間時，直接進行價值投資。</li>
-          <li>主場防冷保險：數據看好主隊但賠率偏高時，自動切換為和局保護本金。</li>
-          <li>客場防冷保險：客隊被看好但賠率過低時，利用和局抵禦客場風險。</li>
-          <li>平賠陷阱規避：主客賠率完全相同時，系統自動跳過。</li>
-        </ul>
+        <ul><li>主場價值投資：數據看好主隊且賠率處於合理回報區間時，直接進行價值投資。</li><li>主場防冷保險：數據看好主隊但賠率偏高時，自動切換為和局保護本金。</li><li>客場防冷保險：客隊被看好但賠率過低時，利用和局抵禦客場風險。</li><li>平賠陷阱規避：主客賠率完全相同時，系統自動跳過。</li></ul>
         <p><strong>3. 終極賠率博弈與極端風險防雷</strong></p>
-        <ul>
-          <li>價值博弈：比較主客賠率，誰的賠率更具市場價值就買誰。</li>
-          <li>極端冷門防禦罩：當賠率高達系統設定的警戒線時，系統會強制跳過這些場次。</li>
-        </ul>
+        <ul><li>價值博弈：比較主客賠率，誰的賠率更具市場價值就買誰。</li><li>極端冷門防禦罩：當賠率高達系統設定的警戒線時，系統會強制跳過這些場次。</li></ul>
         <p><strong>4. 動態 EV（期望值）與成本計算模組</strong></p>
         <p>系統內建期望值與成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
         <p><strong>5. 全方位績效儀表板</strong></p>
         <p>自動彙整獲利與虧損、顯示命中率、反映資金使用效率。</p>
         <h3>📈 系統核心優勢</h3>
-        <ul>
-          <li>絕對紀律：所有公式均已設定好，觸發條件自動給出訊號。</li>
-          <li>攻守兼備：兼具捕捉冷門的進攻邏輯與極端賠率跳過的防守邏輯。</li>
-          <li>持續進化：ver 1.0 版本，持續追蹤表現並根據市場變化迭代。</li>
-        </ul>
+        <ul><li>絕對紀律：所有公式均已設定好，觸發條件自動給出訊號。</li><li>攻守兼備：兼具捕捉冷門的進攻邏輯與極端賠率跳過的防守邏輯。</li><li>持續進化：ver 1.0 版本，持續追蹤表現並根據市場變化迭代。</li></ul>
         <h3>⚠️ 給客人的誠信風險聲明</h3>
-        <ul>
-          <li>歷史不等於未來：本系統基於歷史數據回測與概率模型，歷史表現不代表未來必贏。</li>
-          <li>長期複利思維：足球比賽充滿不可抗力（紅牌、點球、烏龍等），單場比賽的盈虧隨機性極高。系統的優勢在於長期複利的穩定，而非一夜暴富。</li>
-          <li>嚴格注碼管理：強烈建議客戶採用固定比例注碼（例如總資金的 1%-2%）。切勿因為短期連續黑單而手動干預公式或盲目重注。</li>
-        </ul>
+        <ul><li>歷史不等於未來：本系統基於歷史數據回測與概率模型，歷史表現不代表未來必贏。</li><li>長期複利思維：足球比賽充滿不可抗力（紅牌、點球、烏龍等），單場比賽的盈虧隨機性極高。系統的優勢在於長期複利的穩定，而非一夜暴富。</li><li>嚴格注碼管理：強烈建議客戶採用固定比例注碼（例如總資金的 1%-2%）。切勿因為短期連續黑單而手動干預公式或盲目重注。</li></ul>
         <h3>🛡️ 法律合規與負責任博彩聲明</h3>
-        <ul>
-          <li>只作研究用途：本系統及所有相關數據、圖表與分析結果，僅供學術研究、數據分析及個人興趣之用，不構成任何形式的投資建議或博彩邀約。</li>
-          <li>必須控制注碼：博彩涉及風險，用戶在參與任何相關活動時，必須嚴格控制注碼，量力而為，切勿將無法承受損失的資金投入其中。</li>
-          <li>切勿沉迷賭博：請保持理性，切勿沉迷賭博。若發現自己或身邊的人有賭博成癮的傾向，請立即尋求專業協助。</li>
-          <li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li>
-        </ul>
+        <ul><li>只作研究用途：本系統及所有相關數據、圖表與分析結果，僅供學術研究、數據分析及個人興趣之用，不構成任何形式的投資建議或博彩邀約。</li><li>必須控制注碼：博彩涉及風險，用戶在參與任何相關活動時，必須嚴格控制注碼，量力而為，切勿將無法承受損失的資金投入其中。</li><li>切勿沉迷賭博：請保持理性，切勿沉迷賭博。若發現自己或身邊的人有賭博成癮的傾向，請立即尋求專業協助。</li><li>只供娛樂：請將本系統視為純粹的娛樂工具，享受數據分析與策略驗證的樂趣，而非視為賺錢的捷徑。</li></ul>
         <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性參與，享受數據分析的樂趣。</p>
         <p style="text-align:center; font-size:12px; color:var(--text-muted);">—— 以上為完整條款，滾動到最底部即可點擊同意 ——</p>
       </div>
@@ -411,45 +235,21 @@
         <p>本系统是一套结合概率模型、市场定价（赔率）与极致风控的自动化量化分析工具。系统严格执行数学逻辑，旨在杜绝人为情绪干扰，协助用户进行数据分析。</p>
         <h3>🛠️ 核心功能模组</h3>
         <p><strong>1. 胜率与市场赔率的综合过滤</strong></p>
-        <ul>
-          <li>核心胜率线：低于系统设定的胜率基准，除非有特殊赔率价值，否则系统一律放弃。</li>
-          <li>冷门捕捉机制：当双方胜率陷入低迷且市场对和局缺乏防备时，系统会自动捕捉高价值的冷门和局。</li>
-        </ul>
+        <ul><li>核心胜率线：低于系统设定的胜率基准，除非有特殊赔率价值，否则系统一律放弃。</li><li>冷门捕捉机制：当双方胜率陷入低迷且市场对和局缺乏防备时，系统会自动捕捉高价值的冷门和局。</li></ul>
         <p><strong>2. 精细化赔率区间与防冷机制</strong></p>
-        <ul>
-          <li>主场价值投资：数据看好主队且赔率处于合理回报区间时，直接进行价值投资。</li>
-          <li>主场防冷保险：数据看好主队但赔率偏高时，自动切换为和局保护本金。</li>
-          <li>客场防冷保险：客队被看好但赔率过低时，利用和局抵御客场风险。</li>
-          <li>平赔陷阱规避：主客赔率完全相同时，系统自动跳过。</li>
-        </ul>
+        <ul><li>主场价值投资：数据看好主队且赔率处于合理回报区间时，直接进行价值投资。</li><li>主场防冷保险：数据看好主队但赔率偏高时，自动切换为和局保护本金。</li><li>客场防冷保险：客队被看好但赔率过低时，利用和局抵御客场风险。</li><li>平赔陷阱规避：主客赔率完全相同时，系统自动跳过。</li></ul>
         <p><strong>3. 终极赔率博弈与极端风险防雷</strong></p>
-        <ul>
-          <li>价值博弈：比较主客赔率，谁的赔率更具市场价值就买谁。</li>
-          <li>极端冷门防御罩：当赔率高达系统设定的警戒线时，系统会强制跳过这些场次。</li>
-        </ul>
+        <ul><li>价值博弈：比较主客赔率，谁的赔率更具市场价值就买谁。</li><li>极端冷门防御罩：当赔率高达系统设定的警戒线时，系统会强制跳过这些场次。</li></ul>
         <p><strong>4. 动态 EV（期望值）与成本计算模组</strong></p>
         <p>系统内建期望值与成本的自動計算功能，確保每一注都是在數學上佔優的價值投注。</p>
         <p><strong>5. 全方位绩效仪表板</strong></p>
         <p>自动汇总获利与亏损、显示命中率、反映资金使用效率。</p>
         <h3>📈 系统核心优势</h3>
-        <ul>
-          <li>绝对纪律：所有公式均已设定好，触发条件自动给出信号。</li>
-          <li>攻守兼备：兼具捕捉冷门的进攻逻辑与极端赔率跳过的防守逻辑。</li>
-          <li>持续进化：ver 1.0 版本，持续追踪表现并根据市场变化迭代。</li>
-        </ul>
+        <ul><li>绝对纪律：所有公式均已设定好，触发条件自动给出信号。</li><li>攻守兼备：兼具捕捉冷门的进攻逻辑与极端赔率跳过的防守逻辑。</li><li>持续进化：ver 1.0 版本，持续追踪表现并根据市场变化迭代。</li></ul>
         <h3>⚠️ 给客人的诚信风险声明</h3>
-        <ul>
-          <li>历史不等于未来：本系统基于历史数据回测与概率模型，历史表现不代表未来必赢。</li>
-          <li>长期复利思维：足球比赛充满不可抗力（红牌、点球、乌龙等），单场比赛的盈亏随机性极高。系统的优势在于长期复利的稳定，而非一夜暴富。</li>
-          <li>严格注码管理：强烈建议客户采用固定比例注码（例如总资金的 1%-2%）。切勿因为短期连续黑单而手动干预公式或盲目重注。</li>
-        </ul>
+        <ul><li>历史不等于未来：本系统基于历史数据回测与概率模型，历史表现不代表未来必赢。</li><li>长期复利思维：足球比赛充满不可抗力（红牌、点球、乌龙等），单场比赛的盈亏随机性极高。系统的优势在于长期复利的稳定，而非一夜暴富。</li><li>严格注码管理：强烈建议客户采用固定比例注码（例如总资金的 1%-2%）。切勿因为短期连续黑单而手动干预公式或盲目重注。</li></ul>
         <h3>🛡️ 法律合规与负责任博彩声明</h3>
-        <ul>
-          <li>只作研究用途：本系统及所有相关数据、图表与分析结果，仅供学术研究、数据分析及个人兴趣之用，不构成任何形式的投资建议或博彩邀约。</li>
-          <li>必须控制注码：博彩涉及风险，用户在参与任何相关活动时，必须严格控制注码，量力而为，切勿将无法承受损失的资金投入其中。</li>
-          <li>切勿沉迷赌博：请保持理性，切勿沉迷赌博。若发现自己或身边的人有赌博成瘾的倾向，请立即寻求专业协助。</li>
-          <li>只供娱乐：请将本系统视为纯粹的娱乐工具，享受数据分析与策略验证的乐趣，而非视为赚钱的捷径。</li>
-        </ul>
+        <ul><li>只作研究用途：本系统及所有相关数据、图表与分析结果，仅供学术研究、数据分析及个人兴趣之用，不构成任何形式的投资建议或博彩邀约。</li><li>必须控制注码：博彩涉及风险，用户在参与任何相关活动时，必须严格控制注码，量力而为，切勿将无法承受损失的资金投入其中。</li><li>切勿沉迷赌博：请保持理性，切勿沉迷赌博。若发现自己或身边的人有赌博成瘾的倾向，请立即寻求专业协助。</li><li>只供娱乐：请将本系统视为纯粹的娱乐工具，享受数据分析与策略验证的乐趣，而非视为赚钱的捷径。</li></ul>
         <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">理性参与，享受数据分析的乐趣。</p>
         <p style="text-align:center; font-size:12px; color:var(--text-muted);">—— 以上为完整条款，滚动到最底部即可点击同意 ——</p>
       </div>
@@ -460,50 +260,26 @@
         <p>This system is an automated quantitative analysis tool combining probability models, market pricing (odds), and strict risk control. It executes mathematical logic strictly to eliminate emotional interference.</p>
         <h3>🛠️ Core Function Modules</h3>
         <p><strong>1. Win Rate & Market Odds Combined Filter</strong></p>
-        <ul>
-          <li>Core win rate line: Below system threshold, unless special odds value exists, the system skips.</li>
-          <li>Underdog capture: When both teams have low win rates and the market underprepares for draws, the system captures high-value draw opportunities.</li>
-        </ul>
+        <ul><li>Core win rate line: Below system threshold, unless special odds value exists, the system skips.</li><li>Underdog capture: When both teams have low win rates and the market underprepares for draws, the system captures high-value draw opportunities.</li></ul>
         <p><strong>2. Refined Odds Ranges & Anti-Upset Mechanism</strong></p>
-        <ul>
-          <li>Home value investment: When data favors home team with reasonable odds, invest directly.</li>
-          <li>Home anti-upset insurance: When data favors home team but odds are elevated, switch to Draw to protect capital.</li>
-          <li>Away anti-upset insurance: Away matches are always difficult. When away team is favored but odds are too low, use Draw to hedge against uncertainty.</li>
-          <li>Equal-odds trap avoidance: When home and away odds are identical, the system skips automatically.</li>
-        </ul>
+        <ul><li>Home value investment: When data favors home team with reasonable odds, invest directly.</li><li>Home anti-upset insurance: When data favors home team but odds are elevated, switch to Draw to protect capital.</li><li>Away anti-upset insurance: Away matches are always difficult. When away team is favored but odds are too low, use Draw to hedge against uncertainty.</li><li>Equal-odds trap avoidance: When home and away odds are identical, the system skips automatically.</li></ul>
         <p><strong>3. Ultimate Odds Game & Extreme Risk Shield</strong></p>
-        <ul>
-          <li>Value game: Compare home/away odds, bet on the one with higher market value.</li>
-          <li>Extreme underdog shield: When odds exceed the system's alert line, the system forcibly skips these matches.</li>
-        </ul>
+        <ul><li>Value game: Compare home/away odds, bet on the one with higher market value.</li><li>Extreme underdog shield: When odds exceed the system's alert line, the system forcibly skips these matches.</li></ul>
         <p><strong>4. Dynamic EV (Expected Value) & Cost Calculation Module</strong></p>
         <p>The system automatically calculates expected value and cost, ensuring every bet has mathematical advantage.</p>
         <p><strong>5. Full Performance Dashboard</strong></p>
         <p>Automatically aggregates profits/losses, displays hit rate, and reflects capital efficiency.</p>
         <h3>📈 Core System Advantages</h3>
-        <ul>
-          <li>Absolute discipline: All formulas pre-set, automatic signals upon trigger.</li>
-          <li>Offense & defense: Combines underdog capture logic with extreme odds skip defense.</li>
-          <li>Continuous evolution: ver 1.0, continuous tracking and market-adaptive iteration.</li>
-        </ul>
+        <ul><li>Absolute discipline: All formulas pre-set, automatic signals upon trigger.</li><li>Offense & defense: Combines underdog capture logic with extreme odds skip defense.</li><li>Continuous evolution: ver 1.0, continuous tracking and market-adaptive iteration.</li></ul>
         <h3>⚠️ Integrity Risk Statement for Users</h3>
-        <ul>
-          <li>History ≠ Future: This system is based on historical backtesting and probability models. Past performance does not guarantee future wins.</li>
-          <li>Long-term compound mindset: Football matches contain uncontrollable factors (red cards, penalties, own goals). Single-match variance is extremely high. The advantage lies in long-term compound stability, not overnight riches.</li>
-          <li>Strict stake management: Fixed proportional stakes strongly recommended (e.g. 1%-2% of total capital). Do not manually intervene or over-bet during short-term losing streaks.</li>
-        </ul>
+        <ul><li>History ≠ Future: This system is based on historical backtesting and probability models. Past performance does not guarantee future wins.</li><li>Long-term compound mindset: Football matches contain uncontrollable factors (red cards, penalties, own goals). Single-match variance is extremely high. The advantage lies in long-term compound stability, not overnight riches.</li><li>Strict stake management: Fixed proportional stakes strongly recommended (e.g. 1%-2% of total capital). Do not manually intervene or over-bet during short-term losing streaks.</li></ul>
         <h3>🛡️ Legal Compliance & Responsible Gaming Statement</h3>
-        <ul>
-          <li>Research purpose only: All data, charts, and analysis results are for academic research, data analysis, and personal interest only. They do not constitute investment advice or betting solicitation.</li>
-          <li>Must control stakes: Betting involves risk. Users must strictly control stakes when participating, never invest funds they cannot afford to lose.</li>
-          <li>Do not become addicted: Stay rational. Do not become addicted to gambling. If you or someone you know shows signs of gambling addiction, seek professional help immediately.</li>
-          <li>Entertainment only: Treat this system as a pure entertainment tool. Enjoy data analysis and strategy validation — not as a shortcut to wealth.</li>
-        </ul>
+        <ul><li>Research purpose only: All data, charts, and analysis results are for academic research, data analysis, and personal interest only. They do not constitute investment advice or betting solicitation.</li><li>Must control stakes: Betting involves risk. Users must strictly control stakes when participating, never invest funds they cannot afford to lose.</li><li>Do not become addicted: Stay rational. Do not become addicted to gambling. If you or someone you know shows signs of gambling addiction, seek professional help immediately.</li><li>Entertainment only: Treat this system as a pure entertainment tool. Enjoy data analysis and strategy validation — not as a shortcut to wealth.</li></ul>
         <p style="text-align:center; margin-top:20px; font-weight:bold; color:#60a5fa;">Play rationally, enjoy data analysis.</p>
         <p style="text-align:center; font-size:12px; color:var(--text-muted);">—— Full terms above. Scroll to bottom to click Agree ——</p>
       </div>
     </div>
-    <button id="agreeBtn" type="button" onclick="handleAgree()">請滾動閱讀至最底部</button>
+    <button id="agreeBtn" type="button">請滾動閱讀至最底部</button>
   </div>
 </div>
 
@@ -531,45 +307,45 @@
     <div class="input-group">
       <label data-i18n="labelHW">主勝率</label>
       <div class="input-wrapper">
-        <input type="text" id="hw" inputmode="numeric" data-i18n-ph="phHW" placeholder="例如：40" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
+        <input type="text" id="hw" inputmode="numeric" data-i18n-ph="phHW" placeholder="例如：40">
         <span class="suffix">%</span>
       </div>
     </div>
     <div class="input-group">
       <label data-i18n="labelDW">和勝率</label>
       <div class="input-wrapper">
-        <input type="text" id="dw" inputmode="numeric" data-i18n-ph="phDW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
+        <input type="text" id="dw" inputmode="numeric" data-i18n-ph="phDW" placeholder="例如：30">
         <span class="suffix">%</span>
       </div>
     </div>
     <div class="input-group">
       <label data-i18n="labelAW">客勝率</label>
       <div class="input-wrapper">
-        <input type="text" id="aw" inputmode="numeric" data-i18n-ph="phAW" placeholder="例如：30" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkClearBtn();">
+        <input type="text" id="aw" inputmode="numeric" data-i18n-ph="phAW" placeholder="例如：30">
         <span class="suffix">%</span>
       </div>
     </div>
     <div class="input-group">
       <label data-i18n="labelHO">主賠</label>
       <div class="input-wrapper">
-        <input type="text" id="ho" inputmode="decimal" data-i18n-ph="phHO" placeholder="例如：1.58" oninput="formatOddsInput(this); checkClearBtn();" onblur="formatOddsOnBlur(this);">
+        <input type="text" id="ho" inputmode="decimal" data-i18n-ph="phHO" placeholder="例如：1.58">
       </div>
     </div>
     <div class="input-group">
       <label data-i18n="labelDO">和賠</label>
       <div class="input-wrapper">
-        <input type="text" id="doo" inputmode="decimal" data-i18n-ph="phDO" placeholder="例如：3.95" oninput="formatOddsInput(this); checkClearBtn();" onblur="formatOddsOnBlur(this);">
+        <input type="text" id="doo" inputmode="decimal" data-i18n-ph="phDO" placeholder="例如：3.95">
       </div>
     </div>
     <div class="input-group">
       <label data-i18n="labelAO">客賠</label>
       <div class="input-wrapper">
-        <input type="text" id="ao" inputmode="decimal" data-i18n-ph="phAO" placeholder="例如：4.05" oninput="formatOddsInput(this); checkClearBtn();" onblur="formatOddsOnBlur(this);">
+        <input type="text" id="ao" inputmode="decimal" data-i18n-ph="phAO" placeholder="例如：4.05">
       </div>
     </div>
 
-    <button id="calcBtn" onclick="calculate()" data-i18n="calcBtn">計算結果</button>
-    <button id="clearBtn" onclick="clearData()" data-i18n="clearBtn">清除數據</button>
+    <button id="calcBtn" data-i18n="calcBtn">計算結果</button>
+    <button id="clearBtn" data-i18n="clearBtn">清除數據</button>
 
     <div id="resultBox" class="result-box"></div>
     <div id="evBox" class="ev-box"></div>
@@ -587,22 +363,10 @@
     </div>
 
     <div class="game-stats">
-      <div class="game-stat">
-        <div class="game-stat-label" data-i18n="gamePlayed">已玩</div>
-        <div class="game-stat-value" id="gamePlayed">0</div>
-      </div>
-      <div class="game-stat">
-        <div class="game-stat-label" data-i18n="gameHits">命中</div>
-        <div class="game-stat-value" id="gameHits">0</div>
-      </div>
-      <div class="game-stat">
-        <div class="game-stat-label" data-i18n="gameRate">命中率</div>
-        <div class="game-stat-value" id="gameRate">—</div>
-      </div>
-      <div class="game-stat">
-        <div class="game-stat-label" data-i18n="gamePnl">總盈虧</div>
-        <div class="game-stat-value neutral" id="gamePnl">0</div>
-      </div>
+      <div class="game-stat"><div class="game-stat-label" data-i18n="gamePlayed">已玩</div><div class="game-stat-value" id="gamePlayed">0</div></div>
+      <div class="game-stat"><div class="game-stat-label" data-i18n="gameHits">命中</div><div class="game-stat-value" id="gameHits">0</div></div>
+      <div class="game-stat"><div class="game-stat-label" data-i18n="gameRate">命中率</div><div class="game-stat-value" id="gameRate">—</div></div>
+      <div class="game-stat"><div class="game-stat-label" data-i18n="gamePnl">總盈虧</div><div class="game-stat-value neutral" id="gamePnl">0</div></div>
     </div>
 
     <div class="game-match">
@@ -619,28 +383,25 @@
     </div>
 
     <div class="game-guess-btns">
-      <button class="game-guess-btn guess-H" id="gbtnH" onclick="gameGuess('H')" data-i18n="resultHShort">主勝</button>
-      <button class="game-guess-btn guess-D" id="gbtnD" onclick="gameGuess('D')" data-i18n="resultDShort">和局</button>
-      <button class="game-guess-btn guess-A" id="gbtnA" onclick="gameGuess('A')" data-i18n="resultAShort">客勝</button>
+      <button class="game-guess-btn guess-H" id="gbtnH" data-i18n="resultHShort">主勝</button>
+      <button class="game-guess-btn guess-D" id="gbtnD" data-i18n="resultDShort">和局</button>
+      <button class="game-guess-btn guess-A" id="gbtnA" data-i18n="resultAShort">客勝</button>
     </div>
 
-    <button class="game-auto-btn" id="gbtnAuto" onclick="gameAutoPredict()" data-i18n="gameAutoBtn">🤖 自動預測（系統公式）</button>
+    <button class="game-auto-btn" id="gbtnAuto" data-i18n="gameAutoBtn">🤖 自動預測（系統公式）</button>
 
-    <button class="game-dev-btn" id="gbtnDev" onclick="devAutoPredict()" style="display:none;">
+    <button class="game-dev-btn" id="gbtnDev" style="display:none;">
       ⚡ 開發者連按模式 <span class="game-dev-badge">DEV</span>
     </button>
 
-    <!-- 開發者參數面板 -->
     <div class="dev-panel" id="devPanel">
       <div class="dev-panel-title">⚙️ 系統公式參數調整</div>
-
       <div class="dev-layer">
         <div class="dev-layer-title">第 1 層：勝率差距 → 買和</div>
         <div class="dev-param-grid">
           <div class="dev-param-item"><label>勝率差上限 (A−C)</label><input type="text" id="p1_gap" value="6" inputmode="numeric"></div>
         </div>
       </div>
-
       <div class="dev-layer">
         <div class="dev-layer-title">第 2 層：主強 + 主賠低 → 買主</div>
         <div class="dev-param-grid">
@@ -649,7 +410,6 @@
           <div class="dev-param-item"><label>主賠上限</label><input type="text" id="p2_dmax" value="205" inputmode="numeric"></div>
         </div>
       </div>
-
       <div class="dev-layer">
         <div class="dev-layer-title">第 3 層：主強 + 主賠中 → 買和</div>
         <div class="dev-param-grid">
@@ -658,14 +418,12 @@
           <div class="dev-param-item"><label>主賠上限</label><input type="text" id="p3_dmax" value="245" inputmode="numeric"></div>
         </div>
       </div>
-
       <div class="dev-layer">
         <div class="dev-layer-title">第 4 層：客強客冷 → 反向買主</div>
         <div class="dev-param-grid">
           <div class="dev-param-item"><label>客賠上限</label><input type="text" id="p4_fmax" value="550" inputmode="numeric"></div>
         </div>
       </div>
-
       <div class="dev-layer">
         <div class="dev-layer-title">第 5 層：客強 + 客賠價值 → 買客</div>
         <div class="dev-param-grid">
@@ -673,7 +431,6 @@
           <div class="dev-param-item"><label>客賠上限</label><input type="text" id="p5_fmax" value="215" inputmode="numeric"></div>
         </div>
       </div>
-
       <div class="dev-layer">
         <div class="dev-layer-title">兜底層：賠率博弈</div>
         <div class="dev-param-grid">
@@ -682,15 +439,14 @@
           <div class="dev-param-item"><label>客賠 skip 門檻</label><input type="text" id="pb_fskip" value="750" inputmode="numeric"></div>
         </div>
       </div>
-
       <div class="dev-btn-row">
-        <button class="dev-btn-reset" onclick="resetParams()">🔄 重設預設</button>
-        <button class="dev-btn-apply" onclick="applyParams()" id="devApplyBtn">✅ 套用參數</button>
+        <button class="dev-btn-reset" id="devResetBtn">🔄 重設預設</button>
+        <button class="dev-btn-apply" id="devApplyBtn">✅ 套用參數</button>
       </div>
     </div>
 
     <div class="game-skip-row">
-      <button class="game-skip-btn" id="gbtnSkip" onclick="gameSkip()" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
+      <button class="game-skip-btn" id="gbtnSkip" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
       <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
     </div>
 
@@ -698,10 +454,10 @@
 
     <div id="gameResult" class="game-result-box"></div>
 
-    <button class="game-new-btn" onclick="gameNewRound()" data-i18n="gameNewBtn">🎲 開始新一局</button>
+    <button class="game-new-btn" id="gameNewBtn" data-i18n="gameNewBtn">🎲 開始新一局</button>
 
     <div class="dev-unlock-row">
-      <button class="dev-unlock-btn" onclick="devUnlock()" id="devUnlockBtn">🔒 開發者模式</button>
+      <button class="dev-unlock-btn" id="devUnlockBtn">🔒 開發者模式</button>
     </div>
   </div>
 </div>
@@ -711,27 +467,14 @@
 </div>
 
 <script>
-// ==================== 全域參數 ====================
-var PARAMS = {
-  p1_gap: 6,
-  p2_hmin: 42, p2_dmin: 155, p2_dmax: 205,
-  p3_hmin: 40, p3_dmin: 210, p3_dmax: 245,
-  p4_fmax: 550,
-  p5_fmin: 185, p5_fmax: 215,
-  pb_hmin: 30, pb_dmin: 600, pb_fskip: 750
-};
+// ==================== 全域 ====================
+var PARAMS = { p1_gap:6, p2_hmin:42, p2_dmin:155, p2_dmax:205, p3_hmin:40, p3_dmin:210, p3_dmax:245, p4_fmax:550, p5_fmin:185, p5_fmax:215, pb_hmin:30, pb_dmin:600, pb_fskip:750 };
 var DEFAULT_PARAMS = JSON.parse(JSON.stringify(PARAMS));
+var CALIBRATION = { FAVORITE_BOOST:0.18, DRAW_BOOST:1.25, DRAW_LOW:150, DRAW_HIGH:210, MARGIN_MIN:1.10, MARGIN_MAX:1.16 };
+var currentLang = 'zh-HK';
+var devMode = false;
 
-var CALIBRATION = {
-  FAVORITE_BOOST: 0.18,
-  DRAW_BOOST: 1.25,
-  DRAW_LOW: 150,
-  DRAW_HIGH: 210,
-  MARGIN_MIN: 1.10,
-  MARGIN_MAX: 1.16
-};
-
-// ==================== 主題 / 語言 ====================
+// ==================== 主題切換 ====================
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   var icon = document.getElementById('themeIcon');
@@ -742,6 +485,8 @@ function toggleTheme() {
   var current = document.documentElement.getAttribute('data-theme') || 'dark';
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
+
+// ==================== 滾動隱藏 ====================
 function handleTopBtnsScroll() {
   var y = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
   var themeBtn = document.querySelector('.theme-switcher');
@@ -750,13 +495,169 @@ function handleTopBtnsScroll() {
   if (y > 100) { themeBtn.classList.add('hidden'); langBtn.classList.add('hidden'); }
   else { themeBtn.classList.remove('hidden'); langBtn.classList.remove('hidden'); }
 }
-window.addEventListener('scroll', handleTopBtnsScroll, { passive: true });
-window.addEventListener('touchmove', handleTopBtnsScroll, { passive: true });
 
+// ==================== 翻譯 ====================
+const translations = {
+  'zh-HK': {
+    termsTitle:'📋 使用守則與風險聲明', statsTitle:'📊 歷史數據統計',
+    totalPnl:'總盈虧', winsCount:'命中數', totalCost:'總成本', betsCount:'出手數',
+    roi:'盈虧率 (ROI)', hitRate:'命中率',
+    statsNote:'※ 每注固定 $100，所有數據實時同步',
+    dbUpdate:'📅 資料庫更新日期：', viewDetails:'📋 查看詳細賽果 →',
+    mainTitle:'⚽ 智能量化預測系統',
+    sub1:'勝率數據建議使用 FootballForecastAI 勝率',
+    sub2:'賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率',
+    labelHW:'主勝率', labelDW:'和勝率', labelAW:'客勝率',
+    labelHO:'主賠', labelDO:'和賠', labelAO:'客賠',
+    phHW:'例如：40', phDW:'例如：30', phAW:'例如：30',
+    phHO:'例如：1.58', phDO:'例如：3.95', phAO:'例如：4.05',
+    calcBtn:'計算結果', clearBtn:'清除數據', whatsapp:'📱 加入WhatsApp群組',
+    resultH:'✅ 建議出手：買主勝', resultA:'✅ 建議出手：買客勝',
+    resultD:'✅ 建議出手：買和局', resultSkip:'⛔ 建議不出手',
+    errIncomplete:'⚠️ 數據不完整', errOver100:'⚠️ 命中率大於100%',
+    evLabel:'期望值 EV-1：',
+    hintSkip:'數據信號不明，系統選擇跳過本次投注，避免風險。',
+    hint1:'主客勝率相近（相差 6 以內），和局概率被市場低估，系統捕捉高價值和局，建議買和局。',
+    hint2:'主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
+    hint3:'主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
+    hint4:'客勝率高於主勝率，客隊略為冷門，系統反向買主隊，搏主場優勢。',
+    hint5:'客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
+    hint6:'市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
+    hintReverse:'偵測到極端冷門賠率，系統按最新規則買和局搏高賠回報。',
+    gameTitle:'🎮 猜賽果挑戰', gameSub:'隨機生成數據，試下你嘅眼光！',
+    gamePlayed:'已玩', gameHits:'命中', gameRate:'命中率', gamePnl:'總盈虧',
+    gameHW:'主勝率', gameDW:'和勝率', gameAW:'客勝率',
+    gameHO:'主賠', gameDO:'和賠', gameAO:'客賠',
+    gameNewBtn:'🎲 開始新一局',
+    gameWin:'🎉 恭喜！答中！', gameLose:'❌ 差啲！答錯',
+    gameAnswer:'正確答案', gameYourGuess:'你的選擇',
+    gameStake:'注碼 $100', gameProfit:'本局盈利', gameLoss:'本局虧損',
+    resultHShort:'主勝', resultDShort:'和局', resultAShort:'客勝',
+    desc_extreme:'💥💥💥 史詩級大爆冷！', desc_huge:'💥💥 大爆冷！', desc_big:'💥 爆冷！',
+    desc_upset:'⚡ 冷門出現！', desc_minor:'📈 小冷門', desc_normal:'✅ 正常賽果',
+    desc_favorite:'🔥 大熱取勝', desc_strong:'💪 大熱輕鬆取勝',
+    desc_D_extreme:'🎯 超罕見超高賠和局！', desc_D_huge:'💰 高賠和局命中！',
+    desc_D_high:'📊 中高賠和局', desc_D_normal:'🤝 正常和局',
+    tierHint:'※ 猜 10 場以上才顯示等級',
+    tierEX:'🏆 傳奇！神級預測！', tierS:'🔥 頂尖表現！繼續保持！',
+    tierA:'⭐ 優秀！表現出色！', tierC:'📊 一般水平，仍有進步空間',
+    tierD:'⚠️ 需要改進，加油！', tierE:'💪 繼續努力！多練習！',
+    gameSkipBtn:'⏭️ 跳過本場', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
+    gameSkipHelp:'💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次',
+    gameSkipExhausted:'❌ 跳過次數已用完', gameSkipToast:'⏭️ 已跳過本場',
+    gameMustGuess:'⚠️ 請先預測本場答案，才能開始新一局',
+    gameAutoBtn:'🤖 自動預測（系統公式）',
+    gameAutoSkip:'🤖 系統建議不出手（Skip），請手動選擇或跳過'
+  },
+  'zh-CN': {
+    termsTitle:'📋 使用守则与风险声明', statsTitle:'📊 历史数据统计',
+    totalPnl:'总盈亏', winsCount:'命中数', totalCost:'总成本', betsCount:'出手数',
+    roi:'盈亏率 (ROI)', hitRate:'命中率',
+    statsNote:'※ 每注固定 $100，所有数据实时同步',
+    dbUpdate:'📅 数据库更新日期：', viewDetails:'📋 查看详细赛果 →',
+    mainTitle:'⚽ 智能量化预测系统',
+    sub1:'胜率数据建议使用 FootballForecastAI 胜率',
+    sub2:'赔率数据建议使用 Tipsme 内的马会(HKJC) 赔率',
+    labelHW:'主胜率', labelDW:'和胜率', labelAW:'客胜率',
+    labelHO:'主赔', labelDO:'和赔', labelAO:'客赔',
+    phHW:'例如：40', phDW:'例如：30', phAW:'例如：30',
+    phHO:'例如：1.58', phDO:'例如：3.95', phAO:'例如：4.05',
+    calcBtn:'计算结果', clearBtn:'清除数据', whatsapp:'📱 加入WhatsApp群组',
+    resultH:'✅ 建议出手：买主胜', resultA:'✅ 建议出手：买客胜',
+    resultD:'✅ 建议出手：买和局', resultSkip:'⛔ 建议不出手',
+    errIncomplete:'⚠️ 数据不完整', errOver100:'⚠️ 命中率大于100%',
+    evLabel:'期望值 EV-1：',
+    hintSkip:'数据信号不明，系统选择跳过本次投注，避免风险。',
+    hint1:'主客胜率相近（相差 6 以内），和局概率被市场低估，系统捕捉高价值和局，建议买和局。',
+    hint2:'主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
+    hint3:'主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
+    hint4:'客胜率高于主胜率，客队略为冷门，系统反向买主队，搏主场优势。',
+    hint5:'客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
+    hint6:'市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
+    hintReverse:'侦测到极端冷门赔率，系统按最新规则买和局搏高赔回报。',
+    gameTitle:'🎮 猜赛果挑战', gameSub:'随机生成数据，试试你的眼光！',
+    gamePlayed:'已玩', gameHits:'命中', gameRate:'命中率', gamePnl:'总盈亏',
+    gameHW:'主胜率', gameDW:'和胜率', gameAW:'客胜率',
+    gameHO:'主赔', gameDO:'和赔', gameAO:'客赔',
+    gameNewBtn:'🎲 开始新一局',
+    gameWin:'🎉 恭喜！答中！', gameLose:'❌ 差一点！答错',
+    gameAnswer:'正确答案', gameYourGuess:'你的选择',
+    gameStake:'注码 $100', gameProfit:'本局盈利', gameLoss:'本局亏损',
+    resultHShort:'主胜', resultDShort:'和局', resultAShort:'客胜',
+    desc_extreme:'💥💥💥 史诗级大爆冷！', desc_huge:'💥💥 大爆冷！', desc_big:'💥 爆冷！',
+    desc_upset:'⚡ 冷门出现！', desc_minor:'📈 小冷门', desc_normal:'✅ 正常赛果',
+    desc_favorite:'🔥 大热取胜', desc_strong:'💪 大热轻松取胜',
+    desc_D_extreme:'🎯 超罕见超高赔和局！', desc_D_huge:'💰 高赔和局命中！',
+    desc_D_high:'📊 中高赔和局', desc_D_normal:'🤝 正常和局',
+    tierHint:'※ 猜 10 场以上才显示等级',
+    tierEX:'🏆 传奇！神级预测！', tierS:'🔥 顶尖表现！继续保持！',
+    tierA:'⭐ 优秀！表现出色！', tierC:'📊 一般水平，仍有进步空间',
+    tierD:'⚠️ 需要改进，加油！', tierE:'💪 继续努力！多练习！',
+    gameSkipBtn:'⏭️ 跳过本场', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
+    gameSkipHelp:'💡 每场随机生成，预设 2 次跳过机会，每玩 10 场 +1 次',
+    gameSkipExhausted:'❌ 跳过次数已用完', gameSkipToast:'⏭️ 已跳过本场',
+    gameMustGuess:'⚠️ 请先预测本场答案，才能开始新一局',
+    gameAutoBtn:'🤖 自动预测（系统公式）',
+    gameAutoSkip:'🤖 系统建议不出手（Skip），请手动选择或跳过'
+  },
+  'en-US': {
+    termsTitle:'📋 Terms of Use & Risk Statement', statsTitle:'📊 Historical Statistics',
+    totalPnl:'Total P/L', winsCount:'Wins', totalCost:'Total Cost', betsCount:'Bets',
+    roi:'ROI', hitRate:'Hit Rate',
+    statsNote:'※ Fixed $100 per bet, all data synced in real-time',
+    dbUpdate:'📅 Database updated: ', viewDetails:'📋 View detailed results →',
+    mainTitle:'⚽ Quant Football Prediction System',
+    sub1:'Win rate data: FootballForecastAI recommended',
+    sub2:'Odds data: Tipsme (HKJC) recommended',
+    labelHW:'Home Win Rate', labelDW:'Draw Rate', labelAW:'Away Win Rate',
+    labelHO:'Home Odds', labelDO:'Draw Odds', labelAO:'Away Odds',
+    phHW:'e.g. 40', phDW:'e.g. 30', phAW:'e.g. 30',
+    phHO:'e.g. 1.58', phDO:'e.g. 3.95', phAO:'e.g. 4.05',
+    calcBtn:'Calculate', clearBtn:'Clear Data', whatsapp:'📱 Join WhatsApp Group',
+    resultH:'✅ Recommendation: Bet Home Win', resultA:'✅ Recommendation: Bet Away Win',
+    resultD:'✅ Recommendation: Bet Draw', resultSkip:'⛔ Recommendation: No Bet',
+    errIncomplete:'⚠️ Incomplete Data', errOver100:'⚠️ Probability exceeds 100%',
+    evLabel:'Expected Value EV-1: ',
+    hintSkip:'Signal unclear. System skips this bet to avoid risk.',
+    hint1:'Home and away win rates are close (within 6). Draw is undervalued. Bet Draw.',
+    hint2:'Home team has clear advantage with reasonable odds. Bet Home Win.',
+    hint3:'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
+    hint4:'Away win rate exceeds home, away team slightly underdog. System bets Home Win as contrarian play.',
+    hint5:'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
+    hint6:'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
+    hintReverse:'Detected extreme underdog odds. System switches to Draw bet for high-payout upside.',
+    gameTitle:'🎮 Guess the Result', gameSub:'Random data generated. Try your luck!',
+    gamePlayed:'Played', gameHits:'Correct', gameRate:'Accuracy', gamePnl:'Total P/L',
+    gameHW:'Home Win %', gameDW:'Draw %', gameAW:'Away Win %',
+    gameHO:'Home Odds', gameDO:'Draw Odds', gameAO:'Away Odds',
+    gameNewBtn:'🎲 New Round',
+    gameWin:'🎉 Correct!', gameLose:'❌ Wrong!',
+    gameAnswer:'Correct answer', gameYourGuess:'Your guess',
+    gameStake:'Stake $100', gameProfit:'Round Profit', gameLoss:'Round Loss',
+    resultHShort:'Home', resultDShort:'Draw', resultAShort:'Away',
+    desc_extreme:'💥💥💥 Epic Upset!', desc_huge:'💥💥 Huge Upset!', desc_big:'💥 Upset!',
+    desc_upset:'⚡ Underdog Wins!', desc_minor:'📈 Minor Upset', desc_normal:'✅ Normal Result',
+    desc_favorite:'🔥 Favorite Wins', desc_strong:'💪 Dominant Win',
+    desc_D_extreme:'🎯 Ultra-Rare High-Odds Draw!', desc_D_huge:'💰 High-Odds Draw Hit!',
+    desc_D_high:'📊 Mid-High Odds Draw', desc_D_normal:'🤝 Normal Draw',
+    tierHint:'※ Play 10+ rounds to reveal your rank',
+    tierEX:'🏆 Legendary! Godlike predictions!', tierS:'🔥 Top-tier performance! Keep it up!',
+    tierA:'⭐ Excellent! Outstanding performance!', tierC:'📊 Average, room to improve',
+    tierD:'⚠️ Needs improvement, keep going!', tierE:'💪 Keep practicing! You\'ll get there!',
+    gameSkipBtn:'⏭️ Skip Match', gameSkipInfoPrefix:'Left ', gameSkipInfoSuffix:'',
+    gameSkipHelp:'💡 Each match is random. Default 2 skips, +1 every 10 plays',
+    gameSkipExhausted:'❌ No skips left', gameSkipToast:'⏭️ Match skipped',
+    gameMustGuess:'⚠️ Please guess the current match before starting a new one',
+    gameAutoBtn:'🤖 Auto Predict (System Formula)',
+    gameAutoSkip:'🤖 System recommends SKIP. Please choose manually or skip.'
+  }
+};
+
+// ==================== 同意按鈕 ====================
 var agreeTexts = {
-  'zh-HK': { scroll: '請滾動閱讀至最底部', agree: '✅ 我已閱讀並同意，進入系統', alert: '請滾動閱讀至最底部，才能按同意。' },
-  'zh-CN': { scroll: '请滚动阅读至最底部', agree: '✅ 我已阅读并同意，进入系统', alert: '请滚动阅读至最底部，才能按同意。' },
-  'en-US': { scroll: 'Please scroll to the bottom', agree: '✅ I have read and agree, enter system', alert: 'Please scroll to the bottom before clicking Agree.' }
+  'zh-HK': { scroll:'請滾動閱讀至最底部', agree:'✅ 我已閱讀並同意，進入系統', alert:'請滾動閱讀至最底部，才能按同意。' },
+  'zh-CN': { scroll:'请滚动阅读至最底部', agree:'✅ 我已阅读并同意，进入系统', alert:'请滚动阅读至最底部，才能按同意。' },
+  'en-US': { scroll:'Please scroll to the bottom', agree:'✅ I have read and agree, enter system', alert:'Please scroll to the bottom before clicking Agree.' }
 };
 function updateAgreeBtnText() {
   var btn = document.getElementById('agreeBtn');
@@ -764,14 +665,23 @@ function updateAgreeBtnText() {
   var lang = agreeTexts[currentLang] || agreeTexts['zh-HK'];
   btn.textContent = btn.classList.contains('active') ? lang.agree : lang.scroll;
 }
+function updateAgreeBtnVisual() {
+  var s = document.getElementById('termsScroll');
+  var btn = document.getElementById('agreeBtn');
+  if (!s || !btn) return;
+  if (btn.classList.contains('active')) return;
+  var reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 200;
+  if (s.scrollHeight <= s.clientHeight + 200) reachedBottom = true;
+  if (reachedBottom) { btn.classList.add('active'); updateAgreeBtnText(); }
+}
 function handleAgree() {
   var btn = document.getElementById('agreeBtn');
   var s = document.getElementById('termsScroll');
   var lang = agreeTexts[currentLang] || agreeTexts['zh-HK'];
   var reachedBottom = false;
   if (s) {
-    reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 100;
-    if (s.scrollHeight <= s.clientHeight + 100) reachedBottom = true;
+    reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 200;
+    if (s.scrollHeight <= s.clientHeight + 200) reachedBottom = true;
   }
   if (!btn.classList.contains('active') && !reachedBottom) { alert(lang.alert); return; }
   if (!btn.classList.contains('active')) btn.classList.add('active');
@@ -782,214 +692,53 @@ function handleAgree() {
   gameNewRound();
 }
 
-const translations = {
-  'zh-HK': {
-    termsTitle: '📋 使用守則與風險聲明', statsTitle: '📊 歷史數據統計',
-    totalPnl: '總盈虧', winsCount: '命中數', totalCost: '總成本', betsCount: '出手數',
-    roi: '盈虧率 (ROI)', hitRate: '命中率',
-    statsNote: '※ 每注固定 $100，所有數據實時同步',
-    dbUpdate: '📅 資料庫更新日期：', viewDetails: '📋 查看詳細賽果 →',
-    mainTitle: '⚽ 智能量化預測系統',
-    sub1: '勝率數據建議使用 FootballForecastAI 勝率',
-    sub2: '賠率數據建議使用 Tipsme 內的馬會(HKJC) 賠率',
-    labelHW: '主勝率', labelDW: '和勝率', labelAW: '客勝率',
-    labelHO: '主賠', labelDO: '和賠', labelAO: '客賠',
-    phHW: '例如：40', phDW: '例如：30', phAW: '例如：30',
-    phHO: '例如：1.58', phDO: '例如：3.95', phAO: '例如：4.05',
-    calcBtn: '計算結果', clearBtn: '清除數據', whatsapp: '📱 加入WhatsApp群組',
-    resultH: '✅ 建議出手：買主勝', resultA: '✅ 建議出手：買客勝',
-    resultD: '✅ 建議出手：買和局', resultSkip: '⛔ 建議不出手',
-    errIncomplete: '⚠️ 數據不完整', errOver100: '⚠️ 命中率大於100%',
-    evLabel: '期望值 EV-1：',
-    hintSkip: '數據信號不明，系統選擇跳過本次投注，避免風險。',
-    hint1: '主客勝率相近（相差 6 以內），和局概率被市場低估，系統捕捉高價值和局，建議買和局。',
-    hint2: '主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
-    hint3: '主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
-    hint4: '客勝率高於主勝率，客隊略為冷門，系統反向買主隊，搏主場優勢。',
-    hint5: '客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
-    hint6: '市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
-    hintReverse: '偵測到極端冷門賠率，系統按最新規則買和局搏高賠回報。',
-    gameTitle: '🎮 猜賽果挑戰',
-    gameSub: '隨機生成數據，試下你嘅眼光！',
-    gamePlayed: '已玩', gameHits: '命中', gameRate: '命中率', gamePnl: '總盈虧',
-    gameHW: '主勝率', gameDW: '和勝率', gameAW: '客勝率',
-    gameHO: '主賠', gameDO: '和賠', gameAO: '客賠',
-    gameNewBtn: '🎲 開始新一局',
-    gameWin: '🎉 恭喜！答中！', gameLose: '❌ 差啲！答錯',
-    gameAnswer: '正確答案', gameYourGuess: '你的選擇',
-    gameStake: '注碼 $100', gameProfit: '本局盈利', gameLoss: '本局虧損',
-    resultHShort: '主勝', resultDShort: '和局', resultAShort: '客勝',
-    desc_extreme: '💥💥💥 史詩級大爆冷！', desc_huge: '💥💥 大爆冷！', desc_big: '💥 爆冷！',
-    desc_upset: '⚡ 冷門出現！', desc_minor: '📈 小冷門', desc_normal: '✅ 正常賽果',
-    desc_favorite: '🔥 大熱取勝', desc_strong: '💪 大熱輕鬆取勝',
-    desc_D_extreme: '🎯 超罕見超高賠和局！', desc_D_huge: '💰 高賠和局命中！',
-    desc_D_high: '📊 中高賠和局', desc_D_normal: '🤝 正常和局',
-    tierHint: '※ 猜 10 場以上才顯示等級',
-    tierEX: '🏆 傳奇！神級預測！', tierS: '🔥 頂尖表現！繼續保持！',
-    tierA: '⭐ 優秀！表現出色！', tierC: '📊 一般水平，仍有進步空間',
-    tierD: '⚠️ 需要改進，加油！', tierE: '💪 繼續努力！多練習！',
-    gameSkipBtn: '⏭️ 跳過本場',
-    gameSkipInfoPrefix: '剩 ',
-    gameSkipInfoSuffix: ' 次',
-    gameSkipHelp: '💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次',
-    gameSkipExhausted: '❌ 跳過次數已用完',
-    gameSkipToast: '⏭️ 已跳過本場',
-    gameMustGuess: '⚠️ 請先預測本場答案，才能開始新一局',
-    gameAutoBtn: '🤖 自動預測（系統公式）',
-    gameAutoSkip: '🤖 系統建議不出手（Skip），請手動選擇或跳過'
-  },
-  'zh-CN': {
-    termsTitle: '📋 使用守则与风险声明', statsTitle: '📊 历史数据统计',
-    totalPnl: '总盈亏', winsCount: '命中数', totalCost: '总成本', betsCount: '出手数',
-    roi: '盈亏率 (ROI)', hitRate: '命中率',
-    statsNote: '※ 每注固定 $100，所有数据实时同步',
-    dbUpdate: '📅 数据库更新日期：', viewDetails: '📋 查看详细赛果 →',
-    mainTitle: '⚽ 智能量化预测系统',
-    sub1: '胜率数据建议使用 FootballForecastAI 胜率',
-    sub2: '赔率数据建议使用 Tipsme 内的马会(HKJC) 赔率',
-    labelHW: '主胜率', labelDW: '和胜率', labelAW: '客胜率',
-    labelHO: '主赔', labelDO: '和赔', labelAO: '客赔',
-    phHW: '例如：40', phDW: '例如：30', phAW: '例如：30',
-    phHO: '例如：1.58', phDO: '例如：3.95', phAO: '例如：4.05',
-    calcBtn: '计算结果', clearBtn: '清除数据', whatsapp: '📱 加入WhatsApp群组',
-    resultH: '✅ 建议出手：买主胜', resultA: '✅ 建议出手：买客胜',
-    resultD: '✅ 建议出手：买和局', resultSkip: '⛔ 建议不出手',
-    errIncomplete: '⚠️ 数据不完整', errOver100: '⚠️ 命中率大于100%',
-    evLabel: '期望值 EV-1：',
-    hintSkip: '数据信号不明，系统选择跳过本次投注，避免风险。',
-    hint1: '主客胜率相近（相差 6 以内），和局概率被市场低估，系统捕捉高价值和局，建议买和局。',
-    hint2: '主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
-    hint3: '主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
-    hint4: '客胜率高于主胜率，客队略为冷门，系统反向买主队，搏主场优势。',
-    hint5: '客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
-    hint6: '市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
-    hintReverse: '侦测到极端冷门赔率，系统按最新规则买和局搏高赔回报。',
-    gameTitle: '🎮 猜赛果挑战',
-    gameSub: '随机生成数据，试试你的眼光！',
-    gamePlayed: '已玩', gameHits: '命中', gameRate: '命中率', gamePnl: '总盈亏',
-    gameHW: '主胜率', gameDW: '和胜率', gameAW: '客胜率',
-    gameHO: '主赔', gameDO: '和赔', gameAO: '客赔',
-    gameNewBtn: '🎲 开始新一局',
-    gameWin: '🎉 恭喜！答中！', gameLose: '❌ 差一点！答错',
-    gameAnswer: '正确答案', gameYourGuess: '你的选择',
-    gameStake: '注码 $100', gameProfit: '本局盈利', gameLoss: '本局亏损',
-    resultHShort: '主胜', resultDShort: '和局', resultAShort: '客胜',
-    desc_extreme: '💥💥💥 史诗级大爆冷！', desc_huge: '💥💥 大爆冷！', desc_big: '💥 爆冷！',
-    desc_upset: '⚡ 冷门出现！', desc_minor: '📈 小冷门', desc_normal: '✅ 正常赛果',
-    desc_favorite: '🔥 大热取胜', desc_strong: '💪 大热轻松取胜',
-    desc_D_extreme: '🎯 超罕见超高赔和局！', desc_D_huge: '💰 高赔和局命中！',
-    desc_D_high: '📊 中高赔和局', desc_D_normal: '🤝 正常和局',
-    tierHint: '※ 猜 10 场以上才显示等级',
-    tierEX: '🏆 传奇！神级预测！', tierS: '🔥 顶尖表现！继续保持！',
-    tierA: '⭐ 优秀！表现出色！', tierC: '📊 一般水平，仍有进步空间',
-    tierD: '⚠️ 需要改进，加油！', tierE: '💪 继续努力！多练习！',
-    gameSkipBtn: '⏭️ 跳过本场',
-    gameSkipInfoPrefix: '剩 ',
-    gameSkipInfoSuffix: ' 次',
-    gameSkipHelp: '💡 每场随机生成，预设 2 次跳过机会，每玩 10 场 +1 次',
-    gameSkipExhausted: '❌ 跳过次数已用完',
-    gameSkipToast: '⏭️ 已跳过本场',
-    gameMustGuess: '⚠️ 请先预测本场答案，才能开始新一局',
-    gameAutoBtn: '🤖 自动预测（系统公式）',
-    gameAutoSkip: '🤖 系统建议不出手（Skip），请手动选择或跳过'
-  },
-  'en-US': {
-    termsTitle: '📋 Terms of Use & Risk Statement', statsTitle: '📊 Historical Statistics',
-    totalPnl: 'Total P/L', winsCount: 'Wins', totalCost: 'Total Cost', betsCount: 'Bets',
-    roi: 'ROI', hitRate: 'Hit Rate',
-    statsNote: '※ Fixed $100 per bet, all data synced in real-time',
-    dbUpdate: '📅 Database updated: ', viewDetails: '📋 View detailed results →',
-    mainTitle: '⚽ Quant Football Prediction System',
-    sub1: 'Win rate data: FootballForecastAI recommended',
-    sub2: 'Odds data: Tipsme (HKJC) recommended',
-    labelHW: 'Home Win Rate', labelDW: 'Draw Rate', labelAW: 'Away Win Rate',
-    labelHO: 'Home Odds', labelDO: 'Draw Odds', labelAO: 'Away Odds',
-    phHW: 'e.g. 40', phDW: 'e.g. 30', phAW: 'e.g. 30',
-    phHO: 'e.g. 1.58', phDO: 'e.g. 3.95', phAO: 'e.g. 4.05',
-    calcBtn: 'Calculate', clearBtn: 'Clear Data', whatsapp: '📱 Join WhatsApp Group',
-    resultH: '✅ Recommendation: Bet Home Win', resultA: '✅ Recommendation: Bet Away Win',
-    resultD: '✅ Recommendation: Bet Draw', resultSkip: '⛔ Recommendation: No Bet',
-    errIncomplete: '⚠️ Incomplete Data', errOver100: '⚠️ Probability exceeds 100%',
-    evLabel: 'Expected Value EV-1: ',
-    hintSkip: 'Signal unclear. System skips this bet to avoid risk.',
-    hint1: 'Home and away win rates are close (within 6). Draw is undervalued. Bet Draw.',
-    hint2: 'Home team has clear advantage with reasonable odds. Bet Home Win.',
-    hint3: 'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
-    hint4: 'Away win rate exceeds home, away team slightly underdog. System bets Home Win as contrarian play.',
-    hint5: 'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
-    hint6: 'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
-    hintReverse: 'Detected extreme underdog odds. System switches to Draw bet for high-payout upside.',
-    gameTitle: '🎮 Guess the Result',
-    gameSub: 'Random data generated. Try your luck!',
-    gamePlayed: 'Played', gameHits: 'Correct', gameRate: 'Accuracy', gamePnl: 'Total P/L',
-    gameHW: 'Home Win %', gameDW: 'Draw %', gameAW: 'Away Win %',
-    gameHO: 'Home Odds', gameDO: 'Draw Odds', gameAO: 'Away Odds',
-    gameNewBtn: '🎲 New Round',
-    gameWin: '🎉 Correct!', gameLose: '❌ Wrong!',
-    gameAnswer: 'Correct answer', gameYourGuess: 'Your guess',
-    gameStake: 'Stake $100', gameProfit: 'Round Profit', gameLoss: 'Round Loss',
-    resultHShort: 'Home', resultDShort: 'Draw', resultAShort: 'Away',
-    desc_extreme: '💥💥💥 Epic Upset!', desc_huge: '💥💥 Huge Upset!', desc_big: '💥 Upset!',
-    desc_upset: '⚡ Underdog Wins!', desc_minor: '📈 Minor Upset', desc_normal: '✅ Normal Result',
-    desc_favorite: '🔥 Favorite Wins', desc_strong: '💪 Dominant Win',
-    desc_D_extreme: '🎯 Ultra-Rare High-Odds Draw!', desc_D_huge: '💰 High-Odds Draw Hit!',
-    desc_D_high: '📊 Mid-High Odds Draw', desc_D_normal: '🤝 Normal Draw',
-    tierHint: '※ Play 10+ rounds to reveal your rank',
-    tierEX: '🏆 Legendary! Godlike predictions!', tierS: '🔥 Top-tier performance! Keep it up!',
-    tierA: '⭐ Excellent! Outstanding performance!', tierC: '📊 Average, room to improve',
-    tierD: '⚠️ Needs improvement, keep going!', tierE: '💪 Keep practicing! You\'ll get there!',
-    gameSkipBtn: '⏭️ Skip Match',
-    gameSkipInfoPrefix: 'Left ',
-    gameSkipInfoSuffix: '',
-    gameSkipHelp: '💡 Each match is random. Default 2 skips, +1 every 10 plays',
-    gameSkipExhausted: '❌ No skips left',
-    gameSkipToast: '⏭️ Match skipped',
-    gameMustGuess: '⚠️ Please guess the current match before starting a new one',
-    gameAutoBtn: '🤖 Auto Predict (System Formula)',
-    gameAutoSkip: '🤖 System recommends SKIP. Please choose manually or skip.'
-  }
-};
-
-let currentLang = 'zh-HK';
-var devMode = false;
-
-function updateAgreeBtnVisual() {
-  var s = document.getElementById('termsScroll');
-  var btn = document.getElementById('agreeBtn');
-  if (!s || !btn) return;
-  if (btn.classList.contains('active')) return;
-  var reachedBottom = s.scrollTop + s.clientHeight >= s.scrollHeight - 100;
-  if (s.scrollHeight <= s.clientHeight + 100) reachedBottom = true;
-  if (reachedBottom) { btn.classList.add('active'); updateAgreeBtnText(); }
+// ==================== 語言切換 ====================
+function applyLanguage(lang) {
+  currentLang = lang;
+  const t = translations[lang];
+  if (!t) return;
+  try {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const key = el.getAttribute('data-i18n-ph');
+      if (t[key]) el.placeholder = t[key];
+    });
+    const titleEl = document.getElementById('termsTitleText');
+    if (titleEl && t.termsTitle) titleEl.textContent = t.termsTitle;
+    ['zh-HK','zh-CN','en-US'].forEach(l => {
+      const el = document.getElementById('terms-' + l);
+      if (el) el.style.display = (l === lang) ? 'block' : 'none';
+    });
+    document.getElementById('langSelect').value = lang;
+    updateAgreeBtnText();
+    if (typeof gameState !== 'undefined' && gameState && gameState.lastGuess && gameState.current) renderGameResult(gameState.lastGuess, false);
+    if (typeof updateTierDisplay === 'function') updateTierDisplay(false);
+    if (typeof updatePnlDisplay === 'function') updatePnlDisplay();
+    if (typeof updateSkipDisplay === 'function') updateSkipDisplay();
+    if (window._lastResult) {
+      const r = window._lastResult;
+      let text = "";
+      if (r.className === 'result-error') {
+        if (r.errKey === 'incomplete') text = t.errIncomplete;
+        else if (r.errKey === 'over100') text = t.errOver100;
+        else text = t.errIncomplete;
+        showResult(text, r.className, r.layer, r.bet, r.ev, r.isReverse, r.errKey);
+        return;
+      }
+      if (r.bet === "H") text = t.resultH;
+      else if (r.bet === "A") text = t.resultA;
+      else if (r.bet === "D") text = t.resultD;
+      else text = t.resultSkip;
+      showResult(text, r.className, r.layer, r.bet, r.ev, r.isReverse);
+    }
+  } catch(e) { console.error('applyLanguage error:', e); }
 }
+function changeLang(lang) { applyLanguage(lang); }
 
-window.addEventListener('load', function() {
-  var savedTheme = 'dark';
-  try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
-  applyTheme(savedTheme);
-  var s = document.getElementById('termsScroll');
-  if (s) {
-    s.addEventListener('scroll', updateAgreeBtnVisual);
-    s.addEventListener('touchmove', updateAgreeBtnVisual);
-    s.addEventListener('touchend', updateAgreeBtnVisual);
-    setTimeout(function() {
-      if (s.scrollHeight <= s.clientHeight + 100) {
-        var btn = document.getElementById('agreeBtn');
-        if (btn) btn.classList.add('active');
-        updateAgreeBtnText();
-      }
-    }, 300);
-    setInterval(function() {
-      if (s.scrollTop + s.clientHeight >= s.scrollHeight - 100) {
-        var btn = document.getElementById('agreeBtn');
-        if (btn && !btn.classList.contains('active')) { btn.classList.add('active'); updateAgreeBtnText(); }
-      }
-    }, 500);
-  }
-  window.addEventListener('resize', updateAgreeBtnVisual);
-  updateAgreeBtnText();
-});
-
+// ==================== 輸入處理 ====================
 function formatOddsInput(input) {
   let val = input.value.replace(/[^0-9.]/g, '');
   const parts = val.split('.');
@@ -1003,62 +752,15 @@ function formatOddsOnBlur(input) {
   if (isNaN(num)) return;
   input.value = num.toFixed(2);
 }
-
-function applyLanguage(lang) {
-  currentLang = lang;
-  const t = translations[lang];
-  if (!t) return;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key]) el.textContent = t[key];
-  });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-    const key = el.getAttribute('data-i18n-ph');
-    if (t[key]) el.placeholder = t[key];
-  });
-  const titleEl = document.getElementById('termsTitleText');
-  if (titleEl && t.termsTitle) titleEl.textContent = t.termsTitle;
-  ['zh-HK', 'zh-CN', 'en-US'].forEach(l => {
-    const el = document.getElementById('terms-' + l);
-    if (el) el.style.display = (l === lang) ? 'block' : 'none';
-  });
-  document.getElementById('langSelect').value = lang;
-  updateAgreeBtnText();
-  if (gameState && gameState.lastGuess && gameState.current) renderGameResult(gameState.lastGuess, false);
-  updateTierDisplay(false);
-  updatePnlDisplay();
-  updateSkipDisplay();
-  if (window._lastResult) {
-    const r = window._lastResult;
-    let text = "";
-    if (r.className === 'result-error') {
-      if (r.errKey === 'incomplete') text = t.errIncomplete;
-      else if (r.errKey === 'over100') text = t.errOver100;
-      else text = t.errIncomplete;
-      showResult(text, r.className, r.layer, r.bet, r.ev, r.isReverse, r.errKey);
-      return;
-    }
-    if (r.bet === "H") text = t.resultH;
-    else if (r.bet === "A") text = t.resultA;
-    else if (r.bet === "D") text = t.resultD;
-    else text = t.resultSkip;
-    showResult(text, r.className, r.layer, r.bet, r.ev, r.isReverse);
-  }
-}
-function changeLang(lang) { applyLanguage(lang); }
-
 function checkClearBtn() {
-  const hw = document.getElementById('hw').value.trim();
-  const dw = document.getElementById('dw').value.trim();
-  const aw = document.getElementById('aw').value.trim();
-  const ho = document.getElementById('ho').value.trim();
-  const doo = document.getElementById('doo').value.trim();
-  const ao = document.getElementById('ao').value.trim();
+  const ids = ['hw','dw','aw','ho','doo','ao'];
+  var allEmpty = true;
+  ids.forEach(id => { var el = document.getElementById(id); if (el && el.value.trim() !== '') allEmpty = false; });
   const clearBtn = document.getElementById('clearBtn');
-  if (hw === '' && dw === '' && aw === '' && ho === '' && doo === '' && ao === '') clearBtn.style.display = 'none';
-  else clearBtn.style.display = 'block';
+  if (clearBtn) clearBtn.style.display = allEmpty ? 'none' : 'block';
 }
 
+// ==================== 讀取 Sheets ====================
 const SHEET_ID = '1zIJSl7Qt3eVkd3qXStZItuFvtcatEnLdfScy95se0WM';
 const SHEET_NAME = '工作表1';
 function fetchCell(range) {
@@ -1108,12 +810,8 @@ function loadStatsWithRetry() {
     checkDone();
   }).catch(checkFail);
 }
-function loadStats() { loadStatsWithRetry(); }
-setInterval(loadStatsWithRetry, 15000);
-window.addEventListener('focus', loadStatsWithRetry);
-document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
 
-// ==================== 核心公式 ====================
+// ==================== 公式 ====================
 function calcBet(hw, dw, aw, ho, doo, ao) {
   if (Math.abs(hw - aw) <= PARAMS.p1_gap) return "D";
   if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return "H";
@@ -1206,7 +904,7 @@ function showResult(text, className, layer, bet, ev, isReverse, errKey) {
 }
 
 function clearData() {
-  ['hw','dw','aw','ho','doo','ao'].forEach(id => document.getElementById(id).value = '');
+  ['hw','dw','aw','ho','doo','ao'].forEach(id => { var el = document.getElementById(id); if (el) el.value = ''; });
   let resultBox = document.getElementById('resultBox');
   resultBox.style.display = 'none'; resultBox.innerText = ''; resultBox.className = 'result-box';
   let evBox = document.getElementById('evBox');
@@ -1250,7 +948,6 @@ function applyParams() {
   PARAMS.pb_fskip = Number(document.getElementById('pb_fskip').value) || 750;
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
   
-  // ✅ 套用後縮小面板
   var panel = document.getElementById('devPanel');
   if (panel) panel.classList.add('compact');
   var btn = document.getElementById('devApplyBtn');
@@ -1266,29 +963,15 @@ function applyParams() {
 
 function resetParams() {
   PARAMS = JSON.parse(JSON.stringify(DEFAULT_PARAMS));
-  document.getElementById('p1_gap').value = DEFAULT_PARAMS.p1_gap;
-  document.getElementById('p2_hmin').value = DEFAULT_PARAMS.p2_hmin;
-  document.getElementById('p2_dmin').value = DEFAULT_PARAMS.p2_dmin;
-  document.getElementById('p2_dmax').value = DEFAULT_PARAMS.p2_dmax;
-  document.getElementById('p3_hmin').value = DEFAULT_PARAMS.p3_hmin;
-  document.getElementById('p3_dmin').value = DEFAULT_PARAMS.p3_dmin;
-  document.getElementById('p3_dmax').value = DEFAULT_PARAMS.p3_dmax;
-  document.getElementById('p4_fmax').value = DEFAULT_PARAMS.p4_fmax;
-  document.getElementById('p5_fmin').value = DEFAULT_PARAMS.p5_fmin;
-  document.getElementById('p5_fmax').value = DEFAULT_PARAMS.p5_fmax;
-  document.getElementById('pb_hmin').value = DEFAULT_PARAMS.pb_hmin;
-  document.getElementById('pb_dmin').value = DEFAULT_PARAMS.pb_dmin;
-  document.getElementById('pb_fskip').value = DEFAULT_PARAMS.pb_fskip;
+  ['p1_gap','p2_hmin','p2_dmin','p2_dmax','p3_hmin','p3_dmin','p3_dmax','p4_fmax','p5_fmin','p5_fmax','pb_hmin','pb_dmin','pb_fskip'].forEach(k => {
+    var el = document.getElementById(k);
+    if (el) el.value = DEFAULT_PARAMS[k];
+  });
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
-  
-  // 展開面板
   var panel = document.getElementById('devPanel');
   if (panel) panel.classList.remove('compact');
   var btn = document.getElementById('devApplyBtn');
-  if (btn) {
-    btn.textContent = '✅ 套用參數';
-    btn.onclick = applyParams;
-  }
+  if (btn) { btn.textContent = '✅ 套用參數'; btn.onclick = applyParams; }
   alert('🔄 已重設為預設值');
 }
 
@@ -1298,30 +981,16 @@ function loadSavedParams() {
     if (saved) {
       var p = JSON.parse(saved);
       PARAMS = Object.assign({}, DEFAULT_PARAMS, p);
-      if (document.getElementById('p1_gap')) {
-        document.getElementById('p1_gap').value = PARAMS.p1_gap;
-        document.getElementById('p2_hmin').value = PARAMS.p2_hmin;
-        document.getElementById('p2_dmin').value = PARAMS.p2_dmin;
-        document.getElementById('p2_dmax').value = PARAMS.p2_dmax;
-        document.getElementById('p3_hmin').value = PARAMS.p3_hmin;
-        document.getElementById('p3_dmin').value = PARAMS.p3_dmin;
-        document.getElementById('p3_dmax').value = PARAMS.p3_dmax;
-        document.getElementById('p4_fmax').value = PARAMS.p4_fmax;
-        document.getElementById('p5_fmin').value = PARAMS.p5_fmin;
-        document.getElementById('p5_fmax').value = PARAMS.p5_fmax;
-        document.getElementById('pb_hmin').value = PARAMS.pb_hmin;
-        document.getElementById('pb_dmin').value = PARAMS.pb_dmin;
-        document.getElementById('pb_fskip').value = PARAMS.pb_fskip;
-      }
+      Object.keys(PARAMS).forEach(k => {
+        var el = document.getElementById(k);
+        if (el) el.value = PARAMS[k];
+      });
     }
   } catch(e) {}
 }
 
-// ==================== 猜賽果挑戰 ====================
-var gameState = {
-  current: null, played: 0, hits: 0, waiting: false,
-  lastGuess: null, totalPnl: 0, skipsUsed: 0
-};
+// ==================== 猜賽果 ====================
+var gameState = { current:null, played:0, hits:0, waiting:false, lastGuess:null, totalPnl:0, skipsUsed:0 };
 
 function getMaxSkips() { return 2 + Math.floor(gameState.played / 10); }
 function getRemainingSkips() { return getMaxSkips() - gameState.skipsUsed; }
@@ -1332,13 +1001,8 @@ function updateSkipDisplay() {
   var t = translations[currentLang];
   var remaining = getRemainingSkips();
   infoEl.textContent = (t.gameSkipInfoPrefix || '剩 ') + remaining + (t.gameSkipInfoSuffix || ' 次');
-  if (remaining <= 0) {
-    infoEl.classList.add('exhausted');
-    if (btn) btn.disabled = true;
-  } else {
-    infoEl.classList.remove('exhausted');
-    if (btn) btn.disabled = false;
-  }
+  if (remaining <= 0) { infoEl.classList.add('exhausted'); if (btn) btn.disabled = true; }
+  else { infoEl.classList.remove('exhausted'); if (btn) btn.disabled = false; }
 }
 
 function generateMatch() {
@@ -1353,7 +1017,6 @@ function generateMatch() {
   if (aw > 60) { aw = 60; hw = 100 - dw - aw; }
   if (hw < 8) { hw = 8; aw = 100 - dw - hw; }
   if (hw > 82) { hw = 82; aw = 100 - dw - hw; }
-
   var margin = CALIBRATION.MARGIN_MIN + Math.random() * (CALIBRATION.MARGIN_MAX - CALIBRATION.MARGIN_MIN);
   var ho  = 100 / (hw  * margin);
   var doo = 100 / (dw  * margin);
@@ -1366,33 +1029,28 @@ function generateMatch() {
   ho  = Math.round(ho  * 100);
   doo = Math.round(doo * 100);
   ao  = Math.round(ao  * 100);
-  ho  = Math.max(100,  Math.min(5500, ho));
-  doo = Math.max(256,  Math.min(2000, doo));
-  ao  = Math.max(100,  Math.min(7000, ao));
+  ho  = Math.max(100, Math.min(5500, ho));
+  doo = Math.max(256, Math.min(2000, doo));
+  ao  = Math.max(100, Math.min(7000, ao));
   var s2 = 100/ho + 100/doo + 100/ao;
   if (s2 < 1.10) { var f2 = s2 / 1.10; ho = Math.round(ho * f2); doo = Math.round(doo * f2); ao = Math.round(ao * f2); }
-
-  var invH = 100 / ho, invD = 100 / doo, invA = 100 / ao;
+  var invH = 100/ho, invD = 100/doo, invA = 100/ao;
   var totalInv = invH + invD + invA;
-  var pH = invH / totalInv, pD = invD / totalInv, pA = invA / totalInv;
-
+  var pH = invH/totalInv, pD = invD/totalInv, pA = invA/totalInv;
   var boost = CALIBRATION.FAVORITE_BOOST;
-  if (ho < ao) { pH *= (1 + boost); pA *= (1 - boost); }
-  else if (ao < ho) { pA *= (1 + boost); pH *= (1 - boost); }
+  if (ho < ao) { pH *= (1+boost); pA *= (1-boost); }
+  else if (ao < ho) { pA *= (1+boost); pH *= (1-boost); }
   var t1 = pH + pD + pA; pH /= t1; pD /= t1; pA /= t1;
-
   if (ho >= CALIBRATION.DRAW_LOW && ho <= CALIBRATION.DRAW_HIGH) {
     pD *= CALIBRATION.DRAW_BOOST;
     var t2 = pH + pD + pA; pH /= t2; pD /= t2; pA /= t2;
   }
-
   var r = Math.random();
   var result;
   if (r < pH) result = "H";
   else if (r < pH + pD) result = "D";
   else result = "A";
-
-  return { hw: hw, dw: dw, aw: aw, ho: ho, doo: doo, ao: ao, result: result };
+  return { hw:hw, dw:dw, aw:aw, ho:ho, doo:doo, ao:ao, result:result };
 }
 
 function displayMatch(m) {
@@ -1631,24 +1289,24 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
     + '　|　' + (t.gameYourGuess || '你的選擇') + '：' + guessText + '</small>';
 }
 
-// ==================== Tier 系統 ====================
+// ==================== Tier ====================
 function getTier(rate) {
-  if (rate >= 70)   return { tier: 'EX', descKey: 'tierEX' };
-  if (rate >= 67.5) return { tier: 'S+', descKey: 'tierS' };
-  if (rate >= 65)   return { tier: 'S',  descKey: 'tierS' };
-  if (rate >= 62.5) return { tier: 'S-', descKey: 'tierS' };
-  if (rate >= 60)   return { tier: 'A+', descKey: 'tierA' };
-  if (rate >= 57.5) return { tier: 'A',  descKey: 'tierA' };
-  if (rate >= 55)   return { tier: 'A-', descKey: 'tierA' };
-  if (rate >= 52.5) return { tier: 'C+', descKey: 'tierC' };
-  if (rate >= 50)   return { tier: 'C',  descKey: 'tierC' };
-  if (rate >= 47.5) return { tier: 'C-', descKey: 'tierC' };
-  if (rate >= 45)   return { tier: 'D+', descKey: 'tierD' };
-  if (rate >= 42.5) return { tier: 'D',  descKey: 'tierD' };
-  if (rate >= 40)   return { tier: 'D-', descKey: 'tierD' };
-  if (rate >= 37.5) return { tier: 'E+', descKey: 'tierE' };
-  if (rate > 35)    return { tier: 'E',  descKey: 'tierE' };
-  return { tier: 'E-', descKey: 'tierE' };
+  if (rate >= 70)   return { tier:'EX', descKey:'tierEX' };
+  if (rate >= 67.5) return { tier:'S+', descKey:'tierS' };
+  if (rate >= 65)   return { tier:'S',  descKey:'tierS' };
+  if (rate >= 62.5) return { tier:'S-', descKey:'tierS' };
+  if (rate >= 60)   return { tier:'A+', descKey:'tierA' };
+  if (rate >= 57.5) return { tier:'A',  descKey:'tierA' };
+  if (rate >= 55)   return { tier:'A-', descKey:'tierA' };
+  if (rate >= 52.5) return { tier:'C+', descKey:'tierC' };
+  if (rate >= 50)   return { tier:'C',  descKey:'tierC' };
+  if (rate >= 47.5) return { tier:'C-', descKey:'tierC' };
+  if (rate >= 45)   return { tier:'D+', descKey:'tierD' };
+  if (rate >= 42.5) return { tier:'D',  descKey:'tierD' };
+  if (rate >= 40)   return { tier:'D-', descKey:'tierD' };
+  if (rate >= 37.5) return { tier:'E+', descKey:'tierE' };
+  if (rate > 35)    return { tier:'E',  descKey:'tierE' };
+  return { tier:'E-', descKey:'tierE' };
 }
 
 function updateTierDisplay(withAnimation) {
@@ -1663,24 +1321,187 @@ function updateTierDisplay(withAnimation) {
   var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
 
   var colorMap = {
-    'EX': { color: '#c084fc', bg: 'rgba(192,132,252,0.18)', border: 'rgba(192,132,252,0.65)', shadow: '0 0 50px rgba(192,132,252,0.6)', isEX: true },
-    'S+': { color: '#FFD700', bg: 'rgba(255,215,0,0.15)', border: 'rgba(255,215,0,0.75)', shadow: '0 0 40px rgba(255,215,0,0.55)' },
-    'S':  { color: '#FFD700', bg: 'rgba(255,215,0,0.15)', border: 'rgba(255,215,0,0.75)', shadow: '0 0 40px rgba(255,215,0,0.55)' },
-    'S-': { color: '#FFD700', bg: 'rgba(255,215,0,0.15)', border: 'rgba(255,215,0,0.75)', shadow: '0 0 40px rgba(255,215,0,0.55)' },
-    'A+': { color: '#60a5fa', bg: 'rgba(96,165,250,0.18)', border: 'rgba(96,165,250,0.65)', shadow: '0 0 25px rgba(96,165,250,0.3)' },
-    'A':  { color: '#60a5fa', bg: 'rgba(96,165,250,0.18)', border: 'rgba(96,165,250,0.65)', shadow: '0 0 25px rgba(96,165,250,0.3)' },
-    'A-': { color: '#60a5fa', bg: 'rgba(96,165,250,0.18)', border: 'rgba(96,165,250,0.65)', shadow: '0 0 25px rgba(96,165,250,0.3)' },
-    'C+': { color: '#fbbf24', bg: 'rgba(251,191,36,0.18)', border: 'rgba(251,191,36,0.65)', shadow: '0 0 18px rgba(251,191,36,0.2)' },
-    'C':  { color: '#fbbf24', bg: 'rgba(251,191,36,0.18)', border: 'rgba(251,191,36,0.65)', shadow: '0 0 18px rgba(251,191,36,0.2)' },
-    'C-': { color: '#fbbf24', bg: 'rgba(251,191,36,0.18)', border: 'rgba(251,191,36,0.65)', shadow: '0 0 18px rgba(251,191,36,0.2)' },
-    'D+': { color: '#f87171', bg: 'rgba(248,113,113,0.18)', border: 'rgba(248,113,113,0.65)', shadow: '0 0 15px rgba(248,113,113,0.2)' },
-    'D':  { color: '#f87171', bg: 'rgba(248,113,113,0.18)', border: 'rgba(248,113,113,0.65)', shadow: '0 0 15px rgba(248,113,113,0.2)' },
-    'D-': { color: '#f87171', bg: 'rgba(248,113,113,0.18)', border: 'rgba(248,113,113,0.65)', shadow: '0 0 15px rgba(248,113,113,0.2)' },
-    'E+': { color: '#9ca3af', bg: 'rgba(156,163,175,0.18)', border: 'rgba(156,163,175,0.65)', shadow: 'none' },
-    'E':  { color: '#9ca3af', bg: 'rgba(156,163,175,0.18)', border: 'rgba(156,163,175,0.65)', shadow: 'none' },
-    'E-': { color: '#9ca3af', bg: 'rgba(156,163,175,0.18)', border: 'rgba(156,163,175,0.65)', shadow: 'none' }
+    'EX': { color:'#c084fc', bg:'rgba(192,132,252,0.18)', border:'rgba(192,132,252,0.65)', shadow:'0 0 50px rgba(192,132,252,0.6)', isEX:true },
+    'S+': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'S':  { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'S-': { color:'#FFD700', bg:'rgba(255,215,0,0.15)', border:'rgba(255,215,0,0.75)', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'A+': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
+    'A':  { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
+    'A-': { color:'#60a5fa', bg:'rgba(96,165,250,0.18)', border:'rgba(96,165,250,0.65)', shadow:'0 0 25px rgba(96,165,250,0.3)' },
+    'C+': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
+    'C':  { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
+    'C-': { color:'#fbbf24', bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.65)', shadow:'0 0 18px rgba(251,191,36,0.2)' },
+    'D+': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
+    'D':  { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
+    'D-': { color:'#f87171', bg:'rgba(248,113,113,0.18)', border:'rgba(248,113,113,0.65)', shadow:'0 0 15px rgba(248,113,113,0.2)' },
+    'E+': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
+    'E':  { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' },
+    'E-': { color:'#9ca3af', bg:'rgba(156,163,175,0.18)', border:'rgba(156,163,175,0.65)', shadow:'none' }
   };
   var style = colorMap[tier.tier] || colorMap['E'];
 
   badgeEl.style.display = 'inline-block';
-  badgeEl.style.padding = '18px
+  badgeEl.style.padding = '18px 42px';
+  badgeEl.style.borderRadius = '16px';
+  badgeEl.style.fontSize = '52px';
+  badgeEl.style.fontWeight = '900';
+  badgeEl.style.letterSpacing = '3px';
+  badgeEl.style.lineHeight = '1';
+  badgeEl.style.minWidth = '150px';
+  badgeEl.style.fontFamily = "'Segoe UI', -apple-system, sans-serif";
+  badgeEl.style.border = '2px solid ' + style.border;
+  badgeEl.style.boxShadow = style.shadow;
+  badgeEl.textContent = tier.tier;
+  badgeEl.setAttribute('data-tier', tier.tier);
+
+  if (style.isEX) {
+    badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
+    badgeEl.style.backgroundSize = '400% 400%';
+    badgeEl.style.color = '#fff';
+    badgeEl.style.textShadow = '0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9';
+    badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
+  } else if (tier.tier.indexOf('S') === 0) {
+    badgeEl.style.background = style.bg;
+    badgeEl.style.color = style.color;
+    badgeEl.style.textShadow = '0 0 15px ' + style.color + ', 0 0 30px ' + style.color + ', 0 2px 12px ' + style.color;
+    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+  } else {
+    badgeEl.style.background = style.bg;
+    badgeEl.style.color = style.color;
+    badgeEl.style.textShadow = '0 2px 12px ' + style.color;
+    if (isNewTier || !badgeEl.style.animation) badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+  }
+
+  descEl.style.fontSize = '14px';
+  descEl.style.marginTop = '12px';
+  descEl.style.fontWeight = 'bold';
+  descEl.style.letterSpacing = '0.5px';
+  descEl.style.color = style.isEX ? '#c084fc' : style.color;
+  descEl.textContent = t[tier.descKey] || '';
+
+  tierEl.style.display = 'block';
+  tierEl.style.textAlign = 'center';
+  tierEl.style.marginBottom = '20px';
+  tierEl.style.padding = '20px 15px';
+  tierEl.style.borderRadius = '14px';
+  tierEl.style.background = 'var(--bg-panel)';
+  tierEl.style.border = '1px solid var(--border-color)';
+
+  if (withAnimation && isNewTier) {
+    badgeEl.style.animation = 'tierPop 0.6s ease-out, ' + (style.isEX ? 'tierEXGradient 2s ease infinite, ' : '') + 'tierPulse 2.5s ease-in-out 0.6s infinite';
+    setTimeout(function() {
+      if (style.isEX) badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
+      else badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
+    }, 700);
+  }
+}
+
+// ==================== 綁定所有事件（使用 addEventListener 更可靠）====================
+window.addEventListener('load', function() {
+  // 主題初始化
+  var savedTheme = 'dark';
+  try { savedTheme = localStorage.getItem('qfp_theme') || 'dark'; } catch(e) {}
+  applyTheme(savedTheme);
+
+  // 主題切換按鈕
+  var themeBtn = document.getElementById('themeSwitcher');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+  // 語言切換
+  var langSel = document.getElementById('langSelect');
+  if (langSel) langSel.addEventListener('change', function() { changeLang(this.value); });
+
+  // 滾動隱藏
+  window.addEventListener('scroll', handleTopBtnsScroll, { passive: true });
+  window.addEventListener('touchmove', handleTopBtnsScroll, { passive: true });
+  handleTopBtnsScroll();
+
+  // 條款滾動
+  var s = document.getElementById('termsScroll');
+  if (s) {
+    s.addEventListener('scroll', updateAgreeBtnVisual);
+    s.addEventListener('touchmove', updateAgreeBtnVisual);
+    s.addEventListener('touchend', updateAgreeBtnVisual);
+    s.addEventListener('wheel', updateAgreeBtnVisual, { passive: true });
+    setTimeout(function() {
+      if (s.scrollHeight <= s.clientHeight + 200) {
+        var btn = document.getElementById('agreeBtn');
+        if (btn) btn.classList.add('active');
+        updateAgreeBtnText();
+      }
+    }, 300);
+    setInterval(function() {
+      if (s.scrollTop + s.clientHeight >= s.scrollHeight - 200) {
+        var btn = document.getElementById('agreeBtn');
+        if (btn && !btn.classList.contains('active')) {
+          btn.classList.add('active');
+          updateAgreeBtnText();
+        }
+      }
+    }, 400);
+  }
+  window.addEventListener('resize', updateAgreeBtnVisual);
+  updateAgreeBtnText();
+
+  // 同意按鈕
+  var agreeBtn = document.getElementById('agreeBtn');
+  if (agreeBtn) agreeBtn.addEventListener('click', handleAgree);
+
+  // 輸入框
+  ['hw','dw','aw'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '');
+      checkClearBtn();
+    });
+  });
+  ['ho','doo','ao'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() { formatOddsInput(this); checkClearBtn(); });
+      el.addEventListener('blur', function() { formatOddsOnBlur(this); });
+    }
+  });
+
+  // 計算 / 清除
+  var calcBtn = document.getElementById('calcBtn');
+  if (calcBtn) calcBtn.addEventListener('click', calculate);
+  var clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) clearBtn.addEventListener('click', clearData);
+
+  // 猜賽果按鈕
+  var gbtnH = document.getElementById('gbtnH');
+  if (gbtnH) gbtnH.addEventListener('click', function() { gameGuess('H'); });
+  var gbtnD = document.getElementById('gbtnD');
+  if (gbtnD) gbtnD.addEventListener('click', function() { gameGuess('D'); });
+  var gbtnA = document.getElementById('gbtnA');
+  if (gbtnA) gbtnA.addEventListener('click', function() { gameGuess('A'); });
+  var gbtnAuto = document.getElementById('gbtnAuto');
+  if (gbtnAuto) gbtnAuto.addEventListener('click', gameAutoPredict);
+  var gbtnDev = document.getElementById('gbtnDev');
+  if (gbtnDev) gbtnDev.addEventListener('click', devAutoPredict);
+  var gbtnSkip = document.getElementById('gbtnSkip');
+  if (gbtnSkip) gbtnSkip.addEventListener('click', gameSkip);
+  var gbtnNew = document.getElementById('gameNewBtn');
+  if (gbtnNew) gbtnNew.addEventListener('click', gameNewRound);
+
+  // 開發者
+  var devUnlockBtn = document.getElementById('devUnlockBtn');
+  if (devUnlockBtn) devUnlockBtn.addEventListener('click', devUnlock);
+  var devApplyBtn = document.getElementById('devApplyBtn');
+  if (devApplyBtn) devApplyBtn.addEventListener('click', applyParams);
+  var devResetBtn = document.getElementById('devResetBtn');
+  if (devResetBtn) devResetBtn.addEventListener('click', resetParams);
+
+  // 初始化
+  applyLanguage('zh-HK');
+  checkClearBtn();
+  loadSavedParams();
+  loadStatsWithRetry();
+  setInterval(loadStatsWithRetry, 15000);
+  window.addEventListener('focus', loadStatsWithRetry);
+  document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
+});
+</script>
+</body>
+</html>
