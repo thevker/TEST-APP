@@ -111,6 +111,17 @@
   :root[data-theme="dark"] .game-stat-value.positive { color: #4ade80; }
   :root[data-theme="dark"] .game-stat-value.negative { color: #f87171; }
   .game-stat-value.neutral { color: var(--text-primary); }
+
+  /* 跳過按鈕樣式 */
+  .game-skip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .game-skip-btn { flex: 1; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.5); }
+  .game-skip-btn:hover:not(:disabled) { background: rgba(156, 163, 175, 0.25); }
+  .game-skip-btn:active:not(:disabled) { transform: scale(0.97); }
+  .game-skip-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  :root[data-theme="dark"] .game-skip-btn { color: #d1d5db; }
+  .game-skip-info { flex: 0 0 auto; font-size: 12px; font-weight: bold; color: var(--text-secondary); padding: 6px 10px; background: var(--bg-stat); border-radius: 6px; min-width: 70px; text-align: center; white-space: nowrap; }
+  .game-skip-info.exhausted { color: var(--text-muted); opacity: 0.7; }
+
   .game-match { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
   .game-match-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .game-match-row:last-child { margin-bottom: 0; }
@@ -135,6 +146,10 @@
   :root[data-theme="dark"] .game-lose { color: #f87171; }
   .game-new-btn { width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .game-new-btn:active { background: #0062cc; }
+
+  /* 說明框 */
+  .game-skip-help { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 12px; line-height: 1.5; padding: 8px 10px; background: var(--bg-panel); border-radius: 6px; border: 1px dashed var(--border-color); }
+
   @keyframes tierPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.15); } }
   @keyframes tierPop { 0% { transform: scale(1); } 40% { transform: scale(1.2) rotate(-3deg); } 70% { transform: scale(0.95) rotate(2deg); } 100% { transform: scale(1) rotate(0); } }
   @keyframes tierEXGradient {
@@ -431,6 +446,13 @@
       <button class="game-guess-btn guess-A" id="gbtnA" onclick="gameGuess('A')" data-i18n="resultAShort">客勝</button>
     </div>
 
+    <div class="game-skip-row">
+      <button class="game-skip-btn" id="gbtnSkip" onclick="gameSkip()" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
+      <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
+    </div>
+
+    <div class="game-skip-help" data-i18n="gameSkipHelp">💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次</div>
+
     <div id="gameResult" class="game-result-box"></div>
 
     <button class="game-new-btn" onclick="gameNewRound()" data-i18n="gameNewBtn">🎲 開始新一局</button>
@@ -537,7 +559,13 @@ const translations = {
     tierHint: '※ 猜 10 場以上才顯示等級',
     tierEX: '🏆 傳奇！神級預測！', tierS: '🔥 頂尖表現！繼續保持！',
     tierA: '⭐ 優秀！表現出色！', tierC: '📊 一般水平，仍有進步空間',
-    tierD: '⚠️ 需要改進，加油！', tierE: '💪 繼續努力！多練習！'
+    tierD: '⚠️ 需要改進，加油！', tierE: '💪 繼續努力！多練習！',
+    gameSkipBtn: '⏭️ 跳過本場',
+    gameSkipInfoPrefix: '剩 ',
+    gameSkipInfoSuffix: ' 次',
+    gameSkipHelp: '💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次',
+    gameSkipExhausted: '❌ 跳過次數已用完',
+    gameSkipToast: '⏭️ 已跳過本場'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明', statsTitle: '📊 历史数据统计',
@@ -583,7 +611,13 @@ const translations = {
     tierHint: '※ 猜 10 场以上才显示等级',
     tierEX: '🏆 传奇！神级预测！', tierS: '🔥 顶尖表现！继续保持！',
     tierA: '⭐ 优秀！表现出色！', tierC: '📊 一般水平，仍有进步空间',
-    tierD: '⚠️ 需要改进，加油！', tierE: '💪 继续努力！多练习！'
+    tierD: '⚠️ 需要改进，加油！', tierE: '💪 继续努力！多练习！',
+    gameSkipBtn: '⏭️ 跳过本场',
+    gameSkipInfoPrefix: '剩 ',
+    gameSkipInfoSuffix: ' 次',
+    gameSkipHelp: '💡 每场随机生成，预设 2 次跳过机会，每玩 10 场 +1 次',
+    gameSkipExhausted: '❌ 跳过次数已用完',
+    gameSkipToast: '⏭️ 已跳过本场'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement', statsTitle: '📊 Historical Statistics',
@@ -629,7 +663,13 @@ const translations = {
     tierHint: '※ Play 10+ rounds to reveal your rank',
     tierEX: '🏆 Legendary! Godlike predictions!', tierS: '🔥 Top-tier performance! Keep it up!',
     tierA: '⭐ Excellent! Outstanding performance!', tierC: '📊 Average, room to improve',
-    tierD: '⚠️ Needs improvement, keep going!', tierE: '💪 Keep practicing! You\'ll get there!'
+    tierD: '⚠️ Needs improvement, keep going!', tierE: '💪 Keep practicing! You\'ll get there!',
+    gameSkipBtn: '⏭️ Skip Match',
+    gameSkipInfoPrefix: 'Left ',
+    gameSkipInfoSuffix: '',
+    gameSkipHelp: '💡 Each match is random. Default 2 skips, +1 every 10 plays',
+    gameSkipExhausted: '❌ No skips left',
+    gameSkipToast: '⏭️ Match skipped'
   }
 };
 
@@ -709,6 +749,7 @@ function applyLanguage(lang) {
   if (gameState && gameState.lastGuess && gameState.current) renderGameResult(gameState.lastGuess, false);
   updateTierDisplay(false);
   updatePnlDisplay();
+  updateSkipDisplay();
   if (window._lastResult) {
     const r = window._lastResult;
     let text = "";
@@ -893,8 +934,34 @@ var gameState = {
   hits: 0,
   waiting: false,
   lastGuess: null,
-  totalPnl: 0
+  totalPnl: 0,
+  skipsUsed: 0
 };
+
+function getMaxSkips() {
+  // 預設 2 次，每玩 10 場 +1 次
+  return 2 + Math.floor(gameState.played / 10);
+}
+
+function getRemainingSkips() {
+  return getMaxSkips() - gameState.skipsUsed;
+}
+
+function updateSkipDisplay() {
+  var infoEl = document.getElementById('gameSkipInfo');
+  var btn = document.getElementById('gbtnSkip');
+  if (!infoEl) return;
+  var t = translations[currentLang];
+  var remaining = getRemainingSkips();
+  infoEl.textContent = (t.gameSkipInfoPrefix || '剩 ') + remaining + (t.gameSkipInfoSuffix || ' 次');
+  if (remaining <= 0) {
+    infoEl.classList.add('exhausted');
+    if (btn) btn.disabled = true;
+  } else {
+    infoEl.classList.remove('exhausted');
+    if (btn) btn.disabled = false;
+  }
+}
 
 function generateMatch() {
   var r1 = Math.random(), r2 = Math.random();
@@ -950,6 +1017,45 @@ function gameNewRound() {
     b.disabled = false;
     b.style.opacity = '1';
   });
+  updateSkipDisplay();
+}
+
+// 跳過本場
+function gameSkip() {
+  if (!gameState.waiting || !gameState.current) return;
+  var remaining = getRemainingSkips();
+  if (remaining <= 0) {
+    var t = translations[currentLang];
+    // 顯示提示（用結果框簡單顯示）
+    var resultBox = document.getElementById('gameResult');
+    resultBox.style.display = 'block';
+    resultBox.className = 'game-result-box game-lose';
+    resultBox.innerHTML = (t.gameSkipExhausted || '❌ 跳過次數已用完');
+    setTimeout(function() {
+      if (!gameState.waiting) resultBox.style.display = 'none';
+    }, 1500);
+    return;
+  }
+  
+  gameState.skipsUsed++;
+  
+  // 顯示 toast 效果
+  var t = translations[currentLang];
+  var resultBox = document.getElementById('gameResult');
+  resultBox.style.display = 'block';
+  resultBox.className = 'game-result-box';
+  resultBox.style.background = 'rgba(156,163,175,0.15)';
+  resultBox.style.color = 'var(--text-secondary)';
+  resultBox.style.border = '1px solid rgba(156,163,175,0.4)';
+  resultBox.innerHTML = (t.gameSkipToast || '⏭️ 已跳過本場');
+  
+  setTimeout(function() {
+    // 生成下一場
+    gameNewRound();
+    resultBox.style.display = 'none';
+  }, 400);
+  
+  updateSkipDisplay();
 }
 
 function gameGuess(guess) {
@@ -983,6 +1089,7 @@ function gameGuess(guess) {
   document.getElementById('gameRate').textContent = rate;
   updatePnlDisplay();
   updateTierDisplay(true);
+  updateSkipDisplay();
 }
 
 function updatePnlDisplay() {
@@ -1046,6 +1153,9 @@ function renderGameResult(guess, animate, roundPnl) {
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
   resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
+  resultBox.style.background = '';
+  resultBox.style.color = '';
+  resultBox.style.border = '';
   resultBox.innerHTML = (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
     + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
@@ -1119,7 +1229,6 @@ function updateTierDisplay(withAnimation) {
   badgeEl.textContent = tier.tier;
   badgeEl.setAttribute('data-tier', tier.tier);
   
-  // EX：幻彩漸變紫色；S 系列：金色；其他：普通
   if (style.isEX) {
     badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
     badgeEl.style.backgroundSize = '400% 400%';
