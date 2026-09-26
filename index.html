@@ -27,6 +27,23 @@
   @keyframes toastIn { from { opacity:0; transform:translateY(-20px) scale(.9); } to { opacity:1; transform:translateY(0) scale(1); } }
   @keyframes toastOut { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-20px) scale(.9); } }
 
+  /* ==================== 連勝彈出 ==================== */
+  .combo-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); z-index:9999999; pointer-events:none; display:none; }
+  .combo-popup.show { display:block; animation:comboBurst 2s ease-out forwards; }
+  .combo-inner { background:linear-gradient(135deg,#FF6B00,#FF3D00,#FF8C00); border:3px solid #FFD700; border-radius:22px; padding:22px 44px; box-shadow:0 0 40px rgba(255,100,0,0.85),0 0 80px rgba(255,200,0,0.55),inset 0 0 24px rgba(255,220,0,0.35); color:#fff; font-weight:900; text-shadow:0 0 10px #FFD700,0 0 22px #FF6B00,0 0 40px #FF3D00,0 2px 8px rgba(0,0,0,0.6); display:flex; align-items:center; gap:14px; white-space:nowrap; font-size:32px; line-height:1; font-family:'Segoe UI',-apple-system,sans-serif; }
+  .combo-fire { font-size:1.2em; display:inline-block; animation:fireFlicker 0.35s ease-in-out infinite alternate; }
+  .combo-text { font-size:1em; letter-spacing:2px; }
+  @keyframes fireFlicker { from { transform:scale(1) rotate(-4deg); } to { transform:scale(1.18) rotate(4deg); } }
+  @keyframes comboBurst {
+    0%   { transform:translate(-50%,-50%) scale(0) rotate(-20deg); opacity:0; }
+    25%  { transform:translate(-50%,-50%) scale(1.15) rotate(5deg); opacity:1; }
+    40%  { transform:translate(-50%,-50%) scale(0.95) rotate(-3deg); opacity:1; }
+    55%  { transform:translate(-50%,-50%) scale(1.05) rotate(2deg); opacity:1; }
+    70%  { transform:translate(-50%,-50%) scale(1) rotate(0); opacity:1; }
+    85%  { transform:translate(-50%,-50%) scale(1.03) rotate(0); opacity:1; }
+    100% { transform:translate(-50%,-50%) scale(1.08) rotate(0); opacity:0; }
+  }
+
   #termsPage { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; padding-top:60px; padding-bottom:40px; }
   .terms-container { background:var(--bg-card); color:var(--text-primary); border-radius:16px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.3); width:100%; max-width:400px; display:flex; flex-direction:column; max-height:80vh; }
   .terms-container h2 { text-align:center; margin:0 0 15px 0; color:var(--text-primary); font-size:20px; }
@@ -212,6 +229,15 @@
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- 連勝彈出 -->
+<div class="combo-popup" id="comboPopup">
+  <div class="combo-inner" id="comboInner">
+    <span class="combo-fire" id="comboFireL">🔥</span>
+    <span class="combo-text" id="comboText">連勝 x3 !!!</span>
+    <span class="combo-fire" id="comboFireR">🔥</span>
+  </div>
+</div>
 
 <div id="termsPage">
   <div class="terms-container">
@@ -501,6 +527,8 @@ var TIER_MIN_PLAYED = 20;
 var TIER_WEIGHT_HITRATE = 0.4;
 var TIER_WEIGHT_ROI = 0.6;
 
+var comboCount = 0;  // 連勝計數
+
 // ==================== Toast 提示系統 ====================
 function showToast(msg, type) {
   var container = document.getElementById('toastContainer');
@@ -512,6 +540,28 @@ function showToast(msg, type) {
   setTimeout(function() {
     toast.style.animation = 'toastOut .3s ease-in forwards';
     setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  }, 2000);
+}
+
+// ==================== 連勝彈出 ====================
+function showComboPopup(combo) {
+  var popup = document.getElementById('comboPopup');
+  var inner = document.getElementById('comboInner');
+  var textEl = document.getElementById('comboText');
+  if (!popup || !inner || !textEl) return;
+  var t = translations[currentLang];
+  var comboText = (t.comboStreak || '連勝 x') + combo + ' !!!';
+  textEl.textContent = comboText;
+  // 體積：x3 = 100%，每多一次 +10%，最高 +50% (150%)
+  var scale = 1 + Math.min(0.5, (combo - 3) * 0.1);
+  var baseSize = 32;
+  inner.style.fontSize = (baseSize * scale) + 'px';
+  // 重置動畫
+  popup.classList.remove('show');
+  void popup.offsetWidth;
+  popup.classList.add('show');
+  setTimeout(function() {
+    popup.classList.remove('show');
   }, 2000);
 }
 
@@ -586,6 +636,7 @@ const translations = {
     tierC:'📊 一般水平，仍有進步空間',
     tierD:'⚠️ 需要改進，加油！', tierE:'💪 繼續努力！多練習！',
     tierFormula:'綜合分數 = 命中率 × 40% + ROI × 60%',
+    comboStreak:'連勝 x',
     gameSkipBtn:'⏭️ 跳過本場', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
     gameSkipHelp:'💡 每場從資料庫真實數據隨機抽樣，預設 2 次跳過機會，每玩 10 場 +1 次',
     gameSkipExhausted:'❌ 跳過次數已用完', gameSkipToast:'⏭️ 已跳過本場',
@@ -658,6 +709,7 @@ const translations = {
     tierC:'📊 一般水平，仍有进步空间',
     tierD:'⚠️ 需要改进，加油！', tierE:'💪 继续努力！多练习！',
     tierFormula:'综合分数 = 命中率 × 40% + ROI × 60%',
+    comboStreak:'连胜 x',
     gameSkipBtn:'⏭️ 跳过本场', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
     gameSkipHelp:'💡 每场从数据库真实数据随机抽样，预设 2 次跳过机会，每玩 10 场 +1 次',
     gameSkipExhausted:'❌ 跳过次数已用完', gameSkipToast:'⏭️ 已跳过本场',
@@ -730,6 +782,7 @@ const translations = {
     tierC:'📊 Average, room to improve',
     tierD:'⚠️ Needs improvement, keep going!', tierE:'💪 Keep practicing! You\'ll get there!',
     tierFormula:'Score = Hit Rate × 40% + ROI × 60%',
+    comboStreak:'STREAK x',
     gameSkipBtn:'⏭️ Skip Match', gameSkipInfoPrefix:'Left ', gameSkipInfoSuffix:'',
     gameSkipHelp:'💡 Each match is randomly sampled from real database. Default 2 skips, +1 every 10 plays',
     gameSkipExhausted:'❌ No skips left', gameSkipToast:'⏭️ Match skipped',
@@ -1100,6 +1153,7 @@ function resetGameProgress() {
   gameState.current = null;
   gameState.waiting = false;
   gameState.lastGuess = null;
+  comboCount = 0;  // 重置連勝
   document.getElementById('gamePlayed').textContent = '0';
   document.getElementById('gameHits').textContent = '0';
   document.getElementById('gameRate').textContent = '—';
@@ -1386,7 +1440,15 @@ function performGuess(bet, isAuto) {
     roundPnl = Math.round(odds * 100 - 100);
   } else roundPnl = -100;
   gameState.played++;
-  if (isWin) gameState.hits++;
+  if (isWin) {
+    gameState.hits++;
+    comboCount++;
+    if (comboCount >= 3) {
+      showComboPopup(comboCount);
+    }
+  } else {
+    comboCount = 0;
+  }
   gameState.totalPnl += roundPnl;
   gameState.waiting = false;
   renderGameResult(bet, true, roundPnl, isAuto);
@@ -1434,7 +1496,15 @@ function devAutoPredict() {
   else odds = m.ao / 100;
   var roundPnl = isWin ? Math.round(odds * 100 - 100) : -100;
   gameState.played++;
-  if (isWin) gameState.hits++;
+  if (isWin) {
+    gameState.hits++;
+    comboCount++;
+    if (comboCount >= 3) {
+      showComboPopup(comboCount);
+    }
+  } else {
+    comboCount = 0;
+  }
   gameState.totalPnl += roundPnl;
   gameState.lastGuess = bet;
   renderGameResult(bet, true, roundPnl, true);
@@ -1515,7 +1585,7 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
   resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
   resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
-    + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
+    + '<small>' + pnlLabel + '（' + (t.gameStake || '註碼 $100') + '）<br>'
     + '📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
     + desc
     + scoreLine + '<br>'
@@ -1524,7 +1594,7 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
 }
 
 // ==================== Tier ====================
-// 🎯 新 Tier 門檻（19 級，含 B 級，每級差 2.5 分）
+// 🎯 19 級 Tier（含 B 級），單向漸變（淺→深順落，不循環）
 function getTier(rate) {
   if (rate >= 55)   return { tier:'EX', descKey:'tierEX' };
   if (rate >= 52.5) return { tier:'S+', descKey:'tierS' };
@@ -1562,27 +1632,27 @@ function updateTierDisplay(withAnimation) {
   var detailEl = document.getElementById('tierDetail');
   var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
 
-  // 🎨 每個 Tier 專屬漸變色系（全部有漸變 + 發光）
+  // 🎨 單向漸變（淺→深順落），EX 保留原漸變
   var colorMap = {
     'EX': { grad:'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)', color:'#fff', glow:'0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9', shadow:'0 0 50px rgba(192,132,252,0.6)' },
-    'S+': { grad:'linear-gradient(135deg, #FFD700, #FFA500, #FFED4E, #FFD700, #FFA500)', color:'#fff', glow:'0 0 18px #FFD700, 0 0 36px #FFA500, 0 2px 12px #FFD700', shadow:'0 0 45px rgba(255,215,0,0.6)' },
-    'S':  { grad:'linear-gradient(135deg, #FFD700, #FFB347, #FFED4E, #FFD700)', color:'#fff', glow:'0 0 16px #FFD700, 0 0 32px #FFB347, 0 2px 10px #FFD700', shadow:'0 0 40px rgba(255,215,0,0.55)' },
-    'S-': { grad:'linear-gradient(135deg, #FFC700, #FF9E2C, #FFD97A, #FFC700)', color:'#fff', glow:'0 0 14px #FFC700, 0 0 28px #FF9E2C, 0 2px 8px #FFC700', shadow:'0 0 35px rgba(255,199,0,0.55)' },
-    'A+': { grad:'linear-gradient(135deg, #60a5fa, #3b82f6, #93c5fd, #60a5fa)', color:'#fff', glow:'0 0 16px #60a5fa, 0 0 32px #3b82f6, 0 2px 10px #60a5fa', shadow:'0 0 35px rgba(96,165,250,0.6)' },
-    'A':  { grad:'linear-gradient(135deg, #4f9df7, #2563eb, #82b9ff, #4f9df7)', color:'#fff', glow:'0 0 14px #4f9df7, 0 0 28px #2563eb, 0 2px 8px #4f9df7', shadow:'0 0 30px rgba(79,157,247,0.55)' },
-    'A-': { grad:'linear-gradient(135deg, #3b82f6, #1d4ed8, #60a5fa, #3b82f6)', color:'#fff', glow:'0 0 12px #3b82f6, 0 0 24px #1d4ed8, 0 2px 6px #3b82f6', shadow:'0 0 25px rgba(59,130,246,0.55)' },
-    'B+': { grad:'linear-gradient(135deg, #22d3ee, #06b6d4, #67e8f9, #22d3ee)', color:'#fff', glow:'0 0 16px #22d3ee, 0 0 32px #06b6d4, 0 2px 10px #22d3ee', shadow:'0 0 30px rgba(34,211,238,0.55)' },
-    'B':  { grad:'linear-gradient(135deg, #14b8a6, #0d9488, #5eead4, #14b8a6)', color:'#fff', glow:'0 0 14px #14b8a6, 0 0 28px #0d9488, 0 2px 8px #14b8a6', shadow:'0 0 25px rgba(20,184,166,0.55)' },
-    'B-': { grad:'linear-gradient(135deg, #10b981, #059669, #6ee7b7, #10b981)', color:'#fff', glow:'0 0 12px #10b981, 0 0 24px #059669, 0 2px 6px #10b981', shadow:'0 0 22px rgba(16,185,129,0.5)' },
-    'C+': { grad:'linear-gradient(135deg, #fbbf24, #f59e0b, #fcd34d, #fbbf24)', color:'#fff', glow:'0 0 14px #fbbf24, 0 0 28px #f59e0b, 0 2px 8px #fbbf24', shadow:'0 0 25px rgba(251,191,36,0.5)' },
-    'C':  { grad:'linear-gradient(135deg, #f59e0b, #d97706, #fbbf24, #f59e0b)', color:'#fff', glow:'0 0 12px #f59e0b, 0 0 24px #d97706, 0 2px 6px #f59e0b', shadow:'0 0 22px rgba(245,158,11,0.5)' },
-    'C-': { grad:'linear-gradient(135deg, #ea580c, #c2410c, #fb923c, #ea580c)', color:'#fff', glow:'0 0 10px #ea580c, 0 0 20px #c2410c, 0 2px 6px #ea580c', shadow:'0 0 20px rgba(234,88,12,0.5)' },
-    'D+': { grad:'linear-gradient(135deg, #f87171, #ef4444, #fca5a5, #f87171)', color:'#fff', glow:'0 0 14px #f87171, 0 0 28px #ef4444, 0 2px 8px #f87171', shadow:'0 0 22px rgba(248,113,113,0.5)' },
-    'D':  { grad:'linear-gradient(135deg, #ef4444, #dc2626, #f87171, #ef4444)', color:'#fff', glow:'0 0 12px #ef4444, 0 0 24px #dc2626, 0 2px 6px #ef4444', shadow:'0 0 20px rgba(239,68,68,0.5)' },
-    'D-': { grad:'linear-gradient(135deg, #dc2626, #991b1b, #ef4444, #dc2626)', color:'#fff', glow:'0 0 10px #dc2626, 0 0 20px #991b1b, 0 2px 6px #dc2626', shadow:'0 0 18px rgba(220,38,38,0.5)' },
-    'E+': { grad:'linear-gradient(135deg, #9ca3af, #6b7280, #d1d5db, #9ca3af)', color:'#fff', glow:'0 0 12px #9ca3af, 0 0 24px #6b7280, 0 2px 6px #9ca3af', shadow:'0 0 18px rgba(156,163,175,0.5)' },
-    'E':  { grad:'linear-gradient(135deg, #6b7280, #4b5563, #9ca3af, #6b7280)', color:'#fff', glow:'0 0 10px #6b7280, 0 0 20px #4b5563, 0 2px 6px #6b7280', shadow:'0 0 15px rgba(107,114,128,0.5)' },
-    'E-': { grad:'linear-gradient(135deg, #4b5563, #374151, #6b7280, #4b5563)', color:'#fff', glow:'0 0 8px #4b5563, 0 0 16px #374151, 0 2px 4px #4b5563', shadow:'0 0 15px rgba(75,85,99,0.5)' }
+    'S+': { grad:'linear-gradient(135deg, #FFE44E, #FFD700, #FFB800)', color:'#fff', glow:'0 0 18px #FFE44E, 0 0 36px #FFB800, 0 2px 12px #FFD700', shadow:'0 0 45px rgba(255,215,0,0.6)' },
+    'S':  { grad:'linear-gradient(135deg, #FFD700, #FFC107, #FFA500)', color:'#fff', glow:'0 0 16px #FFD700, 0 0 32px #FFA500, 0 2px 10px #FFC107', shadow:'0 0 40px rgba(255,215,0,0.55)' },
+    'S-': { grad:'linear-gradient(135deg, #FFC700, #FFB300, #FF9500)', color:'#fff', glow:'0 0 14px #FFC700, 0 0 28px #FF9500, 0 2px 8px #FFB300', shadow:'0 0 35px rgba(255,199,0,0.55)' },
+    'A+': { grad:'linear-gradient(135deg, #93c5fd, #60a5fa, #3b82f6)', color:'#fff', glow:'0 0 16px #93c5fd, 0 0 32px #3b82f6, 0 2px 10px #60a5fa', shadow:'0 0 35px rgba(96,165,250,0.6)' },
+    'A':  { grad:'linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb)', color:'#fff', glow:'0 0 14px #60a5fa, 0 0 28px #2563eb, 0 2px 8px #3b82f6', shadow:'0 0 30px rgba(79,157,247,0.55)' },
+    'A-': { grad:'linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8)', color:'#fff', glow:'0 0 12px #3b82f6, 0 0 24px #1d4ed8, 0 2px 6px #2563eb', shadow:'0 0 25px rgba(59,130,246,0.55)' },
+    'B+': { grad:'linear-gradient(135deg, #67e8f9, #22d3ee, #06b6d4)', color:'#fff', glow:'0 0 16px #67e8f9, 0 0 32px #06b6d4, 0 2px 10px #22d3ee', shadow:'0 0 30px rgba(34,211,238,0.55)' },
+    'B':  { grad:'linear-gradient(135deg, #5eead4, #14b8a6, #0d9488)', color:'#fff', glow:'0 0 14px #5eead4, 0 0 28px #0d9488, 0 2px 8px #14b8a6', shadow:'0 0 25px rgba(20,184,166,0.55)' },
+    'B-': { grad:'linear-gradient(135deg, #6ee7b7, #10b981, #059669)', color:'#fff', glow:'0 0 12px #6ee7b7, 0 0 24px #059669, 0 2px 6px #10b981', shadow:'0 0 22px rgba(16,185,129,0.5)' },
+    'C+': { grad:'linear,-gradient(135deg, #fcd34d, #fbbf24, #f59e0b)', color:'#fff', glow:'0 0 14px #fcd34d, 0 0 28px #f59e0b, 0 2px 8px #fbbf24', shadow:'0 0 25px rgba(251,191,36,0.5)' },
+    'C':  { grad:'linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)', color:'#fff', glow:'0 0 12px #fbbf24, 0 0 24px #d97706, 0 2px 6px #f59e0b', shadow:'0 0 22px rgba(245,158,11,0.5)' },
+    'C-': { grad:'linear-gradient(135deg, #fb923c, #ea580c, #c2410c)', color:'#fff', glow:'0 0 10px #fb923c, 0 0 20px #c2410c, 0 2px 6px #ea580c', shadow:'0 0 20px rgba(234,88,12,0.5)' },
+    'D+': { grad:'linear-gradient(135deg, #fca5a5, #f87171, #ef4444)', color:'#fff', glow:'0 0 14px #fca5a5, 0 0 28px #ef4444, 0 2px 8px #f87171', shadow:'0 0 22px rgba(248,113,113,0.5)' },
+    'D':  { grad:'linear-gradient(135deg, #f87171, #ef4444, #dc2626)', color:'#fff', glow:'0 0 12px #f87171, 0 0 24px #dc2626, 0 2px 6px #ef4444', shadow:'0 0 20px rgba(239,68,68,0.5)' },
+    'D-': { grad:'linear-gradient(135deg, #ef4444, #dc2626, #991b1b)', color:'#fff', glow:'0 0 10px #ef4444, 0 0 20px #991b1b, 0 2px 6px #dc2626', shadow:'0 0 18px rgba(220,38,38,0.5)' },
+    'E+': { grad:'linear-gradient(135deg, #d1d5db, #9ca3af, #6b7280)', color:'#fff', glow:'0 0 12px #d1d5db, 0 0 24px #6b7280, 0 2px 6px #9ca3af', shadow:'0 0 18px rgba(156,163,175,0.5)' },
+    'E':  { grad:'linear-gradient(135deg, #9ca3af, #6b7280, #4b5563)', color:'#fff', glow:'0 0 10px #9ca3af, 0 0 20px #4b5563, 0 2px 6px #6b7280', shadow:'0 0 15px rgba(107,114,128,0.5)' },
+    'E-': { grad:'linear-gradient(135deg, #6b7280, #4b5563, #374151)', color:'#fff', glow:'0 0 8px #6b7280, 0 0 16px #374151, 0 2px 4px #4b5563', shadow:'0 0 15px rgba(75,85,99,0.5)' }
   };
   var style = colorMap[tier.tier] || colorMap['E-'];
 
@@ -1603,7 +1673,7 @@ function updateTierDisplay(withAnimation) {
   badgeEl.style.border = '2px solid rgba(255,255,255,0.35)';
   badgeEl.textContent = tier.tier;
   badgeEl.setAttribute('data-tier', tier.tier);
-  badgeEl.style.animation = 'tierEXGradient 3s ease infinite, tierPulse 2.5s ease-in-out infinite';
+  badgeEl.style.animation = 'tierEXGradient 3s ease infinite tierPulse 2.5s ease-in-out infinite';
 
   descEl.style.fontSize = '14px';
   descEl.style.marginTop = '12px';
