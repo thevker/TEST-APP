@@ -29,9 +29,9 @@
     --scroll-thumb: #c0c0c0;
   }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-primary); margin: 0; padding: 0; min-height: 100vh; transition: background-color 0.3s; }
-  .theme-switcher { position: fixed; top: 12px; left: max(20px, calc(50% - 200px)); z-index: 9999; background: var(--bg-switcher); border: 1px solid var(--border-switcher); border-radius: 8px; height: 32px; padding: 0 12px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; color: var(--text-primary); font-size: 16px; line-height: 1; cursor: pointer; backdrop-filter: blur(10px); user-select: none; -webkit-tap-highlight-color: transparent; transition: opacity 0.3s, background 0.3s; }
+  .theme-switcher { position: fixed; top: 12px; left: 12px; z-index: 9999; background: var(--bg-switcher); border: 1px solid var(--border-switcher); border-radius: 8px; height: 32px; padding: 0 12px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; color: var(--text-primary); font-size: 16px; line-height: 1; cursor: pointer; backdrop-filter: blur(10px); user-select: none; -webkit-tap-highlight-color: transparent; transition: opacity 0.3s, background 0.3s; }
   .theme-switcher:active { opacity: 0.7; }
-  .lang-switcher { position: fixed; top: 12px; right: max(20px, calc(50% - 200px)); z-index: 9999; background: var(--bg-switcher); border: 1px solid var(--border-switcher); border-radius: 8px; height: 32px; padding: 0 10px; display: flex; align-items: center; box-sizing: border-box; color: var(--text-primary); font-size: 13px; cursor: pointer; backdrop-filter: blur(10px); transition: opacity 0.3s, background 0.3s; }
+  .lang-switcher { position: fixed; top: 12px; right: 12px; z-index: 9999; background: var(--bg-switcher); border: 1px solid var(--border-switcher); border-radius: 8px; height: 32px; padding: 0 10px; display: flex; align-items: center; box-sizing: border-box; color: var(--text-primary); font-size: 13px; cursor: pointer; backdrop-filter: blur(10px); transition: opacity 0.3s, background 0.3s; }
   .lang-switcher select { background: transparent; color: var(--text-secondary); border: none; outline: none; font-size: 13px; cursor: pointer; font-weight: bold; height: 100%; }
   .lang-switcher select option { background: var(--bg-body); color: var(--text-primary); }
   .theme-switcher.hidden, .lang-switcher.hidden { opacity: 0; pointer-events: none; }
@@ -146,6 +146,7 @@
     background: rgba(34, 197, 94, 0.05);
     border: 2px dashed rgba(34, 197, 94, 0.4);
     border-radius: 10px;
+    transition: padding 0.3s;
   }
   .dev-panel.show { display: block; }
   .dev-panel-title {
@@ -155,6 +156,7 @@
     text-align: center;
     margin-bottom: 12px;
     letter-spacing: 1px;
+    transition: font-size 0.3s, margin-bottom 0.3s;
   }
   .dev-layer {
     background: var(--bg-panel);
@@ -162,6 +164,7 @@
     border-radius: 8px;
     padding: 10px;
     margin-bottom: 10px;
+    transition: padding 0.3s, margin-bottom 0.3s;
   }
   .dev-layer-title {
     font-size: 12px;
@@ -170,11 +173,13 @@
     margin-bottom: 8px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--border-color);
+    transition: font-size 0.3s, margin-bottom 0.3s, padding-bottom 0.3s;
   }
   .dev-param-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    transition: gap 0.3s;
   }
   .dev-param-item { display: flex; flex-direction: column; }
   .dev-param-item label {
@@ -182,6 +187,7 @@
     color: var(--text-tertiary);
     margin-bottom: 3px;
     font-weight: bold;
+    transition: font-size 0.3s, margin-bottom 0.3s;
   }
   .dev-param-item input {
     width: 100%;
@@ -193,16 +199,53 @@
     color: var(--text-primary);
     outline: none;
     font-family: monospace;
+    transition: padding 0.3s, font-size 0.3s;
   }
   .dev-param-item input:focus {
     border-color: #22c55e;
     background: var(--bg-input-focus);
   }
+
+  /* 縮小模式 */
+  .dev-panel.compact {
+    padding: 8px;
+    margin-top: 10px;
+  }
+  .dev-panel.compact .dev-panel-title {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .dev-panel.compact .dev-layer {
+    padding: 5px 8px;
+    margin-bottom: 5px;
+  }
+  .dev-panel.compact .dev-layer-title {
+    font-size: 9px;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
+  }
+  .dev-panel.compact .dev-param-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 4px;
+  }
+  .dev-panel.compact .dev-param-item label {
+    font-size: 8px;
+    margin-bottom: 1px;
+  }
+  .dev-panel.compact .dev-param-item input {
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+
   .dev-btn-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-top: 10px;
+    transition: margin-top 0.3s;
+  }
+  .dev-panel.compact .dev-btn-row {
+    margin-top: 6px;
   }
   .dev-btn-row button {
     padding: 10px;
@@ -212,6 +255,11 @@
     cursor: pointer;
     border: none;
     -webkit-tap-highlight-color: transparent;
+    transition: padding 0.3s, font-size 0.3s;
+  }
+  .dev-panel.compact .dev-btn-row button {
+    padding: 6px;
+    font-size: 10px;
   }
   .dev-btn-reset {
     background: rgba(239, 68, 68, 0.15);
@@ -263,6 +311,30 @@
   @keyframes tierPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.15); } }
   @keyframes tierPop { 0% { transform: scale(1); } 40% { transform: scale(1.2) rotate(-3deg); } 70% { transform: scale(0.95) rotate(2deg); } 100% { transform: scale(1) rotate(0); } }
   @keyframes tierEXGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+  /* ==================== 桌面版三欄對稱佈局 ==================== */
+  @media (min-width: 1024px) {
+    #calcPage {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 16px;
+      padding: 80px 20px 40px;
+      min-height: auto;
+    }
+    #calcPage .dark-card {
+      flex: 1 1 0;
+      max-width: 380px;
+      min-width: 280px;
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+      margin-top: 0 !important;
+    }
+    #calcPage .dark-card::-webkit-scrollbar { width: 6px; }
+    #calcPage .dark-card::-webkit-scrollbar-track { background: transparent; }
+    #calcPage .dark-card::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
+    .game-panel { margin-top: 0; }
+  }
 </style>
 </head>
 <body>
@@ -562,7 +634,6 @@
     <div class="dev-panel" id="devPanel">
       <div class="dev-panel-title">⚙️ 系統公式參數調整</div>
 
-      <!-- 第 1 層 -->
       <div class="dev-layer">
         <div class="dev-layer-title">第 1 層：勝率差距 → 買和</div>
         <div class="dev-param-grid">
@@ -570,7 +641,6 @@
         </div>
       </div>
 
-      <!-- 第 2 層 -->
       <div class="dev-layer">
         <div class="dev-layer-title">第 2 層：主強 + 主賠低 → 買主</div>
         <div class="dev-param-grid">
@@ -580,7 +650,6 @@
         </div>
       </div>
 
-      <!-- 第 3 層 -->
       <div class="dev-layer">
         <div class="dev-layer-title">第 3 層：主強 + 主賠中 → 買和</div>
         <div class="dev-param-grid">
@@ -590,7 +659,6 @@
         </div>
       </div>
 
-      <!-- 第 4 層 -->
       <div class="dev-layer">
         <div class="dev-layer-title">第 4 層：客強客冷 → 反向買主</div>
         <div class="dev-param-grid">
@@ -598,7 +666,6 @@
         </div>
       </div>
 
-      <!-- 第 5 層 -->
       <div class="dev-layer">
         <div class="dev-layer-title">第 5 層：客強 + 客賠價值 → 買客</div>
         <div class="dev-param-grid">
@@ -607,7 +674,6 @@
         </div>
       </div>
 
-      <!-- 兜底層 -->
       <div class="dev-layer">
         <div class="dev-layer-title">兜底層：賠率博弈</div>
         <div class="dev-param-grid">
@@ -619,7 +685,7 @@
 
       <div class="dev-btn-row">
         <button class="dev-btn-reset" onclick="resetParams()">🔄 重設預設</button>
-        <button class="dev-btn-apply" onclick="applyParams()">✅ 套用參數</button>
+        <button class="dev-btn-apply" onclick="applyParams()" id="devApplyBtn">✅ 套用參數</button>
       </div>
     </div>
 
@@ -654,15 +720,7 @@ var PARAMS = {
   p5_fmin: 185, p5_fmax: 215,
   pb_hmin: 30, pb_dmin: 600, pb_fskip: 750
 };
-
-var DEFAULT_PARAMS = {
-  p1_gap: 6,
-  p2_hmin: 42, p2_dmin: 155, p2_dmax: 205,
-  p3_hmin: 40, p3_dmin: 210, p3_dmax: 245,
-  p4_fmax: 550,
-  p5_fmin: 185, p5_fmax: 215,
-  pb_hmin: 30, pb_dmin: 600, pb_fskip: 750
-};
+var DEFAULT_PARAMS = JSON.parse(JSON.stringify(PARAMS));
 
 var CALIBRATION = {
   FAVORITE_BOOST: 0.18,
@@ -1055,19 +1113,13 @@ setInterval(loadStatsWithRetry, 15000);
 window.addEventListener('focus', loadStatsWithRetry);
 document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
 
-// ==================== 核心公式（動態參數）====================
+// ==================== 核心公式 ====================
 function calcBet(hw, dw, aw, ho, doo, ao) {
-  // 第1層：勝率差距
   if (Math.abs(hw - aw) <= PARAMS.p1_gap) return "D";
-  // 第2層：主強 + 主賠低
   if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return "H";
-  // 第3層：主強 + 主賠中
   if (hw >= PARAMS.p3_hmin && ho > PARAMS.p3_dmin/100 && ho <= PARAMS.p3_dmax/100 && ho !== ao) return "D";
-  // 第4層：客強客冷 → 反向買主
   if (aw > hw && ao > ho && ao < PARAMS.p4_fmax/100) return "H";
-  // 第5層：客強 + 客賠價值
   if (aw > hw && ao >= PARAMS.p5_fmin/100 && ao <= PARAMS.p5_fmax/100) return "A";
-  // 兜底層
   if (ho > ao) {
     if (hw >= PARAMS.pb_hmin && ho >= PARAMS.pb_dmin/100) return "D";
     return "H";
@@ -1080,7 +1132,6 @@ function calcBet(hw, dw, aw, ho, doo, ao) {
     return "skip";
   }
 }
-
 function calcLayer(hw, dw, aw, ho, doo, ao) {
   if (Math.abs(hw - aw) <= PARAMS.p1_gap) return 1;
   if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return 2;
@@ -1198,7 +1249,19 @@ function applyParams() {
   PARAMS.pb_dmin = Number(document.getElementById('pb_dmin').value) || 600;
   PARAMS.pb_fskip = Number(document.getElementById('pb_fskip').value) || 750;
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
-  alert('✅ 參數已套用');
+  
+  // ✅ 套用後縮小面板
+  var panel = document.getElementById('devPanel');
+  if (panel) panel.classList.add('compact');
+  var btn = document.getElementById('devApplyBtn');
+  if (btn) {
+    btn.textContent = '✏️ 繼續編輯';
+    btn.onclick = function() {
+      panel.classList.remove('compact');
+      btn.textContent = '✅ 套用參數';
+      btn.onclick = applyParams;
+    };
+  }
 }
 
 function resetParams() {
@@ -1217,6 +1280,15 @@ function resetParams() {
   document.getElementById('pb_dmin').value = DEFAULT_PARAMS.pb_dmin;
   document.getElementById('pb_fskip').value = DEFAULT_PARAMS.pb_fskip;
   try { localStorage.setItem('qfp_params', JSON.stringify(PARAMS)); } catch(e) {}
+  
+  // 展開面板
+  var panel = document.getElementById('devPanel');
+  if (panel) panel.classList.remove('compact');
+  var btn = document.getElementById('devApplyBtn');
+  if (btn) {
+    btn.textContent = '✅ 套用參數';
+    btn.onclick = applyParams;
+  }
   alert('🔄 已重設為預設值');
 }
 
@@ -1226,7 +1298,6 @@ function loadSavedParams() {
     if (saved) {
       var p = JSON.parse(saved);
       PARAMS = Object.assign({}, DEFAULT_PARAMS, p);
-      // 更新面板顯示
       if (document.getElementById('p1_gap')) {
         document.getElementById('p1_gap').value = PARAMS.p1_gap;
         document.getElementById('p2_hmin').value = PARAMS.p2_hmin;
@@ -1301,7 +1372,6 @@ function generateMatch() {
   var s2 = 100/ho + 100/doo + 100/ao;
   if (s2 < 1.10) { var f2 = s2 / 1.10; ho = Math.round(ho * f2); doo = Math.round(doo * f2); ao = Math.round(ao * f2); }
 
-  // 校準版賽果抽樣
   var invH = 100 / ho, invD = 100 / doo, invA = 100 / ao;
   var totalInv = invH + invD + invA;
   var pH = invH / totalInv, pD = invD / totalInv, pA = invA / totalInv;
@@ -1613,72 +1683,4 @@ function updateTierDisplay(withAnimation) {
   var style = colorMap[tier.tier] || colorMap['E'];
 
   badgeEl.style.display = 'inline-block';
-  badgeEl.style.padding = '18px 42px';
-  badgeEl.style.borderRadius = '16px';
-  badgeEl.style.fontSize = '52px';
-  badgeEl.style.fontWeight = '900';
-  badgeEl.style.letterSpacing = '3px';
-  badgeEl.style.lineHeight = '1';
-  badgeEl.style.minWidth = '150px';
-  badgeEl.style.fontFamily = "'Segoe UI', -apple-system, sans-serif";
-  badgeEl.style.border = '2px solid ' + style.border;
-  badgeEl.style.boxShadow = style.shadow;
-  badgeEl.textContent = tier.tier;
-  badgeEl.setAttribute('data-tier', tier.tier);
-
-  if (style.isEX) {
-    badgeEl.style.background = 'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)';
-    badgeEl.style.backgroundSize = '400% 400%';
-    badgeEl.style.color = '#fff';
-    badgeEl.style.textShadow = '0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9';
-    badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
-  } else if (tier.tier.indexOf('S') === 0) {
-    badgeEl.style.background = style.bg;
-    badgeEl.style.color = style.color;
-    badgeEl.style.textShadow = '0 0 15px ' + style.color + ', 0 0 30px ' + style.color + ', 0 2px 12px ' + style.color;
-    if (isNewTier || !badgeEl.style.animation) {
-      badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-    }
-  } else {
-    badgeEl.style.background = style.bg;
-    badgeEl.style.color = style.color;
-    badgeEl.style.textShadow = '0 2px 12px ' + style.color;
-    if (isNewTier || !badgeEl.style.animation) {
-      badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-    }
-  }
-
-  descEl.style.fontSize = '14px';
-  descEl.style.marginTop = '12px';
-  descEl.style.fontWeight = 'bold';
-  descEl.style.letterSpacing = '0.5px';
-  descEl.style.color = style.isEX ? '#c084fc' : style.color;
-  descEl.textContent = t[tier.descKey] || '';
-
-  tierEl.style.display = 'block';
-  tierEl.style.textAlign = 'center';
-  tierEl.style.marginBottom = '20px';
-  tierEl.style.padding = '20px 15px';
-  tierEl.style.borderRadius = '14px';
-  tierEl.style.background = 'var(--bg-panel)';
-  tierEl.style.border = '1px solid var(--border-color)';
-
-  if (withAnimation && isNewTier) {
-    badgeEl.style.animation = 'tierPop 0.6s ease-out, ' + (style.isEX ? 'tierEXGradient 2s ease infinite, ' : '') + 'tierPulse 2.5s ease-in-out 0.6s infinite';
-    setTimeout(function() {
-      if (style.isEX) {
-        badgeEl.style.animation = 'tierEXGradient 2s ease infinite, tierPulse 2.5s ease-in-out infinite';
-      } else {
-        badgeEl.style.animation = 'tierPulse 2.5s ease-in-out infinite';
-      }
-    }, 700);
-  }
-}
-
-applyLanguage('zh-HK');
-checkClearBtn();
-handleTopBtnsScroll();
-loadSavedParams();
-</script>
-</body>
-</html>
+  badgeEl.style.padding = '18px
