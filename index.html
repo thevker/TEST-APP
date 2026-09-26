@@ -27,7 +27,6 @@
   @keyframes toastIn { from { opacity:0; transform:translateY(-20px) scale(.9); } to { opacity:1; transform:translateY(0) scale(1); } }
   @keyframes toastOut { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(-20px) scale(.9); } }
 
-  /* ==================== 連勝彈出 ==================== */
   .combo-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); z-index:9999999; pointer-events:none; display:none; }
   .combo-popup.show { display:block; animation:comboBurst 2s ease-out forwards; }
   .combo-inner { background:linear-gradient(135deg,#FF6B00,#FF3D00,#FF8C00); border:3px solid #FFD700; border-radius:22px; padding:22px 44px; box-shadow:0 0 40px rgba(255,100,0,0.85),0 0 80px rgba(255,200,0,0.55),inset 0 0 24px rgba(255,220,0,0.35); color:#fff; font-weight:900; text-shadow:0 0 10px #FFD700,0 0 22px #FF6B00,0 0 40px #FF3D00,0 2px 8px rgba(0,0,0,0.6); display:flex; align-items:center; gap:14px; white-space:nowrap; font-size:32px; line-height:1; font-family:'Segoe UI',-apple-system,sans-serif; }
@@ -230,7 +229,6 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- 連勝彈出 -->
 <div class="combo-popup" id="comboPopup">
   <div class="combo-inner" id="comboInner">
     <span class="combo-fire" id="comboFireL">🔥</span>
@@ -466,7 +464,13 @@
         </div>
       </div>
       <div class="dev-layer">
-        <div class="dev-layer-title">第 2 層：主強 + 主賠低 → 買主</div>
+        <div class="dev-layer-title">第 2 層：主客賠差 → 買和</div>
+        <div class="dev-param-grid">
+          <div class="dev-param-item"><label>賠率差上限 (D−F)</label><input type="text" id="p_odds_gap" value="20" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="dev-layer">
+        <div class="dev-layer-title">第 3 層：主強 + 主賠低 → 買主</div>
         <div class="dev-param-grid">
           <div class="dev-param-item"><label>主勝率下限</label><input type="text" id="p2_hmin" value="42" inputmode="numeric"></div>
           <div class="dev-param-item"><label>主賠下限</label><input type="text" id="p2_dmin" value="155" inputmode="numeric"></div>
@@ -474,7 +478,7 @@
         </div>
       </div>
       <div class="dev-layer">
-        <div class="dev-layer-title">第 3 層：主強 + 主賠中 → 買和</div>
+        <div class="dev-layer-title">第 4 層：主強 + 主賠中 → 買和</div>
         <div class="dev-param-grid">
           <div class="dev-param-item"><label>主勝率下限</label><input type="text" id="p3_hmin" value="40" inputmode="numeric"></div>
           <div class="dev-param-item"><label>主賠下限</label><input type="text" id="p3_dmin" value="210" inputmode="numeric"></div>
@@ -482,13 +486,13 @@
         </div>
       </div>
       <div class="dev-layer">
-        <div class="dev-layer-title">第 4 層：客強客冷 → 反向買主</div>
+        <div class="dev-layer-title">第 5 層：客強客冷 → 反向買主</div>
         <div class="dev-param-grid">
           <div class="dev-param-item"><label>客賠上限</label><input type="text" id="p4_fmax" value="550" inputmode="numeric"></div>
         </div>
       </div>
       <div class="dev-layer">
-        <div class="dev-layer-title">第 5 層：客強 + 客賠價值 → 買客</div>
+        <div class="dev-layer-title">第 6 層：客強 + 客賠價值 → 買客</div>
         <div class="dev-param-grid">
           <div class="dev-param-item"><label>客賠下限</label><input type="text" id="p5_fmin" value="185" inputmode="numeric"></div>
           <div class="dev-param-item"><label>客賠上限</label><input type="text" id="p5_fmax" value="215" inputmode="numeric"></div>
@@ -517,7 +521,7 @@
 
 <script>
 // ==================== 全域 ====================
-var PARAMS = { p1_gap:6, p2_hmin:42, p2_dmin:155, p2_dmax:205, p3_hmin:40, p3_dmin:210, p3_dmax:245, p4_fmax:550, p5_fmin:185, p5_fmax:215, pb_hmin:30, pb_dmin:600, pb_fskip:750 };
+var PARAMS = { p1_gap:6, p_odds_gap:20, p2_hmin:42, p2_dmin:155, p2_dmax:205, p3_hmin:40, p3_dmin:210, p3_dmax:245, p4_fmax:550, p5_fmin:185, p5_fmax:215, pb_hmin:30, pb_dmin:600, pb_fskip:750 };
 var DEFAULT_PARAMS = JSON.parse(JSON.stringify(PARAMS));
 var CALIBRATION = { FAVORITE_BOOST:0.18, DRAW_BOOST:1.25, DRAW_LOW:150, DRAW_HIGH:210, MARGIN_MIN:1.10, MARGIN_MAX:1.16 };
 var currentLang = 'zh-HK';
@@ -527,7 +531,7 @@ var TIER_MIN_PLAYED = 20;
 var TIER_WEIGHT_HITRATE = 0.4;
 var TIER_WEIGHT_ROI = 0.6;
 
-var comboCount = 0;  // 連勝計數
+var comboCount = 0;
 
 // ==================== Toast 提示系統 ====================
 function showToast(msg, type) {
@@ -552,11 +556,9 @@ function showComboPopup(combo) {
   var t = translations[currentLang];
   var comboText = (t.comboStreak || '連勝 x') + combo + ' !!!';
   textEl.textContent = comboText;
-  // 體積：x3 = 100%，每多一次 +10%，最高 +50% (150%)
   var scale = 1 + Math.min(0.5, (combo - 3) * 0.1);
   var baseSize = 32;
   inner.style.fontSize = (baseSize * scale) + 'px';
-  // 重置動畫
   popup.classList.remove('show');
   void popup.offsetWidth;
   popup.classList.add('show');
@@ -609,11 +611,12 @@ const translations = {
     evLabel:'期望值 EV-1：',
     hintSkip:'數據信號不明，系統選擇跳過本次投注，避免風險。',
     hint1:'主客勝率相近（相差 6 以內），和局概率被市場低估，系統捕捉高價值和局，建議買和局。',
-    hint2:'主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
-    hint3:'主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
-    hint4:'客勝率高於主勝率，客隊略為冷門，系統反向買主隊，搏主場優勢。',
-    hint5:'客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
-    hint6:'市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
+    hint2:'主客賠率非常接近（相差 0.20 以內），市場認為雙方勢均力敵，和局概率上升，建議買和局。',
+    hint3:'主隊勝率明顯佔優，賠率處於合理回報區間，主場優勢強勁，建議買主勝。',
+    hint4:'主隊勝率雖高但賠率偏高，市場對主勝存有疑慮，系統判斷需防冷，建議買和局。',
+    hint5:'客勝率高於主勝率，客隊略為冷門，系統反向買主隊，搏主場優勢。',
+    hint6:'客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
+    hint7:'市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
     hintReverse:'偵測到極端冷門賠率，系統按最新規則買和局搏高賠回報。',
     gameTitle:'🎮 猜賽果挑戰', gameSub:'📚 從資料庫真實數據隨機抽樣，試下你嘅眼光！',
     gamePlayed:'已玩', gameHits:'命中', gameRate:'命中率', gamePnl:'總盈虧',
@@ -682,11 +685,12 @@ const translations = {
     evLabel:'期望值 EV-1：',
     hintSkip:'数据信号不明，系统选择跳过本次投注，避免风险。',
     hint1:'主客胜率相近（相差 6 以内），和局概率被市场低估，系统捕捉高价值和局，建议买和局。',
-    hint2:'主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
-    hint3:'主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
-    hint4:'客胜率高于主胜率，客队略为冷门，系统反向买主队，搏主场优势。',
-    hint5:'客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
-    hint6:'市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
+    hint2:'主客赔率非常接近（相差 0.20 以内），市场认为双方势均力敌，和局概率上升，建议买和局。',
+    hint3:'主队胜率明显占优，赔率处于合理回报区间，主场优势强劲，建议买主胜。',
+    hint4:'主队胜率虽高但赔率偏高，市场对主胜存有疑虑，系统判断需防冷，建议买和局。',
+    hint5:'客胜率高于主胜率，客队略为冷门，系统反向买主队，搏主场优势。',
+    hint6:'客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
+    hint7:'市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
     hintReverse:'侦测到极端冷门赔率，系统按最新规则买和局搏高赔回报。',
     gameTitle:'🎮 猜赛果挑战', gameSub:'📚 从数据库真实数据随机抽样，试试你的眼光！',
     gamePlayed:'已玩', gameHits:'命中', gameRate:'命中率', gamePnl:'总盈亏',
@@ -755,11 +759,12 @@ const translations = {
     evLabel:'Expected Value EV-1: ',
     hintSkip:'Signal unclear. System skips this bet to avoid risk.',
     hint1:'Home and away win rates are close (within 6). Draw is undervalued. Bet Draw.',
-    hint2:'Home team has clear advantage with reasonable odds. Bet Home Win.',
-    hint3:'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
-    hint4:'Away win rate exceeds home, away team slightly underdog. System bets Home Win as contrarian play.',
-    hint5:'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
-    hint6:'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
+    hint2:'Home and away odds are very close (within 0.20). Market sees evenly matched teams. Bet Draw.',
+    hint3:'Home team has clear advantage with reasonable odds. Bet Home Win.',
+    hint4:'Home win rate is high but odds are elevated. Market has doubts. Bet Draw for safety.',
+    hint5:'Away win rate exceeds home, away team slightly underdog. System bets Home Win as contrarian play.',
+    hint6:'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
+    hint7:'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
     hintReverse:'Detected extreme underdog odds. System switches to Draw bet for high-payout upside.',
     gameTitle:'🎮 Guess the Result', gameSub:'📚 Randomly sampled from real database. Try your luck!',
     gamePlayed:'Played', gameHits:'Correct', gameRate:'Accuracy', gamePnl:'Total P/L',
@@ -980,11 +985,19 @@ function loadStatsWithRetry() {
 
 // ==================== 公式 ====================
 function calcBet(hw, dw, aw, ho, doo, ao) {
+  // 第 1 層：勝率差 <=6 → D
   if (Math.abs(hw - aw) <= PARAMS.p1_gap) return "D";
+  // 第 2 層：賠率差 <0.20 → D
+  if (Math.abs(ho - ao) * 100 < PARAMS.p_odds_gap) return "D";
+  // 第 3 層：主強主賠低 → H
   if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return "H";
+  // 第 4 層：主強主賠中 → D
   if (hw >= PARAMS.p3_hmin && ho > PARAMS.p3_dmin/100 && ho <= PARAMS.p3_dmax/100 && ho !== ao) return "D";
+  // 第 5 層：客強客冷 → H
   if (aw > hw && ao > ho && ao < PARAMS.p4_fmax/100) return "H";
+  // 第 6 層：客強客賠價值 → A
   if (aw > hw && ao >= PARAMS.p5_fmin/100 && ao <= PARAMS.p5_fmax/100) return "A";
+  // 兜底層
   if (ho > ao) {
     if (hw >= PARAMS.pb_hmin && ho >= PARAMS.pb_dmin/100) return "D";
     return "H";
@@ -999,11 +1012,12 @@ function calcBet(hw, dw, aw, ho, doo, ao) {
 }
 function calcLayer(hw, dw, aw, ho, doo, ao) {
   if (Math.abs(hw - aw) <= PARAMS.p1_gap) return 1;
-  if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return 2;
-  if (hw >= PARAMS.p3_hmin && ho > PARAMS.p3_dmin/100 && ho <= PARAMS.p3_dmax/100 && ho !== ao) return 3;
-  if (aw > hw && ao > ho && ao < PARAMS.p4_fmax/100) return 4;
-  if (aw > hw && ao >= PARAMS.p5_fmin/100 && ao <= PARAMS.p5_fmax/100) return 5;
-  return 6;
+  if (Math.abs(ho - ao) * 100 < PARAMS.p_odds_gap) return 2;
+  if (hw >= PARAMS.p2_hmin && ho >= PARAMS.p2_dmin/100 && ho < PARAMS.p2_dmax/100 && ho !== ao) return 3;
+  if (hw >= PARAMS.p3_hmin && ho > PARAMS.p3_dmin/100 && ho <= PARAMS.p3_dmax/100 && ho !== ao) return 4;
+  if (aw > hw && ao > ho && ao < PARAMS.p4_fmax/100) return 5;
+  if (aw > hw && ao >= PARAMS.p5_fmin/100 && ao <= PARAMS.p5_fmax/100) return 6;
+  return 7;
 }
 
 function calculate() {
@@ -1026,7 +1040,7 @@ function calculate() {
   var bet = calcBet(hw, dw, aw, ho, doo, ao);
   var layer = calcLayer(hw, dw, aw, ho, doo, ao);
   var isReverse = false;
-  if (layer === 6 && ho > ao && hw >= PARAMS.pb_hmin && ho >= PARAMS.pb_dmin/100) isReverse = true;
+  if (layer === 7 && ho > ao && hw >= PARAMS.pb_hmin && ho >= PARAMS.pb_dmin/100) isReverse = true;
   let text = "", className = "", ev = null;
   if (bet === "H") { text = t.resultH; className = "result-H"; ev = (hw / 100) * ho - 1; }
   else if (bet === "A") { text = t.resultA; className = "result-A"; ev = (aw / 100) * ao - 1; }
@@ -1060,9 +1074,13 @@ function showResult(text, className, layer, bet, ev, isReverse, errKey) {
   else if (isReverse) hintText = t.hintReverse;
   else {
     switch(layer) {
-      case 1: hintText = t.hint1; break; case 2: hintText = t.hint2; break;
-      case 3: hintText = t.hint3; break; case 4: hintText = t.hint4; break;
-      case 5: hintText = t.hint5; break; case 6: hintText = t.hint6; break;
+      case 1: hintText = t.hint1; break;
+      case 2: hintText = t.hint2; break;
+      case 3: hintText = t.hint3; break;
+      case 4: hintText = t.hint4; break;
+      case 5: hintText = t.hint5; break;
+      case 6: hintText = t.hint6; break;
+      case 7: hintText = t.hint7; break;
     }
   }
   hintBox.innerText = hintText;
@@ -1113,6 +1131,7 @@ function closeDevPanel() {
 
 function applyParams() {
   PARAMS.p1_gap = Number(document.getElementById('p1_gap').value) || 6;
+  PARAMS.p_odds_gap = Number(document.getElementById('p_odds_gap').value) || 20;
   PARAMS.p2_hmin = Number(document.getElementById('p2_hmin').value) || 42;
   PARAMS.p2_dmin = Number(document.getElementById('p2_dmin').value) || 155;
   PARAMS.p2_dmax = Number(document.getElementById('p2_dmax').value) || 205;
@@ -1133,7 +1152,7 @@ function applyParams() {
 
 function resetParams() {
   PARAMS = JSON.parse(JSON.stringify(DEFAULT_PARAMS));
-  ['p1_gap','p2_hmin','p2_dmin','p2_dmax','p3_hmin','p3_dmin','p3_dmax','p4_fmax','p5_fmin','p5_fmax','pb_hmin','pb_dmin','pb_fskip'].forEach(k => {
+  ['p1_gap','p_odds_gap','p2_hmin','p2_dmin','p2_dmax','p3_hmin','p3_dmin','p3_dmax','p4_fmax','p5_fmin','p5_fmax','pb_hmin','pb_dmin','pb_fskip'].forEach(k => {
     var el = document.getElementById(k);
     if (el) el.value = DEFAULT_PARAMS[k];
   });
@@ -1153,7 +1172,7 @@ function resetGameProgress() {
   gameState.current = null;
   gameState.waiting = false;
   gameState.lastGuess = null;
-  comboCount = 0;  // 重置連勝
+  comboCount = 0;
   document.getElementById('gamePlayed').textContent = '0';
   document.getElementById('gameHits').textContent = '0';
   document.getElementById('gameRate').textContent = '—';
@@ -1585,7 +1604,7 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
   resultBox.style.background = ''; resultBox.style.color = ''; resultBox.style.border = '';
   resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
-    + '<small>' + pnlLabel + '（' + (t.gameStake || '註碼 $100') + '）<br>'
+    + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
     + '📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
     + desc
     + scoreLine + '<br>'
@@ -1594,7 +1613,6 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
 }
 
 // ==================== Tier ====================
-// 🎯 19 級 Tier（含 B 級），單向漸變（淺→深順落，不循環）
 function getTier(rate) {
   if (rate >= 55)   return { tier:'EX', descKey:'tierEX' };
   if (rate >= 52.5) return { tier:'S+', descKey:'tierS' };
@@ -1632,7 +1650,6 @@ function updateTierDisplay(withAnimation) {
   var detailEl = document.getElementById('tierDetail');
   var isNewTier = badgeEl.getAttribute('data-tier') !== tier.tier;
 
-  // 🎨 單向漸變（淺→深順落），EX 保留原漸變
   var colorMap = {
     'EX': { grad:'linear-gradient(135deg, #c084fc, #a78bfa, #818cf8, #e879f9, #c084fc, #a78bfa)', color:'#fff', glow:'0 0 20px #c084fc, 0 0 40px #a78bfa, 0 0 60px #e879f9', shadow:'0 0 50px rgba(192,132,252,0.6)' },
     'S+': { grad:'linear-gradient(135deg, #FFE44E, #FFD700, #FFB800)', color:'#fff', glow:'0 0 18px #FFE44E, 0 0 36px #FFB800, 0 2px 12px #FFD700', shadow:'0 0 45px rgba(255,215,0,0.6)' },
@@ -1644,7 +1661,7 @@ function updateTierDisplay(withAnimation) {
     'B+': { grad:'linear-gradient(135deg, #67e8f9, #22d3ee, #06b6d4)', color:'#fff', glow:'0 0 16px #67e8f9, 0 0 32px #06b6d4, 0 2px 10px #22d3ee', shadow:'0 0 30px rgba(34,211,238,0.55)' },
     'B':  { grad:'linear-gradient(135deg, #5eead4, #14b8a6, #0d9488)', color:'#fff', glow:'0 0 14px #5eead4, 0 0 28px #0d9488, 0 2px 8px #14b8a6', shadow:'0 0 25px rgba(20,184,166,0.55)' },
     'B-': { grad:'linear-gradient(135deg, #6ee7b7, #10b981, #059669)', color:'#fff', glow:'0 0 12px #6ee7b7, 0 0 24px #059669, 0 2px 6px #10b981', shadow:'0 0 22px rgba(16,185,129,0.5)' },
-    'C+': { grad:'linear,-gradient(135deg, #fcd34d, #fbbf24, #f59e0b)', color:'#fff', glow:'0 0 14px #fcd34d, 0 0 28px #f59e0b, 0 2px 8px #fbbf24', shadow:'0 0 25px rgba(251,191,36,0.5)' },
+    'C+': { grad:'linear-gradient(135deg, #fcd34d, #fbbf24, #f59e0b)', color:'#fff', glow:'0 0 14px #fcd34d, 0 0 28px #f59e0b, 0 2px 8px #fbbf24', shadow:'0 0 25px rgba(251,191,36,0.5)' },
     'C':  { grad:'linear-gradient(135deg, #fbbf24, #f59e0b, #d97706)', color:'#fff', glow:'0 0 12px #fbbf24, 0 0 24px #d97706, 0 2px 6px #f59e0b', shadow:'0 0 22px rgba(245,158,11,0.5)' },
     'C-': { grad:'linear-gradient(135deg, #fb923c, #ea580c, #c2410c)', color:'#fff', glow:'0 0 10px #fb923c, 0 0 20px #c2410c, 0 2px 6px #ea580c', shadow:'0 0 20px rgba(234,88,12,0.5)' },
     'D+': { grad:'linear-gradient(135deg, #fca5a5, #f87171, #ef4444)', color:'#fff', glow:'0 0 14px #fca5a5, 0 0 28px #ef4444, 0 2px 8px #f87171', shadow:'0 0 22px rgba(248,113,113,0.5)' },
@@ -1673,7 +1690,7 @@ function updateTierDisplay(withAnimation) {
   badgeEl.style.border = '2px solid rgba(255,255,255,0.35)';
   badgeEl.textContent = tier.tier;
   badgeEl.setAttribute('data-tier', tier.tier);
-  badgeEl.style.animation = 'tierEXGradient 3s ease infinite tierPulse 2.5s ease-in-out infinite';
+  badgeEl.style.animation = 'tierEXGradient 3s ease infinite, tierPulse 2.5s ease-in-out infinite';
 
   descEl.style.fontSize = '14px';
   descEl.style.marginTop = '12px';
