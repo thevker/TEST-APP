@@ -112,6 +112,24 @@
   :root[data-theme="dark"] .game-stat-value.negative { color: #f87171; }
   .game-stat-value.neutral { color: var(--text-primary); }
 
+  /* 自動預測按鈕 */
+  .game-auto-btn {
+    width: 100%; padding: 14px;
+    border-radius: 8px; font-size: 15px; font-weight: bold;
+    cursor: pointer; transition: transform 0.15s, opacity 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    background: linear-gradient(135deg, rgba(192,132,252,0.20), rgba(96,165,250,0.20));
+    color: #c084fc;
+    border: 1px solid rgba(192,132,252,0.55);
+    margin-bottom: 10px;
+  }
+  .game-auto-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(192,132,252,0.30), rgba(96,165,250,0.30));
+  }
+  .game-auto-btn:active:not(:disabled) { transform: scale(0.97); }
+  .game-auto-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  :root[data-theme="dark"] .game-auto-btn { color: #c084fc; }
+
   .game-skip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .game-skip-btn { flex: 1; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.15s, opacity 0.3s; -webkit-tap-highlight-color: transparent; background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.5); }
   .game-skip-btn:hover:not(:disabled) { background: rgba(156, 163, 175, 0.25); }
@@ -444,6 +462,8 @@
       <button class="game-guess-btn guess-A" id="gbtnA" onclick="gameGuess('A')" data-i18n="resultAShort">客勝</button>
     </div>
 
+    <button class="game-auto-btn" id="gbtnAuto" onclick="gameAutoPredict()" data-i18n="gameAutoBtn">🤖 自動預測（系統公式）</button>
+
     <div class="game-skip-row">
       <button class="game-skip-btn" id="gbtnSkip" onclick="gameSkip()" data-i18n="gameSkipBtn">⏭️ 跳過本場</button>
       <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
@@ -564,7 +584,10 @@ const translations = {
     gameSkipHelp: '💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次',
     gameSkipExhausted: '❌ 跳過次數已用完',
     gameSkipToast: '⏭️ 已跳過本場',
-    gameMustGuess: '⚠️ 請先預測本場答案，才能開始新一局'
+    gameMustGuess: '⚠️ 請先預測本場答案，才能開始新一局',
+    gameAutoBtn: '🤖 自動預測（系統公式）',
+    gameAutoSkip: '🤖 系統建議不出手（Skip），請手動選擇或跳過',
+    gameAutoThinking: '🤖 系統分析中…'
   },
   'zh-CN': {
     termsTitle: '📋 使用守则与风险声明', statsTitle: '📊 历史数据统计',
@@ -617,7 +640,10 @@ const translations = {
     gameSkipHelp: '💡 每场随机生成，预设 2 次跳过机会，每玩 10 场 +1 次',
     gameSkipExhausted: '❌ 跳过次数已用完',
     gameSkipToast: '⏭️ 已跳过本场',
-    gameMustGuess: '⚠️ 请先预测本场答案，才能开始新一局'
+    gameMustGuess: '⚠️ 请先预测本场答案，才能开始新一局',
+    gameAutoBtn: '🤖 自动预测（系统公式）',
+    gameAutoSkip: '🤖 系统建议不出手（Skip），请手动选择或跳过',
+    gameAutoThinking: '🤖 系统分析中…'
   },
   'en-US': {
     termsTitle: '📋 Terms of Use & Risk Statement', statsTitle: '📊 Historical Statistics',
@@ -670,7 +696,10 @@ const translations = {
     gameSkipHelp: '💡 Each match is random. Default 2 skips, +1 every 10 plays',
     gameSkipExhausted: '❌ No skips left',
     gameSkipToast: '⏭️ Match skipped',
-    gameMustGuess: '⚠️ Please guess the current match before starting a new one'
+    gameMustGuess: '⚠️ Please guess the current match before starting a new one',
+    gameAutoBtn: '🤖 Auto Predict (System Formula)',
+    gameAutoSkip: '🤖 System recommends SKIP. Please choose manually or skip.',
+    gameAutoThinking: '🤖 Analyzing…'
   }
 };
 
@@ -963,9 +992,7 @@ function updateSkipDisplay() {
   }
 }
 
-// ✅ 莊家模式：用賠率隱含概率抽樣結果
 function generateMatch() {
-  // 1. 生成勝率（用於計算賠率）
   var r1 = Math.random(), r2 = Math.random();
   var avg = (r1 + r2) / 2;
   var hw = Math.round(15 + avg * 65);
@@ -978,25 +1005,18 @@ function generateMatch() {
   if (hw < 8) { hw = 8; aw = 100 - dw - hw; }
   if (hw > 82) { hw = 82; aw = 100 - dw - hw; }
 
-  // 2. 計算賠率（倒數和 = margin 1.10-1.16）
   var margin = 1.10 + Math.random() * 0.06;
   var ho  = 100 / (hw  * margin);
   var doo = 100 / (dw  * margin);
   var ao  = 100 / (aw  * margin);
 
-  // 3. 加 ±3% 小噪聲（模擬市場波動）
   ho  *= (0.97 + Math.random() * 0.06);
   doo *= (0.97 + Math.random() * 0.06);
   ao  *= (0.97 + Math.random() * 0.06);
 
-  // 4. 檢查倒數和 ≥ 1.10
   var s = 1/ho + 1/doo + 1/ao;
-  if (s < 1.10) {
-    var f = s / 1.10;
-    ho *= f; doo *= f; ao *= f;
-  }
+  if (s < 1.10) { var f = s / 1.10; ho *= f; doo *= f; ao *= f; }
 
-  // 5. 轉成 ×100 並限制範圍
   ho  = Math.round(ho  * 100);
   doo = Math.round(doo * 100);
   ao  = Math.round(ao  * 100);
@@ -1004,24 +1024,12 @@ function generateMatch() {
   doo = Math.max(256,  Math.min(2000, doo));
   ao  = Math.max(100,  Math.min(7000, ao));
 
-  // 6. 二次檢查
   var s2 = 100/ho + 100/doo + 100/ao;
-  if (s2 < 1.10) {
-    var f2 = s2 / 1.10;
-    ho  = Math.round(ho  * f2);
-    doo = Math.round(doo * f2);
-    ao  = Math.round(ao  * f2);
-  }
+  if (s2 < 1.10) { var f2 = s2 / 1.10; ho = Math.round(ho * f2); doo = Math.round(doo * f2); ao = Math.round(ao * f2); }
 
-  // 7. ⭐ 關鍵修正：用賠率隱含概率抽樣結果
-  //    保證 P(結果) = 賠率隱含概率 → 玩家長期必然虧 (莊家抽水生效)
-  var invH = 100 / ho;
-  var invD = 100 / doo;
-  var invA = 100 / ao;
+  var invH = 100 / ho, invD = 100 / doo, invA = 100 / ao;
   var totalInv = invH + invD + invA;
-  var pH = invH / totalInv;
-  var pD = invD / totalInv;
-  var pA = invA / totalInv;
+  var pH = invH / totalInv, pD = invD / totalInv, pA = invA / totalInv;
 
   var r = Math.random();
   var result;
@@ -1064,7 +1072,7 @@ function gameNewRound() {
   resultBox.style.background = '';
   resultBox.style.color = '';
   resultBox.style.border = '';
-  ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
+  ['gbtnH','gbtnD','gbtnA','gbtnAuto'].forEach(function(id){
     var b = document.getElementById(id);
     b.disabled = false;
     b.style.opacity = '1';
@@ -1115,7 +1123,7 @@ function gameSkip() {
     resultBox.style.background = '';
     resultBox.style.color = '';
     resultBox.style.border = '';
-    ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
+    ['gbtnH','gbtnD','gbtnA','gbtnAuto'].forEach(function(id){
       var b = document.getElementById(id);
       b.disabled = false;
       b.style.opacity = '1';
@@ -1123,6 +1131,90 @@ function gameSkip() {
     updateSkipDisplay();
   }, 400);
 
+  updateSkipDisplay();
+}
+
+// ==================== 🤖 自動預測（系統公式）====================
+function gameAutoPredict() {
+  if (!gameState.waiting || !gameState.current) return;
+  
+  var t = translations[currentLang];
+  var m = gameState.current;
+  var hw = m.hw, dw = m.dw, aw = m.aw;
+  var ho = m.ho / 100, doo = m.doo / 100, ao = m.ao / 100;
+  
+  // 跟 calculate() 一樣嘅 6 層公式
+  var bet = "skip", layer = 0, isReverse = false;
+  
+  if (Math.abs(hw - aw) <= 6) { bet = "D"; layer = 1; }
+  else if (hw >= 42 && ho >= 1.55 && ho < 2.05 && ho !== ao) { bet = "H"; layer = 2; }
+  else if (hw >= 40 && ho > 2.10 && ho <= 2.45 && ho !== ao) { bet = "D"; layer = 3; }
+  else if (aw > hw && ao > ho && ao < 5.50) { bet = "H"; layer = 4; }
+  else if (aw > hw && ao >= 1.85 && ao <= 2.15) { bet = "A"; layer = 5; }
+  else {
+    layer = 6;
+    if (ho > ao) {
+      if (hw >= 30 && ho >= 6.00) { bet = "D"; isReverse = true; }
+      else bet = "H";
+    } else if (ao > ho) {
+      if (ao >= 7.50) bet = "skip";
+      else bet = "A";
+    } else {
+      if (hw > aw) bet = "H";
+      else if (aw > hw) bet = "A";
+      else bet = "skip";
+    }
+  }
+  
+  // 如果系統建議 skip
+  if (bet === "skip") {
+    var resultBox = document.getElementById('gameResult');
+    resultBox.style.display = 'block';
+    resultBox.className = 'game-result-box';
+    resultBox.style.background = 'rgba(156,163,175,0.15)';
+    resultBox.style.color = 'var(--text-secondary)';
+    resultBox.style.border = '1px solid rgba(156,163,175,0.4)';
+    resultBox.innerHTML = (t.gameAutoSkip || '🤖 系統建議不出手（Skip），請手動選擇或跳過');
+    setTimeout(function() {
+      if (gameState.waiting) resultBox.style.display = 'none';
+    }, 2000);
+    return;
+  }
+  
+  // 有明確建議 → 執行自動猜測（跟 gameGuess 相同，但顯示系統來源）
+  gameState.lastGuess = bet;
+  var result = m.result;
+  var isWin = (bet === result);
+  var roundPnl = 0;
+  if (isWin) {
+    var odds;
+    if (result === "H") odds = m.ho / 100;
+    else if (result === "D") odds = m.doo / 100;
+    else odds = m.ao / 100;
+    roundPnl = Math.round(odds * 100 - 100);
+  } else {
+    roundPnl = -100;
+  }
+  
+  gameState.played++;
+  if (isWin) gameState.hits++;
+  gameState.totalPnl += roundPnl;
+  gameState.waiting = false;
+  
+  // 顯示結果（加系統建議標籤）
+  renderGameResult(bet, true, roundPnl, true);
+  
+  ['gbtnH','gbtnD','gbtnA','gbtnAuto'].forEach(function(id){
+    var b = document.getElementById(id);
+    b.disabled = true;
+    b.style.opacity = '0.5';
+  });
+  document.getElementById('gamePlayed').textContent = gameState.played;
+  document.getElementById('gameHits').textContent = gameState.hits;
+  var rate = gameState.played > 0 ? (gameState.hits / gameState.played * 100).toFixed(1) + '%' : '—';
+  document.getElementById('gameRate').textContent = rate;
+  updatePnlDisplay();
+  updateTierDisplay(true);
   updateSkipDisplay();
 }
 
@@ -1145,8 +1237,8 @@ function gameGuess(guess) {
   if (isWin) gameState.hits++;
   gameState.totalPnl += roundPnl;
   gameState.waiting = false;
-  renderGameResult(guess, true, roundPnl);
-  ['gbtnH','gbtnD','gbtnA'].forEach(function(id){
+  renderGameResult(guess, true, roundPnl, false);
+  ['gbtnH','gbtnD','gbtnA','gbtnAuto'].forEach(function(id){
     var b = document.getElementById(id);
     b.disabled = true;
     b.style.opacity = '0.5';
@@ -1191,7 +1283,7 @@ function getMatchDescription(result, match) {
   return t.desc_strong || '💪 大熱輕鬆取勝';
 }
 
-function renderGameResult(guess, animate, roundPnl) {
+function renderGameResult(guess, animate, roundPnl, isAuto) {
   if (!gameState.current || !guess) return;
   var t = translations[currentLang];
   var result = gameState.current.result;
@@ -1218,13 +1310,17 @@ function renderGameResult(guess, animate, roundPnl) {
   var pnlLabel = isWin
     ? (t.gameProfit || '本局盈利')
     : (t.gameLoss || '本局虧損');
+  
+  // 自動預測標籤
+  var autoLabel = isAuto ? '🤖 ' : '';
+  
   var resultBox = document.getElementById('gameResult');
   resultBox.style.display = 'block';
   resultBox.className = 'game-result-box ' + (isWin ? 'game-win' : 'game-lose');
   resultBox.style.background = '';
   resultBox.style.color = '';
   resultBox.style.border = '';
-  resultBox.innerHTML = (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
+  resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
     + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
     + desc + '<br>'
