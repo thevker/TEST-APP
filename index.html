@@ -55,9 +55,9 @@
   .input-group { margin-bottom:15px; }
   .container label { display:block; font-size:14px; margin-bottom:5px; color:var(--text-secondary); }
   .input-wrapper { position:relative; }
-  .input-wrapper input { width:100%; padding:12px; padding-right:32px; background:var(--bg-input); border:1px solid var(--border-input); border-radius:8px; box-sizing:border-box; font-size:16px; color:var(--text-primary); outline:none; }
-  .input-wrapper input::placeholder { color:var(--placeholder); }
-  .input-wrapper input:focus { border-color:#60a5fa; background:var(--bg-input-focus); }
+  .input-wrapper input { width:100%; padding:12px; padding-right:32px; background:var(--bg-input); border:1pxa solid5 var(--border-input);fa border-radius:8px; box-sizing:border-box; font-size:16px; color;:var(--text-primary); outline:none; }
+  background .input-wrapper input::placeholder { color:var(--placeholder); }
+  .input-wrapper input:focus { border-color:#60:var(--bg-input-focus); }
   .input-wrapper .suffix { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:15px; font-weight:bold; pointer-events:none; }
   #calcBtn { width:100%; padding:15px; background:#007aff; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:10px; }
   #clearBtn { width:100%; padding:15px; background:#ef4444; color:white; border:none; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; margin-top:10px; display:none; }
@@ -353,7 +353,7 @@
 
   <div class="dark-card game-panel">
     <h2 data-i18n="gameTitle">🎮 猜賽果挑戰</h2>
-    <p class="game-sub" data-i18n="gameSub">隨機生成數據，試下你嘅眼光！</p>
+    <p class="game-sub" data-i18n="gameSub">📚 從資料庫真實數據隨機抽樣，試下你嘅眼光！</p>
 
     <div class="game-tier" id="gameTier">
       <div id="tierBadge" style="display:inline-block;padding:18px 42px;border-radius:16px;font-size:52px;font-weight:900;letter-spacing:3px;line-height:1;min-width:150px;color:#9ca3af;background:rgba(156,163,175,0.18);border:2px solid rgba(156,163,175,0.65);">—</div>
@@ -449,7 +449,7 @@
       <div class="game-skip-info" id="gameSkipInfo">剩 2 次</div>
     </div>
 
-    <div class="game-skip-help" data-i18n="gameSkipHelp">💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次</div>
+    <div class="game-skip-help" data-i18n="gameSkipHelp">💡 每場從資料庫真實數據隨機抽樣，預設 2 次跳過機會，每玩 10 場 +1 次</div>
 
     <div id="gameResult" class="game-result-box"></div>
 
@@ -523,7 +523,7 @@ const translations = {
     hint5:'客勝率高於主勝率，且客賠處於 1.85～2.15 的高價值區間，客隊具備市場價值，建議買客勝。',
     hint6:'市場賠率與勝率模型出現分歧，系統選擇賠率更高的一方進行博弈。',
     hintReverse:'偵測到極端冷門賠率，系統按最新規則買和局搏高賠回報。',
-    gameTitle:'🎮 猜賽果挑戰', gameSub:'隨機生成數據，試下你嘅眼光！',
+    gameTitle:'🎮 猜賽果挑戰', gameSub:'📚 從資料庫真實數據隨機抽樣，試下你嘅眼光！',
     gamePlayed:'已玩', gameHits:'命中', gameRate:'命中率', gamePnl:'總盈虧',
     gameHW:'主勝率', gameDW:'和勝率', gameAW:'客勝率',
     gameHO:'主賠', gameDO:'和賠', gameAO:'客賠',
@@ -538,19 +538,20 @@ const translations = {
     desc_favorite:'🔥 大熱取勝', desc_strong:'💪 大熱輕鬆取勝',
     desc_D_extreme:'🎯 超罕見超高賠和局！', desc_D_huge:'💰 高賠和局命中！',
     desc_D_high:'📊 中高賠和局', desc_D_normal:'🤝 正常和局',
-    tierHint:'※ 猜 10 場以上才顯示等級',
+    tierHint:'※ 猜 10 場以上才顯示等級（綜合命中率與 ROI）',
     tierEX:'🏆 傳奇！神級預測！', tierS:'🔥 頂尖表現！繼續保持！',
     tierA:'⭐ 優秀！表現出色！', tierC:'📊 一般水平，仍有進步空間',
     tierD:'⚠️ 需要改進，加油！', tierE:'💪 繼續努力！多練習！',
     gameSkipBtn:'⏭️ 跳過本場', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
-    gameSkipHelp:'💡 每場隨機生成，預設 2 次跳過機會，每玩 10 場 +1 次',
+    gameSkipHelp:'💡 每場從資料庫真實數據隨機抽樣，預設 2 次跳過機會，每玩 10 場 +1 次',
     gameSkipExhausted:'❌ 跳過次數已用完', gameSkipToast:'⏭️ 已跳過本場',
     gameMustGuess:'⚠️ 請先預測本場答案，才能開始新一局',
     gameAutoBtn:'🤖 自動預測（系統公式）',
     gameAutoSkip:'🤖 系統建議不出手（Skip），請手動選擇或跳過',
     gameLoading:'⏳ 載入比賽數據中...',
     gameNoData:'⚠️ 暫無比賽數據，請稍後再試',
-    gameLoadError:'⚠️ 載入數據失敗，請檢查網絡'
+    gameLoadError:'⚠️ 載入數據失敗，請檢查網絡',
+    gameRealDataBadge:'📚 真實數據'
   },
   'zh-CN': {
     termsTitle:'📋 使用守则与风险声明', statsTitle:'📊 历史数据统计',
@@ -578,7 +579,7 @@ const translations = {
     hint5:'客胜率高于主胜率，且客赔处于 1.85～2.15 的高价值区间，客队具备市场价值，建议买客胜。',
     hint6:'市场赔率与胜率模型出现分歧，系统选择赔率更高的一方进行博弈。',
     hintReverse:'侦测到极端冷门赔率，系统按最新规则买和局搏高赔回报。',
-    gameTitle:'🎮 猜赛果挑战', gameSub:'随机生成数据，试试你的眼光！',
+    gameTitle:'🎮 猜赛果挑战', gameSub:'📚 从数据库真实数据随机抽样，试试你的眼光！',
     gamePlayed:'已玩', gameHits:'命中', gameRate:'命中率', gamePnl:'总盈亏',
     gameHW:'主胜率', gameDW:'和胜率', gameAW:'客胜率',
     gameHO:'主赔', gameDO:'和赔', gameAO:'客赔',
@@ -593,19 +594,20 @@ const translations = {
     desc_favorite:'🔥 大热取胜', desc_strong:'💪 大热轻松取胜',
     desc_D_extreme:'🎯 超罕见超高赔和局！', desc_D_huge:'💰 高赔和局命中！',
     desc_D_high:'📊 中高赔和局', desc_D_normal:'🤝 正常和局',
-    tierHint:'※ 猜 10 场以上才显示等级',
+    tierHint:'※ 猜 10 场以上才显示等级（综合命中率与 ROI）',
     tierEX:'🏆 传奇！神级预测！', tierS:'🔥 顶尖表现！继续保持！',
     tierA:'⭐ 优秀！表现出色！', tierC:'📊 一般水平，仍有进步空间',
     tierD:'⚠️ 需要改进，加油！', tierE:'💪 继续努力！多练习！',
     gameSkipBtn:'⏭️ 跳过本场', gameSkipInfoPrefix:'剩 ', gameSkipInfoSuffix:' 次',
-    gameSkipHelp:'💡 每场随机生成，预设 2 次跳过机会，每玩 10 场 +1 次',
+    gameSkipHelp:'💡 每场从数据库真实数据随机抽样，预设 2 次跳过机会，每玩 10 场 +1 次',
     gameSkipExhausted:'❌ 跳过次数已用完', gameSkipToast:'⏭️ 已跳过本场',
     gameMustGuess:'⚠️ 请先预测本场答案，才能开始新一局',
     gameAutoBtn:'🤖 自动预测（系统公式）',
     gameAutoSkip:'🤖 系统建议不出手（Skip），请手动选择或跳过',
     gameLoading:'⏳ 加载比赛数据中...',
     gameNoData:'⚠️ 暂无比赛数据，请稍后再试',
-    gameLoadError:'⚠️ 加载数据失败，请检查网络'
+    gameLoadError:'⚠️ 加载数据失败，请检查网络',
+    gameRealDataBadge:'📚 真实数据'
   },
   'en-US': {
     termsTitle:'📋 Terms of Use & Risk Statement', statsTitle:'📊 Historical Statistics',
@@ -633,7 +635,7 @@ const translations = {
     hint5:'Away win rate exceeds home, and away odds fall in the 1.85–2.15 high-value zone. Bet Away Win.',
     hint6:'Market odds diverge from win rate model. System selects the higher-odds side for contrarian play.',
     hintReverse:'Detected extreme underdog odds. System switches to Draw bet for high-payout upside.',
-    gameTitle:'🎮 Guess the Result', gameSub:'Random data generated. Try your luck!',
+    gameTitle:'🎮 Guess the Result', gameSub:'📚 Randomly sampled from real database. Try your luck!',
     gamePlayed:'Played', gameHits:'Correct', gameRate:'Accuracy', gamePnl:'Total P/L',
     gameHW:'Home Win %', gameDW:'Draw %', gameAW:'Away Win %',
     gameHO:'Home Odds', gameDO:'Draw Odds', gameAO:'Away Odds',
@@ -648,19 +650,20 @@ const translations = {
     desc_favorite:'🔥 Favorite Wins', desc_strong:'💪 Dominant Win',
     desc_D_extreme:'🎯 Ultra-Rare High-Odds Draw!', desc_D_huge:'💰 High-Odds Draw Hit!',
     desc_D_high:'📊 Mid-High Odds Draw', desc_D_normal:'🤝 Normal Draw',
-    tierHint:'※ Play 10+ rounds to reveal your rank',
+    tierHint:'※ Play 10+ rounds to reveal rank (combined Hit Rate & ROI)',
     tierEX:'🏆 Legendary! Godlike predictions!', tierS:'🔥 Top-tier performance! Keep it up!',
     tierA:'⭐ Excellent! Outstanding performance!', tierC:'📊 Average, room to improve',
     tierD:'⚠️ Needs improvement, keep going!', tierE:'💪 Keep practicing! You\'ll get there!',
     gameSkipBtn:'⏭️ Skip Match', gameSkipInfoPrefix:'Left ', gameSkipInfoSuffix:'',
-    gameSkipHelp:'💡 Each match is random. Default 2 skips, +1 every 10 plays',
+    gameSkipHelp:'💡 Each match is randomly sampled from real database. Default 2 skips, +1 every 10 plays',
     gameSkipExhausted:'❌ No skips left', gameSkipToast:'⏭️ Match skipped',
     gameMustGuess:'⚠️ Please guess the current match before starting a new one',
     gameAutoBtn:'🤖 Auto Predict (System Formula)',
     gameAutoSkip:'🤖 System recommends SKIP. Please choose manually or skip.',
     gameLoading:'⏳ Loading match data...',
     gameNoData:'⚠️ No match data available. Please try again later.',
-    gameLoadError:'⚠️ Failed to load data. Please check your connection.'
+    gameLoadError:'⚠️ Failed to load data. Please check your connection.',
+    gameRealDataBadge:'📚 REAL DATA'
   }
 };
 
@@ -1000,7 +1003,7 @@ function loadSavedParams() {
 }
 
 // ==================== 猜賽果 ====================
-// 從 Google Sheet A2:H 逐行讀取，每行代表一場數據
+// ⚠️ 所有隨機抽樣都是真實數據（來自 Google Sheet A2:H）
 var sheetMatchPool = null;
 var sheetPoolPromise = null;
 
@@ -1014,7 +1017,6 @@ function normalizeResult(v) {
   return null;
 }
 
-// 賠率統一轉為整數格式：150 = 1.50；若輸入 1.50 則自動 *100 = 150
 function toOddsInt(v) {
   if (v === null || v === undefined) return null;
   if (v < 100) return Math.round(v * 100);
@@ -1070,7 +1072,7 @@ function fetchSheetMatches() {
       if (m) pool.push(m);
     });
     sheetMatchPool = pool;
-    console.log('✅ 載入比賽數據：' + pool.length + ' 場');
+    console.log('✅ 載入真實數據比賽：' + pool.length + ' 場');
     return pool;
   });
 }
@@ -1121,6 +1123,7 @@ function updateSkipDisplay() {
   else { infoEl.classList.remove('exhausted'); if (btn) btn.disabled = false; }
 }
 
+// ⚠️ 從真實數據 Pool 隨機抽樣（非本地生成）
 function generateMatch() {
   if (!sheetMatchPool || sheetMatchPool.length === 0) return null;
   var idx = Math.floor(Math.random() * sheetMatchPool.length);
@@ -1371,6 +1374,7 @@ function renderGameResult(guess, animate, roundPnl, isAuto) {
   resultBox.innerHTML = autoLabel + (isWin ? (t.gameWin || '🎉 恭喜！答中！') : (t.gameLose || '❌ 差啲！答錯'))
     + '<span class="pnl-big">' + pnlText + '</span>'
     + '<small>' + pnlLabel + '（' + (t.gameStake || '注碼 $100') + '）<br>'
+    + '📚 ' + (t.gameRealDataBadge || '真實數據') + '<br>'
     + desc
     + scoreLine + '<br>'
     + (t.gameAnswer || '正確答案') + '：<b>' + resultText + '</b>'
@@ -1401,7 +1405,13 @@ function updateTierDisplay(withAnimation) {
   var tierEl = document.getElementById('gameTier');
   if (!tierEl) return;
   if (gameState.played < 10) { tierEl.style.display = 'none'; return; }
-  var rate = (gameState.hits / gameState.played) * 100;
+  // 命中率（%）
+  var hitRate = (gameState.hits / gameState.played) * 100;
+  // ROI（%）= 總盈虧 ÷ 總成本 × 100
+  var totalCost = gameState.played * 100;
+  var roi = totalCost > 0 ? (gameState.totalPnl / totalCost) * 100 : 0;
+  // 綜合分數 = (命中率 + ROI) / 2 （50:50 比例）
+  var rate = (hitRate + roi) / 2;
   var tier = getTier(rate);
   var t = translations[currentLang];
   var badgeEl = document.getElementById('tierBadge');
@@ -1579,7 +1589,6 @@ window.addEventListener('load', function() {
   window.addEventListener('focus', loadStatsWithRetry);
   document.addEventListener('visibilitychange', function() { if (!document.hidden) loadStatsWithRetry(); });
 
-  // 背景預先載入 Sheet Pool
   ensureSheetPool().catch(function(e) { console.warn('Pool preload failed:', e); });
 });
 </script>
